@@ -54,8 +54,9 @@ void BowAimbot::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 		C_Entity* entity = targetList[0];
 		vec3_t pos = entity->eyePos0;
 		pos = {13.f, 8.5f, 21.5f};
-		pos = pos.sub(origin);
-		float yaw = (atan2f(pos.z, pos.x) * DEG_RAD) - 90;
+		pos = pos.sub(origin);		
+		// fix inverted yaw
+		float yaw = (atan2f(pos.z, pos.x) * DEG_RAD) + 90;
 		float len = pos.magnitudexz();
 		constexpr float g = 0.002f;  // nukkit = 0.012, some servers need different values
 		float tmp = 1 - g * (g * (len * len) + 2 * pos.y);
