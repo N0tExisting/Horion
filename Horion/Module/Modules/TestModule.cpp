@@ -3,6 +3,7 @@
 #include "../../DrawUtils.h"
 
 TestModule::TestModule() : IModule(0, Category::MISC, "For testing purposes") {
+	registerFloatSetting("float1", &this->float1, 0, -10, 10);
 }
 
 TestModule::~TestModule() {
@@ -28,7 +29,10 @@ void TestModule::onTick(C_GameMode* gm) {
 	if(std::find(lastPos.begin(), lastPos.end(), startNode) == lastPos.end()){
 		lastPos.push_back(startNode);
 	}*/
-	//logF("%.2f", gm->player->velocity.z);
+	//if (gm->player->velocity.y > 0)
+		
+	//logF("%.4f %.4f", gm->player->velocity.y, gm->player->aabb.lower.y);
+	
 }
 
 void TestModule::onMove(C_MoveInputHandler* hand){

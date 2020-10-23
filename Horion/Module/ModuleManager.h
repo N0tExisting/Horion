@@ -89,8 +89,10 @@
 #include "Modules/AntiImmobile.h"
 #include "Modules/FollowPathModule.h"
 #include "Modules/NoPaintingCrash.h"
+#include "Modules/Waypoints.h"
 #include "Modules/Spider.h"
 #include "Modules/Compass.h"
+#include "Modules/Radar.h"
 
 #ifdef _DEBUG
 #include "Modules/PacketLogger.h"

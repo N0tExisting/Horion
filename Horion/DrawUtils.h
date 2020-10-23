@@ -83,10 +83,11 @@ public:
 	static void setGameRenderContext(__int64 ctx);
 	static void flush();
 	static void setColor(float r, float g, float b, float a);  // rgba, values from 0 to 1
-	static inline void tess__begin(__int64 tesselator, int vertexFormat = 3);
+	static inline void tess__begin(__int64 tesselator, int vertexFormat = 3, int numVerticesReserved = 0);
 	static C_Font* getFont(Fonts font);
 	static float getTextWidth(std::string* textStr, float textSize = 1, Fonts font = Fonts::SMOOTH);
 
+	static void drawTriangle(vec2_t p1, vec2_t p2, vec2_t p3);
 	static void drawLine(vec2_t start, vec2_t end, float lineWidth);  // rgba
 	static void drawLinestrip3d(const std::vector<vec3_t>& points);
 	static void drawLine3d(const vec3_t& start, const vec3_t& end);
