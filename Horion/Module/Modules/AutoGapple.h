@@ -4,7 +4,8 @@
 class AutoGapple : public IModule {
 private:
 	int health;
-	bool SmolEqual;
+	bool SmolEqual = true;
+	bool NotInHotbar = false;
 	int currHealth = 20;
 
 public:
