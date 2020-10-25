@@ -2,8 +2,6 @@
 
 AutoGapple::AutoGapple() : IModule(0x0, Category::PLAYER, "Auto eat gapples if you're low health") {
 	registerIntSetting("health", &this->health, 10, 1, 20);
-	registerBoolSetting("health", &this->SmolEqual, true);
-	//Get player health based of offset(0x??...??C4)
 }
 
 AutoGapple::~AutoGapple() {
@@ -14,7 +12,5 @@ const char* AutoGapple::getModuleName() {
 }
 
 void AutoGapple::onTick(C_GameMode* gm) {
-	currHealth == 20//
-	/if (SmolEqual)
-		if (health <= 20)
+	
 */;}
