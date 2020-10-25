@@ -13,4 +13,4 @@ const char* AutoGapple::getModuleName() {
 
 void AutoGapple::onTick(C_GameMode* gm) {
 	
-*/;}
+;}
