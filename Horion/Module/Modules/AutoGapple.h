@@ -4,6 +4,8 @@
 class AutoGapple : public IModule {
 private:
 	int health;
+	bool SmolEqual;
+	int currHealth = 20;
 
 public:
 	C_MoveInputHandler* inputHandler = nullptr;
