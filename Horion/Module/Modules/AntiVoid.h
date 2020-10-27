@@ -4,7 +4,7 @@
 
 class AntiVoid : public IModule {
 private:
-	int distance = 5;
+	int distance = 10;
 	vec3_t savepos;
 
 public:

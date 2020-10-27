@@ -3,7 +3,7 @@
 
 class Reach : public IModule {
 private:
-	float reachValue = 3;
+	float reachValue = 4.1f;
 	float originalReach = 0;
 	float* reachPtr = nullptr;
 	unsigned long oldProtect = 0;

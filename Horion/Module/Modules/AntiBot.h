@@ -3,8 +3,8 @@
 class AntiBot : public IModule {
 private:
 	bool hitboxCheck = true;
-	bool nameCheck = false;
-	bool invisibleCheck = true;
+	bool nameCheck = true;
+	bool invisibleCheck = false;
 	bool entityIdCheck = true;
 	bool otherCheck = true;
 	bool extraCheck = false;
