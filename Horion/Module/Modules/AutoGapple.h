@@ -3,10 +3,13 @@
 
 class AutoGapple : public IModule {
 private:
-	int health;
+	int health = 10;
 	bool SmolEqual = true;
-	bool NotInHotbar = false;
+	bool PrefEnchant = true;
+	bool Selected = false;
+	bool CheckInv = false;
 	int currHealth = 20;
+	void eat();
 
 public:
 	C_MoveInputHandler* inputHandler = nullptr;
