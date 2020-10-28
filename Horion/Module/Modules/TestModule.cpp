@@ -1,6 +1,17 @@
 #include "TestModule.h"
 #include "../../../Utils/Logger.h"
 #include "../../DrawUtils.h"
+#include "../../../SDK/MatrixStack.h"
+#include <deque>
+#include <array>
+#include <glm/mat4x4.hpp>
+#include <glm/trigonometric.hpp>  //radians
+#include <glm/ext/matrix_transform.hpp> // perspective, translate, rotate
+#include <glm/ext/matrix_relational.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/gtc/constants.hpp>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 TestModule::TestModule() : IModule(0, Category::MISC, "For testing purposes") {
 	registerFloatSetting("float1", &this->float1, 0, -10, 10);
@@ -33,9 +44,7 @@ void TestModule::onTick(C_GameMode* gm) {
 	//if (gm->player->velocity.y > 0)
 		
 	//logF("%.4f %.4f", gm->player->velocity.y, gm->player->aabb.lower.y);
-	int dim = -5;
-	gm->player->getDimensionId(&dim);
-	logF("%i", dim);
+	
 }
 
 void TestModule::onMove(C_MoveInputHandler* hand){
@@ -56,34 +65,45 @@ void TestModule::onDisable() {
 }
 float t = 0;
 void TestModule::onLevelRender() {
-	t++;
-	DrawUtils::setColor(1, 0.2f, 0.2f, 1);
+	DrawUtils::setColor(0.5f, 0.5f, 0.5f, 1);
 
-	vec3_t permutations[36];
-	for(int i = 0; i < 36; i++){
-		permutations[i] = {sinf((i * 10.f) / (180 / PI)), 0.f, cosf((i * 10.f) / (180 / PI))};
-	}
+	auto blockTess = g_Data.getClientInstance()->levelRenderer->blockTessellator;
+	auto tess = DrawUtils::get3dTessellator();
 
-	const float coolAnim = 0.9f + 0.9f * sin((t / 60) * PI * 2);
+	vec3_ti pos(3, 3, 3);
+	auto block = g_Data.getLocalPlayer()->region->getBlock(pos);
 
-	g_Data.forEachEntity([&](auto c, auto _){
-	  vec3_t* start = c->getPosOld();
-	  vec3_t* end = c->getPos();
+	MatrixStack* matStackPtr = DrawUtils::getMatrixStack();
 
-	  auto te = DrawUtils::getLerpTime();
-	  vec3_t pos = start->lerp(end, te);
+	auto& newMat = matStackPtr->push();
 
-	  auto yPos = pos.y;
-	  yPos -= 1.62f;
-	  yPos += coolAnim;
+	auto origin = DrawUtils::getOrigin();
+	auto temp = DrawUtils::getOrigin().add(pos.toFloatVector()).mul(-1);
 
-	  std::vector<vec3_t> posList;
-	  posList.reserve(36);
-	  for(auto& perm : permutations){
-		  vec3_t curPos(pos.x, yPos, pos.z);
-		  posList.push_back(curPos.add(perm));
-	  }
+	static float t = 0;
+	t+=3;
+	auto preRotTranslation = glm::translate(glm::mat4(1.f), glm::vec3(-0.5f, -0.5f, -0.5f));
+	auto afterRotTranslation = glm::translate(glm::mat4(1.f), glm::vec3(0.5f, 0.5f, 0.5f));
+	auto rotation = afterRotTranslation * glm::rotate(glm::mat4(1.f), glm::radians(t), glm::vec3(0, 1, 0)) * preRotTranslation;
 
-	  DrawUtils::drawLinestrip3d(posList);
-	});
+	auto translation = glm::translate(glm::mat4(1.f), glm::vec3(-origin.x, -origin.y, -origin.z));
+	*newMat = translation * rotation;
+
+	vec3_ti zer = {0, 0, 0};
+	auto mesh = blockTess->getMeshForBlockInWorld(tess, block, zer);
+	
+	static std::array<mce::MaterialPtr, 8> mats = {{mce::MaterialPtr("moving_block_double_side"),
+													mce::MaterialPtr("moving_block_blend"),
+													mce::MaterialPtr("moving_block"),
+													mce::MaterialPtr("moving_block_alpha"),
+													mce::MaterialPtr("moving_block_alpha"),
+													mce::MaterialPtr("moving_block_seasons"),
+													mce::MaterialPtr("moving_block_alpha_seasons"),
+													mce::MaterialPtr("moving_block_alpha_single_side")}};
+
+	std::array<__int64*, 2> textures;
+	textures[0] = g_Data.getClientInstance()->levelRenderer->atlasTexture.getClientTexture();
+	textures[1] = *reinterpret_cast<__int64**>(g_Data.getClientInstance()->getLightTexture() + 0x18);
+
+	mesh->renderMesh(DrawUtils::getScreenContext(), &mats[block->getRenderLayer()], textures);
 }
