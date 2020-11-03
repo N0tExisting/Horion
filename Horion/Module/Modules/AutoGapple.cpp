@@ -1,16 +1,11 @@
 #include "AutoGapple.h"
 
-int currHealth = 20;
-void eat();
-
 AutoGapple::AutoGapple() : IModule(0x0, Category::PLAYER, "Auto eat gapples if you're low health") {
-	registerIntSetting("health", &this->health, this->health, 1, 36);
-	//registerBoolSetting("On Equal health", &this->SmolEqual, this->SmolEqual);
+	registerIntSetting("health", &this->health, this->health, 1, 35);
 	registerBoolSetting("Pref enchanted", &this->PrefEnchant, this->PrefEnchant);
-	//registerBoolSetting("Check Inv", &this->CheckInv, this->CheckInv);
-	registerBoolSetting("Select", &this->Selected, this->Selected);
 	//Get player health offset(0x??...??C4)
 }
+C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 
 AutoGapple::~AutoGapple() {
 }
@@ -18,57 +13,65 @@ AutoGapple::~AutoGapple() {
 const char* AutoGapple::getModuleName() {
 	return ("AutoGapple");
 }
+
+void AutoGapple::onEnable() {
+	/*prevSlot = supplies->selectedHotbarSlot;
+	slot = PrepareEat();
+	if (!eating)
+		AutoGapple::clientMessageF("§1Coud not find Gapple. Make sure you have one in your hotbar");*/
+}
+
 void AutoGapple::onTick(C_GameMode* gm) {
-	if (AutoGapple::CheckInv && AutoGapple::Selected) {
-		Selected = false;
-	}
-	currHealth == 20;	//replace 20 w/ value from Memory(0x??...??C4)
-	/*if (SmolEqual) {
-		if (health >= currHealth)
-			AutoGapple::eat();
-	} else if (health > currHealth)*/
-		AutoGapple::eat();
-	;}
-//eat a gapple
-void AutoGapple::eat() {
+	currHealth = 20;	//replace 20 w/ value from Memory(0x??...??C4)
+	if (health >= currHealth && !eating)
+		AutoGapple::PrepareEat();
+	if (eating)
+		//AutoGapple::Eat();
+		supplies->selectedHotbarSlot = slot;
+}
+
+void AutoGapple::onDisable() {
+	supplies->selectedHotbarSlot = prevSlot;
+}
+//Prepare a gapple
+int AutoGapple::PrepareEat() {
 	//loop Hotbar
 	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 	C_Inventory* inv = supplies->inventory;
 	int slot = supplies->selectedHotbarSlot;
-	int prevSlot = slot;
-	int max;
-	if (!AutoGapple::CheckInv)
-		max = 9;
-	else
-		max = 36; 
-	for (int n = 0; n < max; n++) {
+	prevSlot = slot;
+	for (int n = 0; n < 9; n++) {
 		C_ItemStack* stack = inv->getItemStack(n);
 		if (stack->item != nullptr) {
-			if ((*stack->item)->itemId == 322){
-				if (Selected) {
-					slot = n;
-					supplies->selectedHotbarSlot = slot;
-				}
+			if ((*stack->item)->itemId == 322) {
+				slot = n;
+				//supplies->selectedHotbarSlot = slot;
 #ifdef _UseDone
-				C_Item::use(stack&, g_Data.getLocalPlayer()&);
+				(*stack->item)->C_Item::use(stack&, g_Data.getLocalPlayer()&);
 #endif
-				/*if (Selected)
-					supplies->selectedHotbarSlot = prevSlot;*/
-				if (PrefEnchant)
-					return;
-			}else if ((*stack->item)->itemId == 466) {
-				if (Selected) {
-					slot = n;
-					supplies->selectedHotbarSlot = slot;
+				if (PrefEnchant) {
+					eating = true;
+					return slot;
 				}
+			} else if ((*stack->item)->itemId == 466) {
+				slot = n;
+				//supplies->selectedHotbarSlot = slot;
 #ifdef _UseDone
-				C_Item::use(stack&, g_Data.getLocalPlayer()&);
+				(*stack->item)->C_Item::use(stack&, g_Data.getLocalPlayer()&);
 #endif
-				/*if (Selected)
-					supplies->selectedHotbarSlot = prevSlot;*/
-				if (PrefEnchant)
-					return;
+				if (PrefEnchant) {
+					eating = true;
+					return slot;
+				}
 			}
 		}
-	} 
+	}
+	return slot;
+}
+
+void AutoGapple::Eat() {
+	/*supplies->selectedHotbarSlot = prevSlot;*/
+	eating = false;
+	C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
+	//supplies->selectedHotbarSlot = prevSlot;
 }
