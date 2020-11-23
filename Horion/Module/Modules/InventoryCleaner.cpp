@@ -3,10 +3,10 @@
 #include "../ModuleManager.h"
 
 InventoryCleaner::InventoryCleaner() : IModule(0, Category::PLAYER, "Automatically throws not needed stuff out of your inventory") {
-	registerBoolSetting("Tools", &this->keepTools, this->keepTools);
-	registerBoolSetting("Armor", &this->keepArmor, this->keepArmor);
-	registerBoolSetting("Food", &this->keepFood, this->keepFood);
-	registerBoolSetting("Blocks", &this->keepBlocks, this->keepBlocks);
+	registerBoolSetting("Keep Tools", &this->keepTools, this->keepTools);
+	registerBoolSetting("Keep Armor", &this->keepArmor, this->keepArmor);
+	registerBoolSetting("Keep Food", &this->keepFood, this->keepFood);
+	registerBoolSetting("Keep Blocks", &this->keepBlocks, this->keepBlocks);
 	registerBoolSetting("OpenInv", &this->openInv, this->openInv);
 	registerBoolSetting("AutoSort", &this->autoSort, this->autoSort);
 }
@@ -243,12 +243,14 @@ bool InventoryCleaner::isLastItem(C_Item* item) {
 	std::vector<C_Item*> items;
 	for (int i = 0; i < 36; i++) {
 		C_ItemStack* stack = g_Data.getLocalPlayer()->getSupplies()->inventory->getItemStack(i);
-		if (stack->item != nullptr) items.push_back((*stack->item));
+		if (stack->item != nullptr) 
+			items.push_back((*stack->item));
 	}
 	int count = 0;
 	for (C_Item* a : items) {
 		if (a == item) count++;
 	}
-	if (count > 1) return false;
+	if (count > 1) 
+		return false;
 	return true;
 }

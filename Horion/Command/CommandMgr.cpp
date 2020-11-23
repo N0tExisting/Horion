@@ -42,7 +42,6 @@ void CommandMgr::initCommands() {
 	commandList.push_back(new NbtCommand());
 	commandList.push_back(new WaypointCommand());
 	commandList.push_back(new TopCommand());
-
 	commandList.push_back(new CommandBlockExploitCommand());
 	commandList.push_back(new NameSpoofCommand());
 	commandList.push_back(new ExecuteCommand());

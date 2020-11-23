@@ -19,7 +19,7 @@ void FullBright::onEnable() {
 
 void FullBright::onTick(C_GameMode* gm) {
 	if (gammaPtr != nullptr && *gammaPtr != 10) {
-		//if player joins world get original gamma (doesn't work)
+		//if the player joins a world get original gamma (doesn't work)
 		if (prevGamma > 0.0f)
 			prevGamma = *gammaPtr;
 		*gammaPtr = 10;
