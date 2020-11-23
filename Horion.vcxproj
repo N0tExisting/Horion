@@ -359,6 +359,7 @@
     <ClCompile Include="Horion\Module\Modules\Tower.cpp" />
     <ClCompile Include="Horion\Module\Modules\Tracer.cpp" />
     <ClCompile Include="Horion\Module\Modules\TriggerBot.cpp" />
+    <ClCompile Include="Horion\Module\Modules\VanillaPlus.cpp" />
     <ClCompile Include="Horion\Module\Modules\Velocity.cpp" />
     <ClCompile Include="Horion\Module\Modules\Waypoints.cpp" />
     <ClCompile Include="Horion\Module\Modules\Xray.cpp" />
@@ -411,6 +412,7 @@
     <ClCompile Include="Utils\Target.cpp" />
     <ClCompile Include="Utils\TextFormat.cpp" />
     <ClCompile Include="Utils\Utils.cpp" />
+    <ClCompile Include="Utils\VoxelIntersector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Horion\Command\CommandMgr.h" />
@@ -542,6 +544,7 @@
     <ClInclude Include="Horion\Module\Modules\Tower.h" />
     <ClInclude Include="Horion\Module\Modules\Tracer.h" />
     <ClInclude Include="Horion\Module\Modules\TriggerBot.h" />
+    <ClInclude Include="Horion\Module\Modules\VanillaPlus.h" />
     <ClInclude Include="Horion\Module\Modules\Velocity.h" />
     <ClInclude Include="Horion\Module\Modules\Waypoints.h" />
     <ClInclude Include="Horion\Module\Modules\Xray.h" />
@@ -631,6 +634,7 @@
     <ClInclude Include="Utils\Target.h" />
     <ClInclude Include="Utils\TextFormat.h" />
     <ClInclude Include="Utils\Utils.h" />
+    <ClInclude Include="Utils\VoxelIntersector.h" />
     <ClInclude Include="Utils\xorstr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
