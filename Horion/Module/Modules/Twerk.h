@@ -5,11 +5,11 @@
 
 class Twerk : public IModule {
 private:
-	int dDelay = 1;
-	int uDelay = 1;
+	int dDelay = 2;
+	int uDelay = 3;
 	int Odelay = 0;
-	bool WasSneaking;
-	AutoSneak* sneak = nullptr;
+	bool shouldSneak;
+	C_MoveInputHandler* Pl = nullptr;
 
 public:
 	Twerk();
@@ -17,7 +17,7 @@ public:
 
 	// Inherited via IModule (override)
 	virtual const char* getModuleName() override;
-	virtual void onEnable()override;
+	virtual void onEnable() override;
 	virtual void onTick(C_GameMode* gm) override;
 	virtual void onDisable() override;
 };
