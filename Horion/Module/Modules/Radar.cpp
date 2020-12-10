@@ -7,7 +7,7 @@ float pixelSize = 2.5f;
 float cent = size / 2.f;
 float pxSize = pixelSize / 2.f;
 float topPad = -1;
-float zoom = 1;
+float zoom = .75;
 float pxOpacity = 1;
 bool grid = true;
 // didn't bother puting this onto the header file and making it non-static...

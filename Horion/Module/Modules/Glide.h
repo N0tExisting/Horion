@@ -2,7 +2,7 @@
 #include "Module.h"
 class Glide : public IModule {
 private:
-	float glideMod = -0.01f;
+	float glideMod = .0f;
 	float glideModEffective = 0;
 
 public:

@@ -7,16 +7,16 @@ class Killaura : public IModule
 {
 private:
 	bool isMulti = true;
-	int delay = 0;
+	int delay = 4;
 	int Odelay = 0;
 	bool autoweapon = false;
 	void findWeapon();
 	bool silent = true;
 
 public:
-	bool isMobAura = false;
+	bool isMobAura = true;
 	bool hurttime = true;
-	float range = 6;
+	float range = 3;
 
 
 	Killaura();

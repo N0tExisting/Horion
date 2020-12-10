@@ -2,9 +2,9 @@
 #include "Module.h"
 class BowAimbot : public IModule {
 private:
-	bool silent = true;
-	bool predict = false;
-	bool visualize = false;
+	bool silent = false;
+	bool predict = true;
+	bool visualize = true;
 	vec2_t angle;
 
 public:

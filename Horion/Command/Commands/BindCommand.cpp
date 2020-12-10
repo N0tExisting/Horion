@@ -46,6 +46,9 @@ bool BindCommand::execute(std::vector<std::string>* args) {
 				if (strcmp(needle, haystackLowercase) == 0) {
 					mod->setKeybind(i);
 					clientMessageF("%sThe keybind of %s is now '%s'", GREEN, mod->getModuleName(), haystack);
+#ifdef _DEBUG
+					clientMessageF("Keybind: '%s'", i);
+#endif
 					delete[] haystackLowercase;
 					return true;
 				}

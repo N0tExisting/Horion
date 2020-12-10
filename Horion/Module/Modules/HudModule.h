@@ -6,17 +6,17 @@ public:
 	HudModule();
 	~HudModule();
 
-	bool tabgui = true;
+	bool tabgui = false;
 	bool arraylist = true;
 	bool clickToggle = true;
 	bool watermark = true;
-	bool coordinates = false;
+	bool coordinates = true;
 	bool keybinds = true;
 	bool displayArmor = true;
 	bool keystrokes = true;
 	bool fps = true;
 	bool cps = true;
-	bool alwaysShow = false;
+	bool alwaysShow = true;
 
 	float scale = 1.f;
 

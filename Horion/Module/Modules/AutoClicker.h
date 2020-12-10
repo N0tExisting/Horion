@@ -4,9 +4,9 @@
 
 class AutoClicker : public IModule {
 private:
-	int delay = 0;
+	int delay = 4;
 	int Odelay = 0;
-	bool weapons = true;
+	bool weapons = false;
 	bool rightclick = false;
 	bool hold = false;
 

@@ -11,7 +11,7 @@ private:
 	float horizontalspeed = 50.f;
 	float verticalspeed = 50.f;
 	float verticalrange = 40.f;
-	float horizontalrange = 60.f;
+	float horizontalrange = 90.f;
 	bool lock = false;
 
 public:
