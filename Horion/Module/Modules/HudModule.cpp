@@ -14,6 +14,7 @@ HudModule::HudModule() : IModule(0, Category::VISUAL, "Displays ArrayList/TabGUI
 	registerBoolSetting("Show FPS", &this->fps, this->fps);
 	registerBoolSetting("Show CPS", &this->cps, this->cps);
 	registerBoolSetting("Always show", &this->alwaysShow, this->alwaysShow);
+	registerBoolSetting("Replace Logo", &this->startScreen, this->startScreen);
 	registerFloatSetting("Scale", &this->scale, this->scale, 0.5f, 1.5f);
 }
 

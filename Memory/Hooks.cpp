@@ -508,14 +508,14 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 		std::string screenName(g_Hooks.currentScreenName);
 		if (strcmp(screenName.c_str(), "start_screen") == 0) {
 			// Draw BIG epic horion watermark
-			/*{
+			if(hudModule->isEnabled() && hudModule->startScreen){
 				std::string text = "H O R I O N";
 				vec2_t textPos = vec2_t(wid.x / 2.f - DrawUtils::getTextWidth(&text, 8.f) / 2.f, wid.y / 9.5f);
-				vec4_t rectPos = vec4_t(textPos.x - 55.f, textPos.y - 15.f, textPos.x + DrawUtils::getTextWidth(&text, 8.f) + 55.f, textPos.y + 75.f);
+				vec4_t rectPos = vec4_t(textPos.x - 5.f, textPos.y, textPos.x + DrawUtils::getTextWidth(&text, 8.f) + 5.f, textPos.y + DrawUtils::getFontHeight(8.f) + 5.f);
 				DrawUtils::fillRectangle(rectPos, MC_Color(13, 29, 48, 1), 1.f);
 				DrawUtils::drawRectangle(rectPos, rcolors, 1.f, 2.f);
 				DrawUtils::drawText(textPos, &text, MC_Color(255, 255, 255, 1), 8.f);
-			}*/
+			}
 
 			// Draw Custom Geo Button
 			if (g_Data.allowWIPFeatures()) {
@@ -661,7 +661,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 				if (shouldRenderWatermark) {
 					constexpr float nameTextSize = 1.5f;
 					constexpr float versionTextSize = 0.7f;
-					static const float textHeight = (nameTextSize + versionTextSize * 0.7f /* We don't quite want the version string in its own line, just a bit below the name */) * DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight();
+					static const float textHeight = (nameTextSize + versionTextSize * 0.7f) * DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight();//We don't quite want the version string in its own line, just a bit below the name
 					constexpr float borderPadding = 1;
 					constexpr float margin = 5;
 
@@ -684,8 +684,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 
 					DrawUtils::drawRectangle(rect, MC_Color(13, 29, 48), 0.f, 2.f);
 					DrawUtils::fillRectangle(rect, MC_Color(rcolors), 0.f);
-					DrawUtils::drawText(vec2_t(rect.x + borderPadding, rect.y), &name, MC_Color(6, 15, 24), nameTextSize);
-					DrawUtils::drawText(vec2_t(rect.x + borderPadding + nameLength, rect.w - 7), &version, MC_Color(0, 0, 0), versionTextSize);
+					DrawUtils::drawText(vec2_t(rect.x + borderPadding, rect.y), &name, MC_Color(rcolors), nameTextSize);
+					DrawUtils::drawText(vec2_t(rect.x + borderPadding + nameLength, rect.w - 7), &version, MC_Color(rcolors), versionTextSize);
 				}
 
 				// Draw ArrayList

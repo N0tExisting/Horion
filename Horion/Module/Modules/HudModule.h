@@ -17,6 +17,7 @@ public:
 	bool fps = true;
 	bool cps = true;
 	bool alwaysShow = true;
+	bool startScreen = true;
 
 	float scale = 1.f;
 
