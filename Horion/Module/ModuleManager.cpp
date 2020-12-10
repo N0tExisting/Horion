@@ -106,6 +106,8 @@ void ModuleManager::initModules() {
 #ifdef _DEBUG
 		this->moduleList.push_back(std::shared_ptr<IModule>(new PacketLogger()));
 		this->moduleList.push_back(std::shared_ptr<IModule>(new TestModule()));
+		this->moduleList.push_back(std::shared_ptr<IModule>(new Twerk()));
+
 #endif
 
 		// Sort modules alphabetically

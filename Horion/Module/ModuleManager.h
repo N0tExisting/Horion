@@ -95,6 +95,7 @@
 #include "Modules/Radar.h"
 
 #ifdef _DEBUG
+#include "Modules/Twerk.h"
 #include "Modules/PacketLogger.h"
 #include "Modules/TestModule.h"
 #endif
