@@ -31,7 +31,7 @@ bool TestModule::isFlashMode() {
 std::vector<vec3_ti> lastPos;
 void TestModule::onEnable() {
 	lastPos.clear();
-	
+	g_Data.getLocalPlayer()->unlockAchievments();
 }
 
 void TestModule::onTick(C_GameMode* gm) {

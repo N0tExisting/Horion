@@ -391,9 +391,7 @@ DWORD WINAPI start(LPVOID lpParam) {
 	ExitThread(0);
 }
 
-BOOL __stdcall DllMain(HMODULE hModule,
-					   DWORD ul_reason_for_call,
-					   LPVOID) {
+BOOL __stdcall DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID) {
 	switch (ul_reason_for_call) {
 	case DLL_PROCESS_ATTACH: {
 		CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)start, hModule, NULL, NULL);

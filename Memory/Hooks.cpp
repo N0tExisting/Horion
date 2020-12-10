@@ -500,7 +500,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 		disabledRcolors[0] = std::min(1.f, rcolors[0] * 0.4f + 0.2f);
 		disabledRcolors[1] = std::min(1.f, rcolors[1] * 0.4f + 0.2f);
 		disabledRcolors[2] = std::min(1.f, rcolors[2] * 0.4f + 0.2f);
-		disabledRcolors[3] = 1;
+		disabledRcolors[3] = 0.5f;
 	}
 
 	{
@@ -667,7 +667,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 
 					static std::string name = "Horion";
 #ifdef _DEBUG
-					static std::string version = "dev";
+					static std::string version = "Custom";
 #elif defined _BETA
 					static std::string version = "beta";
 #else
@@ -682,8 +682,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 						windowSize.x - margin + borderPadding,
 						windowSize.y - margin);
 
-					DrawUtils::drawRectangle(rect, MC_Color(13, 29, 48), 1.f, 2.f);
-					DrawUtils::fillRectangle(rect, MC_Color(rcolors), 1.f);
+					DrawUtils::drawRectangle(rect, MC_Color(13, 29, 48), 0.f, 2.f);
+					DrawUtils::fillRectangle(rect, MC_Color(rcolors), 0.f);
 					DrawUtils::drawText(vec2_t(rect.x + borderPadding, rect.y), &name, MC_Color(6, 15, 24), nameTextSize);
 					DrawUtils::drawText(vec2_t(rect.x + borderPadding + nameLength, rect.w - 7), &version, MC_Color(0, 0, 0), versionTextSize);
 				}
@@ -812,8 +812,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 						currColor[0] += 1.f / a * c;
 						Utils::ColorConvertHSVtoRGB(currColor[0], currColor[1], currColor[2], currColor[0], currColor[1], currColor[2]);
 
-						DrawUtils::fillRectangle(rectPos, MC_Color(13, 29, 48), 1.f);
-						DrawUtils::fillRectangle(leftRect, MC_Color(currColor), 1.f);
+						DrawUtils::fillRectangle(rectPos, MC_Color(13, 29, 48), 0.f);
+						DrawUtils::fillRectangle(leftRect, MC_Color(currColor), 0.f);
 						if (!GameData::canUseMoveKeys() && rectPos.contains(&mousePos) && hudModule->clickToggle) {
 							vec4_t selectedRect = rectPos;
 							selectedRect.x = leftRect.z;
