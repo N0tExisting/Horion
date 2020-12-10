@@ -5,7 +5,6 @@ AutoGapple::AutoGapple() : IModule(0x0, Category::PLAYER, "Auto eat gapples if y
 	registerBoolSetting("Pref enchanted", &this->PrefEnchant, this->PrefEnchant);
 	//Get player health offset(0x??...??C4)
 }
-C_PlayerInventoryProxy* supplies = g_Data.getLocalPlayer()->getSupplies();
 
 AutoGapple::~AutoGapple() {
 }
@@ -15,19 +14,21 @@ const char* AutoGapple::getModuleName() {
 }
 
 void AutoGapple::onEnable() {
-	/*prevSlot = supplies->selectedHotbarSlot;
+	if (supplies == nullptr)
+		supplies = g_Data.getLocalPlayer()->getSupplies();
+	prevSlot = supplies->selectedHotbarSlot;
 	slot = PrepareEat();
-	if (!eating)
-		AutoGapple::clientMessageF("�1Coud not find Gapple. Make sure you have one in your hotbar");*/
+	/*if (!eating)
+		AutoGapple::clientMessageF("§1Coud not find Gapple. Make sure you have one in your hotbar");*/
 }
 
 void AutoGapple::onTick(C_GameMode* gm) {
-	currHealth = 20;	//replace 20 w/ value from Memory(0x??...??C4)
+	currHealth = 20;  //replace 20 w/ value from Memory(0x??...??C4)
 	if (health >= currHealth && !eating)
 		AutoGapple::PrepareEat();
 	if (eating)
-		//AutoGapple::Eat();
 		supplies->selectedHotbarSlot = slot;
+		//AutoGapple::Eat();
 }
 
 void AutoGapple::onDisable() {
