@@ -5,8 +5,8 @@
 
 class Twerk : public IModule {
 private:
-	int dDelay = 2;
-	int uDelay = 3;
+	int dDelay = 3;
+	int uDelay = 2;
 	int Odelay = 0;
 	bool shouldSneak;
 	C_MoveInputHandler* Pl = nullptr;
