@@ -10,6 +10,21 @@ void Target::init(C_LocalPlayer** cl) {
 	localPlayer = cl;
 }
 
+bool Target::VanillaAttac(C_Entity* ent, bool inclLeash) {
+	return VanillaAttac(ent->getEntityTypeId(), inclLeash);
+}
+
+bool Target::VanillaAttac(int id, bool inclLeash) {
+	if ((id == 64 || id == 65 || id == 66 || id == 67 || id == 68 || id == 69 || id == 70 || id == 72
+		|| id == 73 || id == 77 || id == 79 || id == 80 || id == 81 || id == 82 || id == 83 || id == 84
+		|| id == 85 || id == 86 || id == 87 || id == 88 || id == 89 || id == 90 || id == 91 || id == 93
+		|| id == 94 || id == 95 || id == 96 || id == 97 || id == 98 || id == 100 || id == 101 || id == 102
+		|| id == 103 || id == 104 || id == 105)|| id == 106/*Icebomb*/ || id == 117/*shield*/
+		||(id == 88 && inclLeash))
+		return false;
+	return true;
+}
+
 bool Target::isValidTarget(C_Entity* ent) {
 	if (ent == NULL)
 		return false;
