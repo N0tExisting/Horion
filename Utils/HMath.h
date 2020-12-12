@@ -537,6 +537,10 @@ struct AABB {
 		lower = vec3_t(aabb.lower);
 		upper = vec3_t(aabb.upper);
 	}
+	AABB(vec3_t lower, float width, float height) {
+		this->lower = lower;
+		this->upper = {lower.x + width, lower.y + height, lower.z + width};
+	}
 	AABB(vec3_t lower, float width, float height, float eyeHeight) {
 		lower = lower.sub(vec3_t(width, eyeHeight * 2, width).div(2));
 		this->lower = lower;
