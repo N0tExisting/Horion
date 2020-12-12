@@ -15,7 +15,6 @@
 #include "Modules/AntiBot.h"
 #include "Modules/AutoArmor.h"
 #include "Modules/AutoClicker.h"
-#include "Modules/AutoGapple.h"
 #include "Modules/AutoSneak.h"
 #include "Modules/AutoSprint.h"
 #include "Modules/AutoTotem.h"
@@ -98,6 +97,9 @@
 #include "Modules/Twerk.h"
 #include "Modules/PacketLogger.h"
 #include "Modules/TestModule.h"
+#ifdef GAPPLE
+#include "Modules/AutoGapple.h"
+#endif
 #endif
 
 

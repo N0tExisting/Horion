@@ -285,7 +285,7 @@
     <ClCompile Include="Horion\Module\Modules\AntiVoid.cpp" />
     <ClCompile Include="Horion\Module\Modules\AutoArmor.cpp" />
     <ClCompile Include="Horion\Module\Modules\AutoClicker.cpp" />
-    <!--<ClCompile Include="Horion\Module\Modules\AutoGapple.cpp" />-->
+    <ClCompile Include="Horion\Module\Modules\AutoGapple.cpp" />
     <ClCompile Include="Horion\Module\Modules\AutoSneak.cpp" />
     <ClCompile Include="Horion\Module\Modules\AutoSprint.cpp" />
     <ClCompile Include="Horion\Module\Modules\AutoTotem.cpp" />
@@ -470,7 +470,7 @@
     <ClInclude Include="Horion\Module\Modules\AntiVoid.h" />
     <ClInclude Include="Horion\Module\Modules\AutoArmor.h" />
     <ClInclude Include="Horion\Module\Modules\AutoClicker.h" />
-    <!--<ClInclude Include="Horion\Module\Modules\AutoGapple.h" />-->
+    <ClInclude Include="Horion\Module\Modules\AutoGapple.h" />
     <ClInclude Include="Horion\Module\Modules\AutoSneak.h" />
     <ClInclude Include="Horion\Module\Modules\AutoSprint.h" />
     <ClInclude Include="Horion\Module\Modules\AutoTotem.h" />
