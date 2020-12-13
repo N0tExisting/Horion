@@ -422,4 +422,4 @@ BOOL __stdcall DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID) {
 	}
 	return TRUE;
 }
-//https://minecraft.gamepedia.com/Bedrock_Edition_data_value#:~:text=Item%20IDs
+//https://minecraft.gamepedia.com/Bedrock_Edition_data_value

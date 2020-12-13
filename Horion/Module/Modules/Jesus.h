@@ -1,8 +1,7 @@
 #pragma once
 #include "Module.h"
-class Jesus :
-	public IModule
-{
+#include "../ModuleManager.h"
+class Jesus : public IModule {
 private:
 	bool wasInWater = false;
 public:
@@ -12,4 +11,3 @@ public:
 	virtual const char* getModuleName() override;
 	virtual void onTick(C_GameMode* gm) override;
 };
-
