@@ -19,8 +19,8 @@ TextHolder styledReturnText;
 //#define TEST_DEBUG
 
 void Hooks::Init() {
-	logF("Setting up Hooks...");
 	// clang-format off
+	logF("Setting up Hooks...");
 	// Vtables
 	{
 		// GameMode::vtable
