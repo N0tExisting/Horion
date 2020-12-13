@@ -197,9 +197,8 @@ DWORD WINAPI injectorConnectionThread(LPVOID lpParam) {
 							g_Data.setAccountInformation(AccountInformation::fromToken(data.at("discordAuth").get<std::string>(), serialNum));
 						}
 					}
-					if (flags & (1 << 2))  // WIP Features
-						g_Data.setAllowWIPFeatures(true);
-
+					//if (flags & (1 << 2)) g_Data.setAllowWIPFeatures(true); // WIP Features
+					g_Data.setAllowWIPFeatures(true);
 					break;
 				}
 				case CMD_PING: {

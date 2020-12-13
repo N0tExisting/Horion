@@ -212,7 +212,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include=".clang-format" />
+    <None Include=".gitignore" />
+    <None Include="CppProperties.json" />
+    <None Include="LICENSE" />
     <None Include="packages.config" />
+    <None Include="README.md" />
     <None Include="resources\coolroblox.json" />
     <None Include="resources\Steve.dat" />
   </ItemGroup>
@@ -600,6 +604,7 @@
     <ClInclude Include="Memory\Hooks.h" />
     <ClInclude Include="Memory\MinHook.h" />
     <ClInclude Include="Memory\SlimMem.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SDK\CBlockLegacy.h" />
     <ClInclude Include="SDK\CCamera.h" />
     <ClInclude Include="SDK\CChestBlockActor.h" />
@@ -636,6 +641,9 @@
     <ClInclude Include="Utils\TextFormat.h" />
     <ClInclude Include="Utils\Utils.h" />
     <ClInclude Include="Utils\xorstr.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
