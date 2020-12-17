@@ -1,4 +1,5 @@
 #include "Jesus.h"
+
 #include "../../../Utils/Logger.h"
 Jesus::Jesus() : IModule(0, Category::MOVEMENT, "Allows you to walk on water and lava. Also you can't be on fire") {
 	registerBoolSetting("Solid", &this->Solid, Solid);
@@ -17,16 +18,32 @@ void Jesus::onTick(C_GameMode* gm) {
 	if (gm->player->isSneaking())
 		return;
 	if (Solid) {
-		if (gm->player->isOnFire())
-			gm->player->setOnFire(-1);
-		if (gm->player->isOnFire()) return;
+		if (gm->player->isOnFire()) {
+			gm->player->setOnFire(0);
+			g_Data.getLocalPlayer()->setOnFire(0);
+		}
+		if (gm->player->isOnFire() && (gm->player->gamemode == 0 || gm->player->gamemode == 2) && !gm->player->isFireImmune())
+			return;
 		vec3_t pos = *gm->player->getPos();
+		vec3_ti _pos1 = {(int)pos.x, (int)pos.y - 1, (int)pos.z};
+		C_Block* block = g_Data.getLocalPlayer()->region->getBlock(_pos1);
+		if (gm->player->isInLava())
+			add2 = 0.62f;
+		else if ((*block->blockLegacy)->blockId == 10)
+			add2 = 0.62f;
+		else if ((*block->blockLegacy)->blockId == 11)
+			add2 = 0.62f;
+		AABB ColShape;
+		(*block->blockLegacy)->getCollisionShape(&ColShape, block, g_Data.getLocalPlayer()->region, &_pos1, gm->player);
+		if (gm->player->aabb.intersects(ColShape))  // inside of Block
+			gm->player->setPos({pos.x, pos.y + .5f, pos.z});
+		//clientMessageF("%s", (float)((1.0 / 8.0) * ((double)(*block->blockLegacy)->liquidGetDepth(gm->player->region, &_pos1))));
 		pos.y -= 1.62f;
 
 		pos.z = gm->player->aabb.upper.z;
 		pos.x = gm->player->aabb.upper.x;  // upper upper
 
-		C_Block* block = g_Data.getLocalPlayer()->region->getBlock(vec3_ti(pos));
+		block = g_Data.getLocalPlayer()->region->getBlock(vec3_ti(pos));
 		C_BlockLegacy* blockLegacy = *(block->blockLegacy);
 
 		if (blockLegacy->material->isLiquid && gm->player->velocity.y <= 0) {
