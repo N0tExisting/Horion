@@ -1,5 +1,4 @@
 #include "Jesus.h"
-
 #include "../../../Utils/Logger.h"
 Jesus::Jesus() : IModule(0, Category::MOVEMENT, "Allows you to walk on water and lava. Also you can't be on fire") {
 	registerBoolSetting("Solid", &this->Solid, Solid);
@@ -42,7 +41,7 @@ void Jesus::onTick(C_GameMode* gm) {
 
 		pos.z = gm->player->aabb.upper.z;
 		pos.x = gm->player->aabb.upper.x;  // upper upper
-
+		
 		block = g_Data.getLocalPlayer()->region->getBlock(vec3_ti(pos));
 		C_BlockLegacy* blockLegacy = *(block->blockLegacy);
 

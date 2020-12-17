@@ -3,10 +3,10 @@
 #include "../ModuleManager.h"
 
 InventoryCleaner::InventoryCleaner() : IModule(0, Category::PLAYER, "Automatically throws not needed stuff out of your inventory") {
-	registerBoolSetting("Tools", &this->keepTools, this->keepTools);
-	registerBoolSetting("Armor", &this->keepArmor, this->keepArmor);
-	registerBoolSetting("Food", &this->keepFood, this->keepFood);
-	registerBoolSetting("Blocks", &this->keepBlocks, this->keepBlocks);
+	registerBoolSetting("Keep tools", &this->keepTools, this->keepTools);
+	registerBoolSetting("Keep armor", &this->keepArmor, this->keepArmor);
+	registerBoolSetting("Keep food", &this->keepFood, this->keepFood);
+	registerBoolSetting("Keep blocks", &this->keepBlocks, this->keepBlocks);
 	registerBoolSetting("OpenInv", &this->openInv, this->openInv);
 	registerBoolSetting("AutoSort", &this->autoSort, this->autoSort);
 }
@@ -51,7 +51,13 @@ void InventoryCleaner::onTick(C_GameMode* gm) {
 		}
 	}
 }
-
+#ifdef d
+void InventoryCleaner::onSendPacket(C_Packet* _pk) {
+	if (!_pk->isInstanceOf<C_InventoryTransactionPacket>()) return;
+	C_InventoryTransactionPacket* pk = reinterpret_cast<C_InventoryTransactionPacket*>(_pk);
+	//pk->complexTransaction
+}
+#endif
 std::vector<int> InventoryCleaner::findStackableItems() {
 	std::vector<int> stackableSlot;
 
@@ -91,12 +97,12 @@ std::vector<int> InventoryCleaner::findUselessItems() {
 						uselessItems.push_back(i);
 					else
 						items.push_back(itemStack);
-				} else if (std::find(items.begin(), items.end(), itemStack) == items.end()) {
+				}/* else if (std::find(items.begin(), items.end(), itemStack) == items.end()) {
 					if ((*itemStack->item)->itemId == 261 && !isLastItem(*itemStack->item))
 						uselessItems.push_back(i);
 					else
 						items.push_back(itemStack);	
-				}
+				}*/
 			}
 		}
 
