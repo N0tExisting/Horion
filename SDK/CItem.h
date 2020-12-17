@@ -293,23 +293,22 @@ public:
 		int enchantValue = 0;
 		for (int i = 0; i < 40; i++) {
 			enchantValue = this->getEnchantValue(i);
+			if (enchantValue != 0)
+				return true;
 		}
-		if (enchantValue != 0)
-			return true;
-		else
-			return false;
+		return false;
 	}
 
 	float getArmorValueWithEnchants() {
 		if (!this->item || !(*this->item)->isArmor())
 			return 0;
-
-		return (float) (((*this->item)->getArmorValue() + (( this->getEnchantValue(0) * 1.5f	// Protection
-														   + this->getEnchantValue(5) * 0.5f	// Thorns
-														   + this->getEnchantValue(3) * 0.4f	// Blast Protection
-														   + this->getEnchantValue(1) * 0.4f	// Fire Protection
-														   + this->getEnchantValue(4) * 0.4f	// Projectile Protection
-			))));
+		return (float) ((*this->item)->getArmorValue() + 
+			( this->getEnchantValue(0) * 1.5f	// Protection
+			+ this->getEnchantValue(5) * 0.5f	// Thorns
+			+ this->getEnchantValue(3) * 0.4f	// Blast Protection
+			+ this->getEnchantValue(1) * 0.4f	// Fire Protection
+			+ this->getEnchantValue(4) * 0.4f	// Projectile Protection
+			));
 	}
 
 	float getAttackingDamageWithEnchants() {
