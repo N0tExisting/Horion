@@ -1,6 +1,6 @@
 #include "Jesus.h"
 #include "../../../Utils/Logger.h"
-Jesus::Jesus() : IModule(0, Category::MOVEMENT, "Allows you to walk on water and lava. Also you can't be on fire") {
+Jesus::Jesus() : IModule(0, Category::MOVEMENT, "Allows you to walk on water and lava. Also you shouldn't be on fire") {
 	registerBoolSetting("Solid", &this->Solid, Solid);
 }
 Jesus::~Jesus() {
