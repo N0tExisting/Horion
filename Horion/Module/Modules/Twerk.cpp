@@ -1,8 +1,8 @@
 #include "Twerk.h"
 
 Twerk::Twerk() : IModule(0, Category::PLAYER, "Crouches up and down") {
-	this->registerIntSetting("up time", &this->uDelay, this->uDelay, 1, 20);
-	this->registerIntSetting("down time", &this->dDelay, this->dDelay, 1, 20);
+	this->registerIntSetting("up time", &this->uDelay, this->uDelay, 0, 20);
+	this->registerIntSetting("down time", &this->dDelay, this->dDelay, 0, 20);
 }
 Twerk::~Twerk() {
 }
