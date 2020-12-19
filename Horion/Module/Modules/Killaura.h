@@ -3,8 +3,7 @@
 #include "../ModuleManager.h"
 #include "../../../Utils/Target.h"
 
-class Killaura : public IModule
-{
+class Killaura : public IModule {
 private:
 	bool isMulti = true;
 	int delay = 4;

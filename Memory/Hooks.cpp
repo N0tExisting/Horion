@@ -500,7 +500,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 		disabledRcolors[0] = std::min(1.f, rcolors[0] * 0.4f + 0.2f);
 		disabledRcolors[1] = std::min(1.f, rcolors[1] * 0.4f + 0.2f);
 		disabledRcolors[2] = std::min(1.f, rcolors[2] * 0.4f + 0.2f);
-		disabledRcolors[3] = 0.5f;
+		disabledRcolors[3] = 0.0f;
 	}
 
 	{
@@ -643,7 +643,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 				shouldRenderWatermark = false;
 			}
 
-			if (shouldRenderTabGui) TabGui::render();
+			if (shouldRenderTabGui)
+				TabGui::render();
 
 			{
 				// Display ArrayList on the Right?
@@ -722,7 +723,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 								moduleName = text;
 							}
 
-							if (!this->enabled && *this->pos == vec2_t(0.f, 0.f))
+							if (!this->enabled/* && *this->pos == vec2_t(0.f, 0.f)*/)
 								this->shouldRender = false;
 							this->textWidth = DrawUtils::getTextWidth(&moduleName, hudModule->scale);
 						}

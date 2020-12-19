@@ -2,12 +2,17 @@
 #include "Module.h"
 class AntiBot : public IModule {
 private:
+	const bool nameCheck = false;
 	bool hitboxCheck = true;
-	bool nameCheck = true;
 	bool invisibleCheck = false;
+	// entId == 63
 	bool entityIdCheck = true;
-	bool otherCheck = true;
+	// Nametag Checks
 	bool extraCheck = false;
+	// Other Checks
+	bool otherCheck = true;
+	// entId != (64 || 66 || 69(nice))
+	bool LagCheck = true;
 
 public:
 	AntiBot();
@@ -17,7 +22,7 @@ public:
 		return hitboxCheck && this->isEnabled();
 	}
 	bool isNameCheckEnabled() {
-		return false && this->isEnabled();
+		return nameCheck && this->isEnabled();
 	}
 	bool isInvisibleCheckEnabled() {
 		return invisibleCheck && this->isEnabled();
@@ -30,6 +35,9 @@ public:
 	}
 	bool isExtraCheckEnabled() {
 		return this->extraCheck && this->isEnabled();
+	}
+	bool isLagCheckEnabled() {
+		return this->LagCheck && this->isEnabled();
 	}
 
 	// Inherited via IModule
