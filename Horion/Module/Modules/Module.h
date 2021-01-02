@@ -1,9 +1,9 @@
 #pragma once
-
+#include "../../../SDK/SettingEnum.h"
 #include "../../../Memory/GameData.h"
 #include "../../FriendList/FriendList.h"
-//#include "../../DrawUtils.h"
 #include "../../../Utils/keys.h"
+//#include "../../DrawUtils.h"
 
 enum class Category {
 	COMBAT = 0,
@@ -21,7 +21,8 @@ enum class ValueType {
 	INT64_T,
 	INT_T,
 	BOOL_T,
-	TEXT_T
+	TEXT_T,
+	ENUM_T
 };
 
 struct SettingValue {
@@ -32,6 +33,7 @@ struct SettingValue {
 		int _int;
 		bool _bool;
 		std::string* text;
+		SettingEnum* Enum;
 	};
 };
 
@@ -65,9 +67,9 @@ protected:
 	IModule(int key, Category c, const char* tooltip);
 
 	void registerFloatSetting(std::string name, float* floatPtr, float defaultValue, float minValue, float maxValue);
+	void registerEnumSetting(std::string name, SettingEnum* intPtr, int defaultValue, int maxValue);
 	void registerIntSetting(std::string name, int* intpTr, int defaultValue, int minValue, int maxValue);
 	void registerBoolSetting(std::string name, bool* boolPtr, bool defaultValue);
-
 	void clientMessageF(const char* fmt, ...);
 
 public:

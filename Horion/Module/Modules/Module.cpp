@@ -1,5 +1,4 @@
 #include "Module.h"
-
 #include "../../../Utils/Json.hpp"
 #include "../../../Utils/Logger.h"
 #include <cstdarg>
@@ -64,6 +63,38 @@ void IModule::registerIntSetting(std::string name, int* intPtr, int defaultValue
 	// Min Value
 	SettingValue* minVal = new SettingValue();
 	minVal->_int = minValue;
+	setting->minValue = minVal;
+
+	// Max Value
+	SettingValue* maxVal = new SettingValue();
+	maxVal->_int = maxValue;
+	setting->maxValue = maxVal;
+
+	// Name
+	strcpy_s(setting->name, 19, name.c_str());
+
+	settings.push_back(setting);  // Add to list
+}
+
+void IModule::registerEnumSetting(std::string name, SettingEnum* ptr, int defaultValue, int maxValue) {
+#ifdef DEBUG
+	if (minValue > maxValue)
+		__debugbreak();  // Minimum value is bigger than maximum value
+#endif
+
+	SettingEntry* setting = new SettingEntry();
+	setting->valueType = ValueType::ENUM_T;
+	// Actual Value
+	setting->value = reinterpret_cast<SettingValue*>(ptr->selected);
+
+	// Default Value
+	SettingValue* defaultVal = new SettingValue();
+	defaultVal->_int = defaultValue;
+	setting->defaultValue = defaultVal;
+
+	// Min Value
+	SettingValue* minVal = new SettingValue();
+	minVal->Enum = ptr;
 	setting->minValue = minVal;
 
 	// Max Value
@@ -283,6 +314,7 @@ void IModule::clientMessageF(const char* fmt, ...) {
 void SettingEntry::makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt() {
 	switch (valueType) {
 		case ValueType::TEXT_T:
+		case ValueType::ENUM_T:
 		case ValueType::BOOL_T:
 			break;
 		case ValueType::INT64_T:
