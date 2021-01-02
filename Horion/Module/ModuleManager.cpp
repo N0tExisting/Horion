@@ -100,13 +100,13 @@ void ModuleManager::initModules() {
 		this->moduleList.push_back(std::shared_ptr<IModule>(new	Spider()));
 		this->moduleList.push_back(std::shared_ptr<IModule>(new	Compass()));
 		this->moduleList.push_back(std::shared_ptr<IModule>(new	Radar()));
+		this->moduleList.push_back(std::shared_ptr<IModule>(new Twerk()));
 
 		this->moduleList.push_back(std::shared_ptr<IModule>(new FollowPathModule()));
 
 #ifdef _DEBUG
 		this->moduleList.push_back(std::shared_ptr<IModule>(new PacketLogger()));
 		this->moduleList.push_back(std::shared_ptr<IModule>(new TestModule()));
-		this->moduleList.push_back(std::shared_ptr<IModule>(new Twerk()));
 
 #endif
 

@@ -12,4 +12,5 @@ public:
 	static bool isValidTarget(C_Entity* ent);
 	static bool VanillaAttac(C_Entity* ent, bool inclLeash = false);
 	static bool VanillaAttac(int id, bool inclLeash = false);
+	static bool AntiLag(C_Entity* ent);
 };

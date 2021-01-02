@@ -300,11 +300,10 @@ public:
 		int enchantValue = 0;
 		for (int i = 0; i < 40; i++) {
 			enchantValue = this->getEnchantValue(i);
+			if (enchantValue != 0)
+				return true;
 		}
-		if (enchantValue != 0)
-			return true;
-		else
-			return false;
+		return false;
 	}
 
 	float getArmorValueWithEnchants();
@@ -343,7 +342,6 @@ public:
 		return ArmorSlot == 3;
 	}
 };
-
 
 class ItemRegistry {
 public:

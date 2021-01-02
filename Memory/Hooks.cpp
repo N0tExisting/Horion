@@ -19,8 +19,8 @@ TextHolder styledReturnText;
 //#define TEST_DEBUG
 
 void Hooks::Init() {
-	logF("Setting up Hooks...");
 	// clang-format off
+	logF("Setting up Hooks...");
 	// Vtables
 	{
 		// GameMode::vtable
@@ -276,10 +276,10 @@ void Hooks::Init() {
 			void* prepFeaturedServers = reinterpret_cast<void*>(FindSignature("48 8B C4 55 57 41 56 48 8D ?? ?? 48 81 EC ?? ?? ?? ?? 48 C7 44 24 ?? FE FF FF FF 48 89 58 ?? 48 89 70 ?? 0F 29 70 ?? 48 8B 05"));
 		else
 			void* prepFeaturedServers = reinterpret_cast<void*>(FindSignature("48 8B C4 55 48 8D 68 98 48 81 EC ? ? ? ? 48 C7 44 24 ? ? ? ? ? 48 89 58 10 48 89 78 18 0F 29 70 E8 48 8B 05 ? ? ? ? 48 33 C4"));
-		//g_Hooks.prepFeaturedServersHook = std::make_unique<FuncHook>(prepFeaturedServers, Hooks::prepFeaturedServers);
+		g_Hooks.prepFeaturedServersHook = std::make_unique<FuncHook>(prepFeaturedServers, Hooks::prepFeaturedServers);
 		
 		void* prepFeaturedServersFirstTime = reinterpret_cast<void*>(FindSignature("48 8B C4 57 41 54 41 55 41 56 41 57 48 83 EC ?? 48 C7 40 ?? FE FF FF FF 48 89 58 ?? 48 89 68 ?? 48 89 70 ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 ?? 48 8B FA"));
-		//g_Hooks.prepFeaturedServersFirstTimeHook = std::make_unique<FuncHook>(prepFeaturedServersFirstTime, Hooks::prepFeaturedServersFirstTime);
+		g_Hooks.prepFeaturedServersFirstTimeHook = std::make_unique<FuncHook>(prepFeaturedServersFirstTime, Hooks::prepFeaturedServersFirstTime);
 
 		void* localPlayerUpdateFromCam = reinterpret_cast<void*>(FindSignature("48 89 5C 24 ?? 57 48 83 EC ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 ?? 80 BA"));
 		g_Hooks.LocalPlayer__updateFromCameraHook = std::make_unique<FuncHook>(localPlayerUpdateFromCam, Hooks::LocalPlayer__updateFromCamera);
@@ -500,7 +500,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 		disabledRcolors[0] = std::min(1.f, rcolors[0] * 0.4f + 0.2f);
 		disabledRcolors[1] = std::min(1.f, rcolors[1] * 0.4f + 0.2f);
 		disabledRcolors[2] = std::min(1.f, rcolors[2] * 0.4f + 0.2f);
-		disabledRcolors[3] = 0.5f;
+		disabledRcolors[3] = 0.0f;
 	}
 
 	{
@@ -643,7 +643,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 				shouldRenderWatermark = false;
 			}
 
-			if (shouldRenderTabGui) TabGui::render();
+			if (shouldRenderTabGui)
+				TabGui::render();
 
 			{
 				// Display ArrayList on the Right?
@@ -722,7 +723,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 								moduleName = text;
 							}
 
-							if (!this->enabled && *this->pos == vec2_t(0.f, 0.f))
+							if (!this->enabled/* && *this->pos == vec2_t(0.f, 0.f)*/)
 								this->shouldRender = false;
 							this->textWidth = DrawUtils::getTextWidth(&moduleName, hudModule->scale);
 						}
