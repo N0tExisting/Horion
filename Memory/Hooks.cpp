@@ -509,7 +509,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 		if (strcmp(screenName.c_str(), "start_screen") == 0) {
 			// Draw BIG epic horion watermark
 			if(hudModule->isEnabled() && hudModule->startScreen){
-				std::string text = "H O R I O N";
+				std::string text = "H O R E 0 N";
 				vec2_t textPos = vec2_t(wid.x / 2.f - DrawUtils::getTextWidth(&text, 8.f) / 2.f, wid.y / 9.5f);
 				vec4_t rectPos = vec4_t(textPos.x - 5.f, textPos.y, textPos.x + DrawUtils::getTextWidth(&text, 8.f) + 5.f, textPos.y + DrawUtils::getFontHeight(8.f) + 5.f);
 				DrawUtils::fillRectangle(rectPos, MC_Color(13, 29, 48, 1), 1.f);
@@ -666,7 +666,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 					constexpr float borderPadding = 1;
 					constexpr float margin = 5;
 
-					static std::string name = "Horion";
+					static std::string name = "Hore0n";
 #ifdef _DEBUG
 					static std::string version = "Custom";
 #elif defined _BETA
@@ -723,8 +723,10 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 								moduleName = text;
 							}
 
-							if (!this->enabled/* && *this->pos == vec2_t(0.f, 0.f)*/)
+							if (!this->enabled /* && *this->pos == vec2_t(0.f, 0.f)*/) {
 								this->shouldRender = false;
+								*this->pos = vec2_t(0.f, 0.f);
+							}
 							this->textWidth = DrawUtils::getTextWidth(&moduleName, hudModule->scale);
 						}
 
@@ -839,7 +841,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 	// Zoom calc
 	{
 		static auto zoomModule = moduleMgr->getModule<Zoom>();
-		if (zoomModule->isEnabled()) zoomModule->target = zoomModule->strength;
+		if (zoomModule->isEnabled())
+			zoomModule->target = zoomModule->strength;
 		zoomModule->modifier = zoomModule->target - ((zoomModule->target - zoomModule->modifier) * 0.8f);
 		if (abs(zoomModule->modifier - zoomModule->target) < 0.1f && !zoomModule->isEnabled())
 			zoomModule->zooming = false;

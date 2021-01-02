@@ -120,7 +120,7 @@ void ClickGui::renderCategory(Category category) {
 	const std::shared_ptr<ClickWindow> ourWindow = getWindow(categoryName);
 
 	// Reset Windows to pre-set positions to avoid confusion
-	if (resetStartPos && ourWindow->pos.x <= 0) {
+	if (resetStartPos && ourWindow->pos.x < 0) {
 		float yot = g_Data.getGuiData()->windowSize.x;
 		ourWindow->pos.y = 4;
 		switch (category) {
