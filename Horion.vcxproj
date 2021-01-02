@@ -472,6 +472,7 @@
     <ClInclude Include="Horion\Module\Modules\AntiBot.h" />
     <ClInclude Include="Horion\Module\Modules\AntiImmobile.h" />
     <ClInclude Include="Horion\Module\Modules\AntiVoid.h" />
+    <ClInclude Include="Horion\Module\Modules\ArmourStruct.h" />
     <ClInclude Include="Horion\Module\Modules\AutoArmor.h" />
     <ClInclude Include="Horion\Module\Modules\AutoClicker.h" />
     <!--<ClInclude Include="Horion\Module\Modules\AutoGapple.h" />-->

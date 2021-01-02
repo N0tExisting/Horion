@@ -50,12 +50,15 @@ public:
 private:
 	virtual __int64 destructor();
 	virtual __int64 tearDown(void);
+public:
 	virtual __int64 getMaxUseDuration(__int64 const*) const;
 	virtual __int64 getMaxUseDuration(C_ItemStack const*) const;
+	virtual bool isExperimental(__int64 const*) const;
+
+private:
+	virtual bool returnFalse();
 
 public:
-	virtual bool isExperimental(__int64 const*) const;
-	virtual bool returnFalse();
 	virtual void setMaxStackSize(unsigned char);
 	virtual void setCategory(int);
 	virtual void setStackedByData(bool);
@@ -137,10 +140,14 @@ private:
 	virtual bool isTintable(void)const;
 	virtual __int64 buildIdAux(short, const CompoundTag*);
 	virtual __int64 buildDescriptor(short, const CompoundTag*);
-	virtual __int64 use(C_ItemStack&, C_Entity&) const;
 	virtual __int64 dispense(C_BlockSource&, __int64&, int, vec3_t const&, unsigned char) const;
+
+public:
+	virtual __int64 use(C_ItemStack&, C_Entity&) const;
 	virtual __int64 useTimeDepleted(C_ItemStack&, __int64*, C_Entity*) const;
 	virtual __int64 releaseUsing(C_ItemStack&, C_Entity*, int) const;
+
+private:
 	virtual __int64 getDestroySpeed(C_ItemStack const&, C_Block const&) const;
 	virtual __int64 hurtEnemy(__int64&, __int64*, __int64*) const;
 	virtual __int64 hurtEnemy(C_ItemStack&, __int64*, __int64*) const;
@@ -299,17 +306,7 @@ public:
 		return false;
 	}
 
-	float getArmorValueWithEnchants() {
-		if (!this->item || !(*this->item)->isArmor())
-			return 0;
-		return (float) ((*this->item)->getArmorValue() + 
-			( this->getEnchantValue(0) * 1.5f	// Protection
-			+ this->getEnchantValue(5) * 0.5f	// Thorns
-			+ this->getEnchantValue(3) * 0.4f	// Blast Protection
-			+ this->getEnchantValue(1) * 0.4f	// Fire Protection
-			+ this->getEnchantValue(4) * 0.4f	// Projectile Protection
-			));
-	}
+	float getArmorValueWithEnchants();
 
 	float getAttackingDamageWithEnchants() {
 		if (!this->item)
@@ -345,7 +342,6 @@ public:
 		return ArmorSlot == 3;
 	}
 };
-
 
 class ItemRegistry {
 public:

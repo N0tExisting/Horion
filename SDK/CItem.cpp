@@ -1,8 +1,8 @@
 #include "CItem.h"
-
 #include "../Utils/Utils.h"
 #include "Tag.h"
 #include "../Memory/GameData.h"
+#include "../Horion/Module/ModuleManager.h"
 
 C_BaseActorRenderContext::C_BaseActorRenderContext(C_ScreenContext *ScreenCtx, C_ClientInstance *client, MinecraftGame *game) {
 	memset(this, 0, sizeof(C_BaseActorRenderContext));
@@ -91,4 +91,16 @@ C_Item ***ItemRegistry::lookUpByName(void *a1, void *a2, TextHolder &text) {
 	using ItemRegistry__lookupByName_t = C_Item ***(__fastcall *)(void *, void *, TextHolder &);
 	static ItemRegistry__lookupByName_t ItemRegistry__lookupByNameF = reinterpret_cast<ItemRegistry__lookupByName_t>(FindSignature("40 55 56 57 41 54 41 55 41 56 41 57 ?? ?? ?? ?? ?? ?? ?? ?? 48 ?? ?? ?? ?? ?? ?? 48 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 ?? ?? ?? ?? ?? ?? ?? 4C 8B F9 48 89 4D ?? 45 33 ED 44 89 6C 24 ?? 4D 39 68"));
 	return ItemRegistry__lookupByNameF(a1, a2, text);
+}
+float C_ItemStack::getArmorValueWithEnchants() {
+	if (!this->item || !(*this->item)->isArmor())
+		return 0;
+	
+	return (float) ((*this->item)->getArmorValue() + (
+		this->getEnchantValue(0) * moduleMgr->getModule<AutoArmor>()->prottM	// Protection
+	  + this->getEnchantValue(5) * moduleMgr->getModule<AutoArmor>()->thornM	// Thorns
+	  + this->getEnchantValue(3) * moduleMgr->getModule<AutoArmor>()->bProtM	// Blast Protection
+	  + this->getEnchantValue(1) * moduleMgr->getModule<AutoArmor>()->fProtM	// Fire Protection
+	  + this->getEnchantValue(4) * moduleMgr->getModule<AutoArmor>()->pProtM	// Projectile Protection
+	));
 }
