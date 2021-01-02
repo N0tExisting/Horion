@@ -87,6 +87,7 @@
 #include "Modules/TimeChanger.h"
 #include "Modules/Timer.h"
 #include "Modules/Tower.h"
+#include "Modules/TpAura.h"
 #include "Modules/Tracer.h"
 #include "Modules/TriggerBot.h"
 #include "Modules/Twerk.h"
@@ -148,7 +149,6 @@ public:
 		auto lock = this->lockModuleList();
 		for (auto pMod : moduleList) {
 			if (auto pRet = dynamic_cast<typename std::remove_pointer<TRet>::type*>(pMod.get())){
-				
 				return pRet;
 			}
 		}
