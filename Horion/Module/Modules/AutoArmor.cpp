@@ -1,28 +1,8 @@
-#include "AutoArmor.h"
+#pragma once
 #include "../../../Utils/Utils.h"
 #include "../../../Utils/Logger.h"
-
-class ArmorStruct {
-public:
-	ArmorStruct(C_ItemStack* item, C_ArmorItem* yot, int slot) {
-		armor = yot;
-		m_slot = slot;
-		m_item = item;
-	}
-	bool isEqual(ArmorStruct& src) {
-		if (this->m_item->getArmorValueWithEnchants() == src.m_item->getArmorValueWithEnchants())
-			return true;
-		else
-			return false;
-	}
-
-	bool operator()(ArmorStruct lhs, ArmorStruct rhs) {
-		return (lhs.m_item->getArmorValueWithEnchants() > rhs.m_item->getArmorValueWithEnchants());
-	}
-	C_ArmorItem* armor = nullptr;
-	C_ItemStack* m_item = nullptr;
-	int m_slot = 0;
-};
+#include "ArmourStruct.h"
+#include "AutoArmor.h"
 
 AutoArmor::AutoArmor() : IModule(0, Category::PLAYER, "Automatically equips the best armor") {
 	registerFloatSetting("Prottection multpl", &prottM, prottM, 0.1f, 2.f);

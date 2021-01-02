@@ -3,7 +3,6 @@
 #include <memory>
 #include "TextHolder.h"
 #include "../Utils/HMath.h"
-#include "../Horion/Module/Modules/AutoArmor.h"
 
 class CompoundTag;
 class Tag;
@@ -308,18 +307,7 @@ public:
 			return false;
 	}
 
-	float getArmorValueWithEnchants() {
-		if (!this->item || !(*this->item)->isArmor())
-			return 0;
-
-		return (float) ((*this->item)->getArmorValue() + (
-			this->getEnchantValue(0) * prottM	// Protection
-		  + this->getEnchantValue(5) * thornM	// Thorns
-		  + this->getEnchantValue(3) * bProtM	// Blast Protection
-		  + this->getEnchantValue(1) * fProtM	// Fire Protection
-		  + this->getEnchantValue(4) * pProtM	// Projectile Protection
-		));
-	}
+	float getArmorValueWithEnchants();
 
 	float getAttackingDamageWithEnchants() {
 		if (!this->item)

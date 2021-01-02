@@ -2,6 +2,11 @@
 #include "Module.h"
 class AutoArmor : public IModule {
 public:
+	float prottM = 1.5f;
+	float thornM = .5f;
+	float pProtM = .4f;
+	float fProtM = .4f;
+	float bProtM = .4f;
 
 	C_CraftingScreenController* inventoryScreen = nullptr;
 
@@ -11,8 +16,3 @@ public:
 	virtual void onTick(C_GameMode* gm) override;
 	virtual const char* getModuleName() override;
 };
-float prottM = 1.5f;
-float thornM = .5f;
-float bProtM = .4f;
-float fProtM = .4f;
-float pProtM = .4f;
