@@ -76,36 +76,28 @@ void IModule::registerIntSetting(std::string name, int* intPtr, int defaultValue
 	settings.push_back(setting);  // Add to list
 }
 
-void IModule::registerEnumSetting(std::string name, SettingEnum* ptr, int defaultValue, int maxValue) {
-#ifdef DEBUG
-	if (minValue > maxValue)
-		__debugbreak();  // Minimum value is bigger than maximum value
-#endif
+void IModule::registerEnumSetting(std::string name, SettingEnum* ptr, int defaultValue) {
 
 	SettingEntry* setting = new SettingEntry();
 	setting->valueType = ValueType::ENUM_T;
 	// Actual Value
-	setting->value = reinterpret_cast<SettingValue*>(ptr->selected);
-
+	setting->value = reinterpret_cast<SettingValue*>(&ptr->selected);
 	// Default Value
 	SettingValue* defaultVal = new SettingValue();
 	defaultVal->_int = defaultValue;
 	setting->defaultValue = defaultVal;
-
-	// Min Value
+	// Min Value (is Extended)
 	SettingValue* minVal = new SettingValue();
-	minVal->Enum = ptr;
+	minVal->_bool = false;
 	setting->minValue = minVal;
-
-	// Max Value
+	// Max Value (The Enum)
 	SettingValue* maxVal = new SettingValue();
-	maxVal->_int = maxValue;
+	maxVal->Enum = ptr;
 	setting->maxValue = maxVal;
-
 	// Name
 	strcpy_s(setting->name, 19, name.c_str());
-
-	settings.push_back(setting);  // Add to list
+	// Add to list
+	settings.push_back(setting);  
 }
 
 void IModule::registerBoolSetting(std::string name, bool* boolPtr, bool defaultValue) {

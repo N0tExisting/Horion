@@ -1,14 +1,20 @@
 #include "SettingEnum.h"
 
 #pragma region EnumEntry 
-EnumEntry::EnumEntry(std::string _name, unsigned char value) {
-	name = /*(const std::string)*/ _name;
-	val = /*(const unsigned char)*/ value;
+EnumEntry::EnumEntry(const std::string _name, const unsigned char value) {
+	name = _name;
+	val = value;
 }
-AddResult::AddResult(bool s, int Pos) {
-	success = s;
-	pos = Pos;
+inline std::string EnumEntry::GetName() {
+	return name;
 }
+inline unsigned char EnumEntry::GetValue() {
+	return val;
+}
+//AddResult::AddResult(bool s, int Pos) {
+//	success = s;
+//	pos = Pos;
+//}
 #pragma endregion
 #pragma region SettingEnum
 SettingEnum::SettingEnum(std::vector<EnumEntry*> entr, IModule* mod) {
@@ -18,22 +24,32 @@ SettingEnum::SettingEnum(std::vector<EnumEntry*> entr, IModule* mod) {
 		return rhs.GetValue() < lhs.GetValue();
 	});
 }
+SettingEnum::SettingEnum(IModule* mod) {
+	//std::vector<EnumEntry*> entr;
+	//Entrys = entr;
+	owner = mod;
+	//std::sort(Entrys.begin(), Entrys.end(), [](EnumEntry rhs, EnumEntry lhs) {
+	//	return rhs.GetValue() < lhs.GetValue();
+	//});
+}
+//SettingEnum::SettingEnum() {
+//	owner = nullptr;
+//}
 
-AddResult SettingEnum::addEntry(EnumEntry* entr) {
-	Entrys.push_back(entr);
-	std::sort(Entrys.begin(), Entrys.end(), [](EnumEntry rhs, EnumEntry lhs) {
-		return rhs.GetValue() < lhs.GetValue();
-	});
+bool SettingEnum::addEntry(EnumEntry entr) {
+	auto etr = new EnumEntry(entr);
 	bool SameVal = false;
-	int i = 0;
-	int e = -1;
-	for (auto it = this->Entrys.begin(); it != this->Entrys.end(); it++, i++) {
-		if (entr == (*it._Ptr))
-			e = 1;
-		else
-			SameVal = (*it._Ptr)->GetValue() == entr->GetValue() || SameVal;
+	for (auto it = this->Entrys.begin(); it != this->Entrys.end(); it++) {
+			SameVal = (*it._Ptr)->GetValue() == etr->GetValue() || SameVal;
 	}
-	return *new AddResult(!SameVal, e);
+	if (!SameVal) {
+		Entrys.push_back(etr);
+		std::sort(Entrys.begin(), Entrys.end(),
+		  [](EnumEntry rhs, EnumEntry lhs) {
+			return rhs.GetValue() < lhs.GetValue();
+		});
+	}
+	return SameVal;
 }
 //AddResult* SettingEnum::addEntry(EnumEntry* entrs[]) {
 //	AddResult results[sizeof(entrs)]{};
@@ -57,4 +73,20 @@ AddResult SettingEnum::addEntry(EnumEntry* entr) {
 //	}
 //	return results;
 //}
+EnumEntry* SettingEnum::GetEntry(int ind) {
+	try {
+		return Entrys.at(ind);
+	} catch (const std::exception&) {
+		return nullptr;
+	}
+}
+EnumEntry* SettingEnum::GetEntry() {
+	if (selected == -1)
+		return nullptr;
+	else
+		return GetEntry(selected);
+}
+int SettingEnum::GetCount() {
+	return (int)Entrys.size();
+}
 #pragma endregion

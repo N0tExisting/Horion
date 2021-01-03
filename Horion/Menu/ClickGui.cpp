@@ -38,8 +38,12 @@ static constexpr float paddingRight = 13.5f;
 static constexpr float crossSize = textHeight / 2.f;
 static constexpr float crossWidth = 0.3f;
 static constexpr float backgroundAlpha = 1;
-static const MC_Color selectedModuleColor = MC_Color(28, 107, 201);
-static const MC_Color moduleColor = MC_Color(13, 29, 48);
+static const MC_Color selectedModuleColor = MC_Color(30, 110, 200);
+static const MC_Color selectedSettingColor1 = MC_Color(20, 100, 195);
+static const MC_Color selectedSettingColor2 = MC_Color(40, 120, 205);
+static const MC_Color moduleColor = MC_Color(15, 30, 50);
+static const MC_Color SettingColor1 = MC_Color(10, 25, 45);
+static const MC_Color SettingColor2 = MC_Color(20, 35, 55);
 
 float currentYOffset = 0;
 float currentXOffset = 0;
@@ -348,6 +352,46 @@ void ClickGui::renderCategory(Category category) {
 									currentYOffset += textHeight + (textPadding * 2);
 								}
 							} break;
+							case ValueType::ENUM_T: {
+								// Text and background
+								{
+									// Convert first letter to uppercase for more friendlieness
+									char name[0x21];
+									sprintf_s(name, 0x21, "%s:", setting->name);
+									if (name[0] != 0)
+										name[0] = toupper(name[0]);
+
+									std::string elTexto = name;
+									windowSize->x = fmax(windowSize->x, DrawUtils::getTextWidth(&elTexto, textSize) + 5/* because we add 5 to text padding*/ + crossSize);
+									DrawUtils::drawText(textPos, &elTexto, MC_Color(1.0f, 1.0f, 1.0f), textSize);
+									currentYOffset += textPadding + textHeight;
+									rectPos.w = currentYOffset;
+									DrawUtils::fillRectangle(rectPos, moduleColor, backgroundAlpha);
+									GuiUtils::drawCrossLine(vec2_t(
+										currentXOffset + windowSize->x + paddingRight - (crossSize / 2) - 1.f,
+										currentYOffset + textPadding + (textHeight / 2)),
+										MC_Color(255, 255, 255), crossWidth, crossSize, !setting->minValue->_bool);
+									if (rectPos.contains(&mousePos) && shouldToggleRightClick && !ourWindow->isInAnimation) {
+										shouldToggleRightClick = false;
+										setting->minValue->_bool = !setting->minValue->_bool;
+									}
+									currentYOffset += textHeight + (textPadding * 2);
+								}
+								if (setting->minValue->_bool) {
+									for (auto it = setting->maxValue->Enum->Entrys.begin();
+										 it != setting->maxValue->Enum->Entrys.end(); it++) {
+										EnumEntry* i = *it._Ptr;
+										if ((currentYOffset - ourWindow->pos.y) > cutoffHeight) {
+											overflowing = true;
+											break;
+										}
+										windowSize->x = fmax(windowSize->x, DrawUtils::getTextWidth(
+										 &i->GetName(), textSize) + 5);//because we add 5 to text padding
+										currentYOffset += textHeight + (textPadding * 2);
+									}
+									
+								}
+							}
 							case ValueType::FLOAT_T: {
 								// Text and background
 								{

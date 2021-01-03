@@ -1,39 +1,40 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "../Horion/Module/Modules/Module.h"
 #include "../Horion/Module/ModuleManager.h"
 
-struct AddResult {
-public:
-	bool success;
-	int pos;
-	AddResult(bool s, int Pos);
-};
+//struct AddResult {
+//public:
+//	bool success;
+//	int pos;
+//	AddResult(bool s, int Pos);
+//};
 
 struct EnumEntry {
-private:
-	std::string name;
-	unsigned char val;
 public:
+	const std::string name;
+	const unsigned char val;
 	/// <summary>Use this however you want</summary>
 	void* ptr = nullptr;
-	EnumEntry(std::string _name, unsigned char value);
-	const std::string GetName() { return name; }
-	const unsigned char GetValue() { return val; }
+	EnumEntry(const std::string _name, const unsigned char value);
+	inline std::string GetName();
+	inline unsigned char GetValue();
 };
 
 class SettingEnum {
 private:
-	std::vector<EnumEntry*> Entrys;
-	IModule* owner = nullptr;
+	IModule* owner/* = nullptr*/;
 
 public:
+	std::vector<EnumEntry*> Entrys;
 	int selected = -1;
+
 	SettingEnum(std::vector<EnumEntry*> entr, IModule* mod = nullptr);
-	//SettingEnum(EnumEntry* entr[], IModule* mod = nullptr);
-	AddResult addEntry(EnumEntry* entr);
-	//AddResult* addEntry(EnumEntry* entrs[]);
+	SettingEnum(IModule* mod = nullptr);
+	//SettingEnum();
+	bool addEntry(EnumEntry entr);
 	EnumEntry* GetEntry(int ind);
 	EnumEntry* GetEntry();
-	int GetCount() { return (int)Entrys.size(); }
+	int GetCount();
 };

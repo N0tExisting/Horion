@@ -67,7 +67,7 @@ protected:
 	IModule(int key, Category c, const char* tooltip);
 
 	void registerFloatSetting(std::string name, float* floatPtr, float defaultValue, float minValue, float maxValue);
-	void registerEnumSetting(std::string name, SettingEnum* intPtr, int defaultValue, int maxValue);
+	void registerEnumSetting(std::string name, SettingEnum* intPtr, int defaultValue);
 	void registerIntSetting(std::string name, int* intpTr, int defaultValue, int minValue, int maxValue);
 	void registerBoolSetting(std::string name, bool* boolPtr, bool defaultValue);
 	void clientMessageF(const char* fmt, ...);
