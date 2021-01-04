@@ -8,6 +8,7 @@
 #include <shared_mutex>
 
 #include "../../Memory/GameData.h"
+#include "Modules/Module.h"
 
 #include "Modules/Aimbot.h"
 #include "Modules/AirJump.h"
@@ -59,7 +60,6 @@
 #include "Modules/Jetpack.h"
 #include "Modules/Killaura.h"
 #include "Modules/MidClick.h"
-#include "Modules/Module.h"
 #include "Modules/NameTags.h"
 #include "Modules/Nbt.h"
 #include "Modules/NightMode.h"

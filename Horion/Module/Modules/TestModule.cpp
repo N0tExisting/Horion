@@ -47,7 +47,6 @@ void TestModule::onTick(C_GameMode* gm) {
 	if (ptr->entityPtr == nullptr && ptr->rayHitType == 0 && ptr->block.y > 0) {
 		bool isDestroyed = false;
 		gm->survivalDestroyBlockHack(ptr->block, ptr->blockSide, isDestroyed, lastStat == 0);
-			
 
 		//logF("%i %i %i %i %i", ptr->block.x, ptr->block.y, ptr->block.z, isDestroyed, lastStat);
 
