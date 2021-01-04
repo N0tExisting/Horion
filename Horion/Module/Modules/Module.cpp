@@ -29,7 +29,7 @@ SettingEnum::SettingEnum(IModule* mod) {
 	owner = mod;
 }
 
-bool SettingEnum::addEntry(EnumEntry entr) {
+AddResult SettingEnum::addEntry(EnumEntry entr) {
 	auto etr = new EnumEntry(entr);
 	bool SameVal = false;
 	for (auto it = this->Entrys.begin(); it != this->Entrys.end(); it++) {
@@ -41,12 +41,12 @@ bool SettingEnum::addEntry(EnumEntry entr) {
 				return rhs.GetValue() < lhs.GetValue();
 		});
 	}
-	return SameVal;
+	return AddResult(SameVal, this);
 }
-EnumEntry SettingEnum::GetEntry(int ind) {
-	return Entrys.at(ind);
+EnumEntry* SettingEnum::GetEntry(int ind) {
+	return &Entrys.at(ind);
 }
-EnumEntry SettingEnum::GetEntry() {
+EnumEntry* SettingEnum::GetEntry() {
 	return GetEntry(selected);
 }
 int SettingEnum::GetCount() {
@@ -252,7 +252,11 @@ void IModule::onLoadConfig(void* confVoid) {
 						sett->value->text = new std::string(value.get<std::string>());
 						break;
 					case ValueType::ENUM_T:
+						try {
 						sett->value->_int = value.get<int>();
+						} catch (const std::exception& e) {
+							logF("Config Load Error(Enum) (%s): %s ", this->getRawModuleName(), e.what());
+						}
 						break;
 					}
 					sett->makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt();

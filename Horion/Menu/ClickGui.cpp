@@ -422,7 +422,6 @@ void ClickGui::renderCategory(Category category) {
 											shouldToggleLeftClick = false;
 											setting->value->_int = e;
 										}
-
 										currentYOffset += textHeight + (textPadding * 2);
 									}
 									

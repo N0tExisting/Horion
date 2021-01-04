@@ -27,9 +27,12 @@ public:
 	std::string GetName();
 	unsigned char GetValue();
 };
+
+struct AddResult;
+
 class SettingEnum {
 private:
-	IModule* owner /* = nullptr*/;
+	IModule* owner  = nullptr;
 
 public:
 	std::vector<EnumEntry> Entrys;
@@ -38,10 +41,24 @@ public:
 	SettingEnum(std::vector<EnumEntry> entr, IModule* mod = nullptr);
 	SettingEnum(IModule* mod = nullptr);
 	//SettingEnum();
-	bool addEntry(EnumEntry entr);
-	EnumEntry GetEntry(int ind);
-	EnumEntry GetEntry();
+	AddResult addEntry(EnumEntry entr);
+	EnumEntry* GetEntry(int ind);
+	EnumEntry* GetEntry();
 	int GetCount();
+};
+
+struct AddResult {
+	union {
+		bool Succes;
+		SettingEnum* Enum;
+	};
+	AddResult(bool succ, SettingEnum* e) {
+		Succes = succ;
+		Enum = e;
+	}
+	inline AddResult addEntry(EnumEntry entr) {
+		return Enum->addEntry(entr);
+	}
 };
 
 enum class ValueType {

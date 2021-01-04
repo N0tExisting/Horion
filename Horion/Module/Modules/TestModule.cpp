@@ -14,10 +14,8 @@
 #include <glm/ext.hpp>
 
 TestModule::TestModule() : IModule(0, Category::MISC, "For testing purposes") {
-	enum1 = *new SettingEnum(this);
-	enum1.addEntry(EnumEntry("1", 1));
-	enum1.addEntry(EnumEntry("2", 2));
-	enum1.addEntry(EnumEntry("3", 3));
+	enum1 = *(*new SettingEnum(this)).addEntry(EnumEntry("1", 1)).addEntry(EnumEntry("2", 2))
+		.addEntry(EnumEntry("3", 3)).Enum;
 	registerFloatSetting("float1", &this->float1, 0, -10, 10);
 	registerIntSetting("int1", &this->int1, 0, -10, 10);
 	registerEnumSetting("Enum1", &enum1, 0);
