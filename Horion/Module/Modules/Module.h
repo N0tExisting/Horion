@@ -1,9 +1,9 @@
 #pragma once
-#include "../../../SDK/SettingEnum.h"
 #include "../../../Memory/GameData.h"
 #include "../../FriendList/FriendList.h"
 #include "../../../Utils/keys.h"
 //#include "../../DrawUtils.h"
+class IModule;
 
 enum class Category {
 	COMBAT = 0,
@@ -13,6 +13,35 @@ enum class Category {
 	WORLD = 4,
 	MISC = 5,
 	CUSTOM = 6
+};
+
+struct EnumEntry {
+private:
+	/*const */ std::string name;
+	/*const */ unsigned char val;
+
+public:
+	/// <summary>Use this however you want</summary>
+	void* ptr = nullptr;
+	EnumEntry(const std::string _name, const unsigned char value);
+	std::string GetName();
+	unsigned char GetValue();
+};
+class SettingEnum {
+private:
+	IModule* owner /* = nullptr*/;
+
+public:
+	std::vector<EnumEntry> Entrys;
+	int selected = -1;
+
+	SettingEnum(std::vector<EnumEntry> entr, IModule* mod = nullptr);
+	SettingEnum(IModule* mod = nullptr);
+	//SettingEnum();
+	bool addEntry(EnumEntry entr);
+	EnumEntry GetEntry(int ind);
+	EnumEntry GetEntry();
+	int GetCount();
 };
 
 enum class ValueType {
