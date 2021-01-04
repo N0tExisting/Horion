@@ -48,6 +48,7 @@ bool CfindEntity(C_Entity* curEnt, bool isRegularEntity) {
 bool space = true;
 vec3_t _pos;
 bool CanPlaceC(vec3_ti* pos) {
+	space = true;
 	_pos = pos->toVec3t();
 	g_Data.forEachEntity([](C_Entity* ent, bool b) {
 		if (!space)
@@ -116,11 +117,11 @@ void CrystalAura::onTick(C_GameMode* gm) {
 		supplies = g_Data.getLocalPlayer()->getSupplies();
 	if (inv == nullptr)
 		inv = supplies->inventory;
+	targetList.clear();
+	g_Data.forEachEntity(CfindEntity);
 	if (this->delay == 0) {
 		// place block around players?
 	}
-	targetList.clear();
-	g_Data.forEachEntity(CfindEntity);
 	if (this->delay == 1 && AutoSelect) {
 		int slot = supplies->selectedHotbarSlot;
 		prevSlot = slot;
@@ -138,8 +139,10 @@ void CrystalAura::onTick(C_GameMode* gm) {
 			if (pEnhanced)
 				for (auto& i : targetList)
 					CPlace(gm, i->getPos());
-			else {  // TODO: place at block player is looking at
-				CPlace(gm, gm->player->getPos());
+			else {
+				auto ptr = g_Data.getClientInstance()->getPointerStruct();
+				if (ptr->entityPtr == nullptr && ptr->rayHitType == 0 )
+					gm->buildBlock(&ptr->block, 0);
 			}
 		}
 	}
@@ -160,6 +163,14 @@ void CrystalAura::onTick(C_GameMode* gm) {
 	}
 	if (this->delay >= 5) {
 		this->delay = 0;
+	}
+}
+
+void CrystalAura::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
+	auto ptr = g_Data.getClientInstance()->getPointerStruct();
+	if (ptr->block != nullptr) {
+		DrawUtils::setColor(.75f, .25f, .5f, 1.f);
+		DrawUtils::drawBox(ptr->block.toVec3t(), ptr->block.add(1).toVec3t(), .3f);
 	}
 }
 
