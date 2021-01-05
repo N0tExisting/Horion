@@ -345,6 +345,7 @@ void DrawUtils::drawNameTags(C_Entity* ent, float textSize, bool drawHealth, boo
 	vec2_t textPos;
 	vec4_t rectPos;
 	std::string text = ent->getNameTag()->getText();
+	//ent->
 	text = Utils::sanitize(text);
 
 	float textWidth = getTextWidth(&text, textSize);
@@ -401,6 +402,39 @@ void DrawUtils::drawEntityBox(C_Entity* ent, float lineWidth) {
 	render.upper.y += 0.1f;
 
 	drawBox(render.lower, render.upper, lineWidth, true);
+}
+
+void DrawUtils::drawAABB(AABB h, MC_Color Col, float opacity, bool* ignoredFaces) {
+	setColor(Col.r, Col.g, Col.b, opacity);
+	vec2_t c1, c2, c3, c4;
+	// down
+	if (!ignoredFaces[0]) {
+		c1 = DrawUtils::worldToScreen(h.lower);
+		c2 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.lower.z + 1.f));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.lower.x + 1.f, h.lower.y, h.lower.z + 1.f));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.lower.x + 1.f, h.lower.y, h.lower.z));
+		DrawUtils::drawQuad(c4, c3, c2, c1);
+	}
+	// up
+	if (!ignoredFaces[1]) {
+		c1 = DrawUtils::worldToScreen(h.upper);
+		c2 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.upper.z - 1.f));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.upper.x - 1.f, h.upper.y, h.upper.z - 1.f));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.upper.x - 1.f, h.upper.y, h.upper.z));
+		DrawUtils::drawQuad(c1, c2, c3, c4);
+	}
+	// z-
+	if (!ignoredFaces[2]) {
+	}
+	// z+
+	if (!ignoredFaces[3]) {
+	}
+	// x-
+	if (!ignoredFaces[4]) {
+	}
+	// x+
+	if (!ignoredFaces[5]) {
+	}
 }
 
 void DrawUtils::draw2D(C_Entity* ent, float lineWidth) {

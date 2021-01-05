@@ -59,6 +59,8 @@ bool CanPlaceC(vec3_ti* pos) {
 	});
 	return space;
 }
+#undef space
+#undef _pos
 
 void CrystalAura::CPlace(C_GameMode* gm, vec3_t* pos) {
 	if (!pEnhanced) {
@@ -184,12 +186,17 @@ void CrystalAura::onTick(C_GameMode* gm) {
 }
 
 void CrystalAura::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
-	if (g_Data.getClientInstance() == nullptr || !Preview || (!pEnhanced && autoplace)) return;
+	if (!Preview || (!pEnhanced && autoplace) ||
+		g_Data.getClientInstance() == nullptr ||
+		g_Data.getPtrLocalPlayer() == nullptr ||
+		g_Data.getLocalPlayer() == nullptr)
+		return;
 	auto ptr = g_Data.getClientInstance()->getPointerStruct();
 	if (ptr != nullptr)
 		if (ptr->entityPtr == nullptr && ptr->rayHitType == 0)
-			if (g_Data.getLocalPlayer()->region->getBlock(ptr->block)->toLegacy()->blockId == 49 ||
-				g_Data.getLocalPlayer()->region->getBlock(ptr->block)->toLegacy()->blockId == 7) {
+			if ((g_Data.getLocalPlayer()->region->getBlock(ptr->block)->toLegacy()->blockId == 49 ||
+				 g_Data.getLocalPlayer()->region->getBlock(ptr->block)->toLegacy()->blockId == 7) &&
+				g_Data.getLocalPlayer()->region->getBlock(ptr->block.add(0,1,0))->toLegacy()->blockId == 0) {
 				DrawUtils::setColor(.75f, .25f, .5f, 1.f);
 				DrawUtils::drawBox(ptr->block.toVec3t().add(0.f, 1.5f, 0.f),
 					ptr->block.add(1).toVec3t().add(0.f, 1.5f, 0.f), .3f);

@@ -81,6 +81,7 @@ void ModuleManager::initModules() {
 		this->moduleList.push_back(std::shared_ptr<IModule>(new Derp()));
 		this->moduleList.push_back(std::shared_ptr<IModule>(new Crasher()));
 		this->moduleList.push_back(std::shared_ptr<IModule>(new CrystalAura()));
+		this->moduleList.push_back(std::shared_ptr<IModule>(new selectionHighlight()));
 		this->moduleList.push_back(std::shared_ptr<IModule>(new Timer()));
 		this->moduleList.push_back(std::shared_ptr<IModule>(new NightMode()));
 		this->moduleList.push_back(std::shared_ptr<IModule>(new NoSwing()));
@@ -120,9 +121,10 @@ void ModuleManager::initModules() {
 		initialized = true;
 	}
 	
+	//this->getModule<AntiBot>()->setEnabled(true);
 	this->getModule<HudModule>()->setEnabled(true);
 	this->getModule<ClickGuiMod>()->setEnabled(false);
-	this->getModule<AntiBot>()->setEnabled(true);
+	//this->getModule<selectionHighlight>()->setEnabled(false);
 }
 
 void ModuleManager::disable() {
@@ -142,9 +144,10 @@ void ModuleManager::onLoadConfig(void* confVoid) {
 		mod->onLoadConfig(conf);
 	}
 
+	//this->getModule<AntiBot>()->setEnabled(true);
 	this->getModule<HudModule>()->setEnabled(true);
 	this->getModule<ClickGuiMod>()->setEnabled(false);
-	this->getModule<AntiBot>()->setEnabled(true);
+	//this->getModule<selectionHighlight>()->setEnabled(false);
 }
 
 void ModuleManager::onSaveConfig(void* confVoid) {

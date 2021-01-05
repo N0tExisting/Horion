@@ -34,6 +34,7 @@
 #include "Modules/Crasher.h"
 #include "Modules/Criticals.h"
 #include "Modules/CrystalAura.h"
+#include "../../WellThatsAnkward/selectionHighlight.h"
 #include "Modules/CubeGlide.h"
 #include "Modules/Derp.h"
 #include "Modules/EditionFaker.h"

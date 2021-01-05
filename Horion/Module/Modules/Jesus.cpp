@@ -32,10 +32,6 @@ void Jesus::onTick(C_GameMode* gm) {
 			add2 = 0.62f;
 		else if ((*block->blockLegacy)->blockId == 11)
 			add2 = 0.62f;
-		AABB ColShape;
-		(*block->blockLegacy)->getCollisionShape(&ColShape, block, g_Data.getLocalPlayer()->region, &_pos1, gm->player);
-		if (gm->player->aabb.intersects(ColShape))  // inside of Block
-			gm->player->setPos({pos.x, pos.y + .5f, pos.z});
 		//clientMessageF("%s", (float)((1.0 / 8.0) * ((double)(*block->blockLegacy)->liquidGetDepth(gm->player->region, &_pos1))));
 		pos.y -= 1.62f;
 
@@ -106,6 +102,10 @@ void Jesus::onTick(C_GameMode* gm) {
 			gm->player->velocity.y = 0.1f;
 			gm->player->onGround = true;
 		}
+		AABB ColShape;
+		(*block->blockLegacy)->getCollisionShape(&ColShape, block, g_Data.getLocalPlayer()->region, &_pos1, gm->player);
+		if (gm->player->aabb.intersects(ColShape))  // inside of Block
+			gm->player->setPos({pos.x, ColShape.upper.y + (gm->player->eyePos0.y - gm->player->aabb.lower.y), pos.z});
 	} else {
 		if (gm->player->hasEnteredWater()) {
 			gm->player->velocity.y = 0.06f;

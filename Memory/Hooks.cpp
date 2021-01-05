@@ -330,6 +330,10 @@ void Hooks::Enable() {
 	MH_EnableHook(MH_ALL_HOOKS);
 }
 
+//std::string Hooks::GetScreenName() {
+//	return currentScreenName;
+//}
+
 void Hooks::GameMode_tick(C_GameMode* _this) {
 	static auto oTick = g_Hooks.GameMode_tickHook->GetFastcall<void, C_GameMode*>();
 	oTick(_this);

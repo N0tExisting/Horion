@@ -253,7 +253,7 @@ void IModule::onLoadConfig(void* confVoid) {
 						break;
 					case ValueType::ENUM_T:
 						try {
-						sett->value->_int = value.get<int>();
+							sett->value->_int = value.get<int>();
 						} catch (const std::exception& e) {
 							logF("Config Load Error(Enum) (%s): %s ", this->getRawModuleName(), e.what());
 						}
@@ -365,8 +365,6 @@ void IModule::clientMessageF(const char* fmt, ...) {
 
 void SettingEntry::makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt() {
 	switch (valueType) {
-		//case ValueType::TEXT_T:
-		//case ValueType::ENUM_T:
 		case ValueType::BOOL_T:
 			break;
 		case ValueType::INT64_T:
@@ -381,6 +379,10 @@ void SettingEntry::makeSureTheValueIsAGoodBoiAndTheUserHasntScrewedWithIt() {
 		case ValueType::INT_T:
 			value->_int = std::max(minValue->_int, std::min(maxValue->_int, value->_int));
 			break;
+		case ValueType::ENUM_T:
+			value->_int = std::max(0, std::min(maxValue->Enum->GetCount()-1, value->_int));
+			break;
+		case ValueType::TEXT_T:
 		default:
 			logF("unrecognized value %i", valueType);
 	}

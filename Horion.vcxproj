@@ -417,6 +417,7 @@
     <ClCompile Include="Utils\Target.cpp" />
     <ClCompile Include="Utils\TextFormat.cpp" />
     <ClCompile Include="Utils\Utils.cpp" />
+    <ClCompile Include="WellThatsAnkward\selectionHighlight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Horion\Command\CommandMgr.h" />
@@ -642,6 +643,7 @@
     <ClInclude Include="Utils\TextFormat.h" />
     <ClInclude Include="Utils\Utils.h" />
     <ClInclude Include="Utils\xorstr.h" />
+    <ClInclude Include="WellThatsAnkward\selectionHighlight.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

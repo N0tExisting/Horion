@@ -442,13 +442,10 @@ public:
 			rcolors[2] = 0.6f;
 			rcolors[3] = 1;
 		}
-
 		Utils::ColorConvertRGBtoHSV(rcolors[0], rcolors[1], rcolors[2], rcolors[0], rcolors[1], rcolors[2]);
-
 		rcolors[0] += modifier;
 		if (rcolors[0] >= 1)
-			rcolors[0] = 0;
-
+			rcolors[0]--;
 		Utils::ColorConvertHSVtoRGB(rcolors[0], rcolors[1], rcolors[2], rcolors[0], rcolors[1], rcolors[2]);
 	}
 

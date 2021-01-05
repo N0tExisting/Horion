@@ -68,10 +68,10 @@ private:
 		 
 public:
 	std::vector<std::shared_ptr<FuncHook>> lambdaHooks;
-
 	static void Init();
 	static void Restore();
 	static void Enable();
+	std::string GetScreenName();
 
 private:
 	static void GameMode_tick(C_GameMode* _this);

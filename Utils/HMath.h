@@ -581,12 +581,9 @@ struct AABB {
 	}
 };
 
-/*
-inline int random(int start, int end) {
-	return rand() % (end - start + 1) + start;
-}
-
-inline float randomf(int start, int end) {
-	return (float)random(start, end);
-}
-*/
+//inline float randomf(float start, float end) {
+//	return (start + (float)rand() / RAND_MAX) * (end - start);
+//}
+//inline int random(int start, int end) {
+//	return (int)randomf(start, end);
+//}
