@@ -6,10 +6,10 @@
 selectionHighlight::selectionHighlight() : IModule(0x0, Category::VISUAL, "Custom selection box!") {
 	FaceH.addEntry(EnumEntry("None", 0)).addEntry(EnumEntry("Selected", 1))
 	 .addEntry(EnumEntry("All", 2)).addEntry(EnumEntry("Not Selected", 3));
-	registerEnumSetting("FaceHighlight", &FaceH, 0);
-	registerFloatSetting("FaceOpacity", &this->fOpacity, this->fOpacity, 0.f, 1.f);
-	registerFloatSetting("Thickness", &this->thickness, this->thickness, 0.f, 1.f);
-	registerFloatSetting("Opacity", &this->opacityVal, this->opacityVal, 0.f, 1.f);
+	registerEnumSetting("FaceHighlight", &FaceH, 1);
+	registerFloatSetting("FaceOpacity", &this->fOpacity, this->fOpacity, 0.05f, 1.f);
+	registerFloatSetting("Thickness", &this->thickness, this->thickness, 0.05f, 1.f);
+	registerFloatSetting("Opacity", &this->opacityVal, this->opacityVal, 0.05f, 1.f);
 	registerBoolSetting("Outline", &this->doOutline, this->doOutline);
 	registerBoolSetting("Rainbow", &this->selectRainbow, this->selectRainbow);
 	registerFloatSetting("Red", &this->rSelect, this->rSelect, 0.f, 1.f);
@@ -121,26 +121,17 @@ void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 		//AABB col = g_Data.getLocalPlayer()->region->getBlock(ptr->block)->toLegacy()->aabb;
 		AABB h = AABB(ptr->block.toVec3t(), ptr->block.add(1).toVec3t());
 		DrawUtils::setColor(Color[0], Color[1], Color[2], fOpacity);
-		bool igndVal[6]{};
 		switch (FaceH.GetEntry()->GetValue()) {
 			case 0:
 				break;
 			case 1:
-				for (size_t i = 0; i < 6; i++)
-					igndVal[i] = true;
-				igndVal[ptr->blockSide] = false;
-				DrawUtils::drawAABB(h, MC_Color((const float*)Color), fOpacity, igndVal);
+				DrawUtils::drawAABB(h, MC_Color((const float*)Color), fOpacity, 1, ptr->blockSide);
 				break;
 			case 2:
-				for (size_t i = 0; i < 6; i++)
-					igndVal[i] = false;
-				DrawUtils::drawAABB(h, MC_Color((const float*)Color), fOpacity, igndVal);
+				DrawUtils::drawAABB(h, MC_Color((const float*)Color), fOpacity, 2, ptr->blockSide);
 				break;
 			case 3:
-				for (size_t i = 0; i < 6; i++)
-					igndVal[i] = false;
-				igndVal[ptr->blockSide] = true;
-				DrawUtils::drawAABB(h, MC_Color((const float*)Color), fOpacity, igndVal);
+				DrawUtils::drawAABB(h, MC_Color((const float*)Color), fOpacity, 3, ptr->blockSide);
 				break;
 		}
 	}

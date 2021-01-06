@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include "../Horion/Module/ModuleManager.h"
 #include "../Horion/Module/Modules/Module.h"
 class selectionHighlight : public IModule {
@@ -13,7 +12,7 @@ private:
 	SettingEnum FaceH;
 	bool doOutline = true;
 	float opacityVal = 1.f;
-	float fOpacity = 0.5f;
+	float fOpacity = 0.15f;
 
 public:
 	selectionHighlight();
