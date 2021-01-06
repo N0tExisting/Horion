@@ -341,11 +341,25 @@ void DrawUtils::drawImage(std::string FilePath, vec2_t& imagePos, vec2_t& ImageD
 	}
 }
 
+bool DrawUtils::ignoreFace(int currFace, int mode, int selecFace) {
+	switch (mode) {
+		case 1:
+			return currFace != selecFace;
+		case 3:
+			return currFace == selecFace;
+		case 2:
+			return false;
+		case 0:
+		default:
+			return true;
+	}
+}
+
 void DrawUtils::drawNameTags(C_Entity* ent, float textSize, bool drawHealth, bool useUnicodeFont) {
 	vec2_t textPos;
 	vec4_t rectPos;
 	std::string text = ent->getNameTag()->getText();
-	//ent->
+	//ent->health
 	text = Utils::sanitize(text);
 
 	float textWidth = getTextWidth(&text, textSize);
@@ -404,36 +418,69 @@ void DrawUtils::drawEntityBox(C_Entity* ent, float lineWidth) {
 	drawBox(render.lower, render.upper, lineWidth, true);
 }
 
-void DrawUtils::drawAABB(AABB h, MC_Color Col, float opacity, bool* ignoredFaces) {
+void DrawUtils::drawAABB(AABB h, MC_Color Col, float opacity, int mode, int face) {
 	setColor(Col.r, Col.g, Col.b, opacity);
 	vec2_t c1, c2, c3, c4;
-	// down
-	if (!ignoredFaces[0]) {
+	// y-
+	if (!ignoreFace(0, mode, face)) {
 		c1 = DrawUtils::worldToScreen(h.lower);
-		c2 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.lower.z + 1.f));
-		c3 = DrawUtils::worldToScreen(vec3_t(h.lower.x + 1.f, h.lower.y, h.lower.z + 1.f));
-		c4 = DrawUtils::worldToScreen(vec3_t(h.lower.x + 1.f, h.lower.y, h.lower.z));
-		DrawUtils::drawQuad(c4, c3, c2, c1);
-	}
-	// up
-	if (!ignoredFaces[1]) {
+		c2 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.upper.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.upper.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.lower.z));
+		if (face != 1) // dont draw other side
+			DrawUtils::drawQuad(c4, c3, c2, c1);
+		if (face != 0)
+			DrawUtils::drawQuad(c1, c2, c3, c4);
+	} // y+
+	if (!ignoreFace(1, mode, face)) {
 		c1 = DrawUtils::worldToScreen(h.upper);
-		c2 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.upper.z - 1.f));
-		c3 = DrawUtils::worldToScreen(vec3_t(h.upper.x - 1.f, h.upper.y, h.upper.z - 1.f));
-		c4 = DrawUtils::worldToScreen(vec3_t(h.upper.x - 1.f, h.upper.y, h.upper.z));
-		DrawUtils::drawQuad(c1, c2, c3, c4);
-	}
-	// z-
-	if (!ignoredFaces[2]) {
-	}
-	// z+
-	if (!ignoredFaces[3]) {
-	}
-	// x-
-	if (!ignoredFaces[4]) {
-	}
-	// x+
-	if (!ignoredFaces[5]) {
+		c2 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.lower.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.lower.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.upper.z));
+		if (face != 0)
+			DrawUtils::drawQuad(c1, c2, c3, c4);
+		if (face != 1)
+			DrawUtils::drawQuad(c4, c3, c2, c1);
+	} // z-
+	if (!ignoreFace(2, mode, face)) {
+		c1 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.lower.z));
+		c2 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.lower.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.lower.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.lower.z));
+		if (face != 3)
+			DrawUtils::drawQuad(c4, c2, c1, c3);
+		if (face != 2)
+			DrawUtils::drawQuad(c3, c1, c2, c4);
+	} // z+
+	if (!ignoreFace(3, mode, face)) {
+		c1 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.upper.z));
+		c2 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.upper.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.upper.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.upper.z));
+		if (face != 3)
+			DrawUtils::drawQuad(c4, c2, c1, c3);
+		if (face != 2)
+			DrawUtils::drawQuad(c3, c1, c2, c4);
+	} // x-
+	if (!ignoreFace(4, mode, face)) {
+		c1 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.upper.z));
+		c2 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.lower.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.upper.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.lower.z));
+		if (face != 5)
+			DrawUtils::drawQuad(c2, c1, c3, c4);
+		if (face != 4)
+			DrawUtils::drawQuad(c4, c3, c1, c2);
+	} // x+
+	if (!ignoreFace(5, mode, face)) {
+		c1 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.lower.z));
+		c2 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.upper.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.lower.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.upper.z));
+		if (face != 4)
+			DrawUtils::drawQuad(c4, c3, c1, c2);
+		if (face != 5)
+			DrawUtils::drawQuad(c2, c1, c3, c4);
 	}
 }
 
