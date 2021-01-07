@@ -4,10 +4,12 @@
 #include "../Memory/Hooks.h"
 
 selectionHighlight::selectionHighlight() : IModule(0x0, Category::VISUAL, "Custom selection box!") {
-	FaceH.addEntry(EnumEntry("None", 0)).addEntry(EnumEntry("Selected", 1))
-	 .addEntry(EnumEntry("All", 2)).addEntry(EnumEntry("Not Selected", 3));
-	registerEnumSetting("FaceHighlight", &FaceH, 1);
-	registerFloatSetting("FaceOpacity", &this->fOpacity, this->fOpacity, 0.05f, 1.f);
+	FaceH.addEntry(EnumEntry("None", 0)).addEntry(EnumEntry("Selected", 1)).addEntry(EnumEntry("All", 3));
+	//ShowName.addEntry(EnumEntry("No", 0)).addEntry(EnumEntry("Yes", 1)).addEntry(EnumEntry("w/ Backround", 2));
+	registerBoolSetting("Block Info", &this->ShowName, this->ShowName);
+	registerFloatSetting("Backround opacity", &this->baOpacity, this->baOpacity, 0.f, 1.f);
+	registerEnumSetting("Highlight Faces", &FaceH, 1);
+	registerFloatSetting("Face Opacity", &this->fOpacity, this->fOpacity, 0.05f, 1.f);
 	registerFloatSetting("Thickness", &this->thickness, this->thickness, 0.05f, 1.f);
 	registerFloatSetting("Opacity", &this->opacityVal, this->opacityVal, 0.05f, 1.f);
 	registerBoolSetting("Outline", &this->doOutline, this->doOutline);
@@ -22,7 +24,7 @@ selectionHighlight::~selectionHighlight() {
 }
 
 const char* selectionHighlight::getModuleName() {
-	return ("SelectionHighlight");
+	return ("Highlight Selection");
 }
 
 //void selectionHighlight::onEnable() {
@@ -31,65 +33,6 @@ const char* selectionHighlight::getModuleName() {
 
 void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	//logF("%s", g_Hooks.GetScreenName());
-	//float customHighlight[4];
-	//
-	//customHighlight[0] = rSelect;
-	//customHighlight[1] = rSelect;
-	//customHighlight[2] = rSelect;
-	//customHighlight[3] = 1.f;
-	//
-	//static float rainbowColors[4];
-	//
-	//{
-	//	if (rainbowColors[3] < 1) {
-	//		rainbowColors[0] = 0.2f;
-	//		rainbowColors[1] = 0.2f;
-	//		rainbowColors[2] = 1.f;
-	//		rainbowColors[3] = 1;
-	//	}
-	//
-	//	Utils::ApplyRainbow(rainbowColors, 0.0015f);
-	//}  //0.0015f
-	//
-	//if (g_Data.getLocalPlayer() != nullptr) {
-	//	float mC = thickness / 2;
-	//	auto pStruct = g_Data.getClientInstance()->getPointerStruct();
-	//
-	//	vec3_ti hLower = pStruct->block;
-	//	vec3_ti hUpper = pStruct->block;
-	//	hUpper.x += 1.f;
-	//	hUpper.y += 1.f;
-	//	hUpper.z += 1.f;
-	//
-	//	if (selectRainbow) {
-	//		DrawUtils::setColor(rainbowColors[0], rainbowColors[1], rainbowColors[2], opacityVal);
-	//		DrawUtils::drawBox(hLower.toVec3t(), hUpper.toVec3t(), thickness, doOutline);
-	//
-	//		if (faceH) {
-	//			int face = pStruct->blockSide;
-	//			int rayType = pStruct->rayHitType;
-	//
-	//			if (face == 1) {
-	//				DrawUtils::setColor(rainbowColors[0], rainbowColors[1], rainbowColors[2], fOpacity);
-	//
-	//				vec2_t c1 = DrawUtils::worldToScreen(hUpper);
-	//				vec2_t c2 = DrawUtils::worldToScreen(vec3_t(hUpper.x, hUpper.y, hUpper.z - 1.f));
-	//				vec2_t c3 = DrawUtils::worldToScreen(vec3_t(hUpper.x - 1.f, hUpper.y, hUpper.z - 1.f));
-	//				vec2_t c4 = DrawUtils::worldToScreen(vec3_t(hUpper.x - 1.f, hUpper.y, hUpper.z));
-	//				//	DrawUtils::drawQuad(c1, c2, c3, c4);
-	//			}
-	//
-	//			//DrawUtils::drawText(vec2_t(100.f, 100.f), &std::string(std::to_string(face) + " " + std::to_string(rayType)), MC_Color(255, 255, 0));
-	//		}
-	//
-	//	} else {
-	//		DrawUtils::setColor(rSelect, gSelect, bSelect, opacityVal);
-	//		DrawUtils::drawBox(hLower, hUpper, thickness, doOutline);
-	//
-	//		if (faceH) {
-	//		}
-	//	}
-	//}
 	static float rainbowColors[4] = {0.2f, 0.2f, 1.f, opacityVal};
 	Utils::ApplyRainbow(rainbowColors, 0.0015f);
 	if (g_Data.getClientInstance() == nullptr ||
@@ -107,6 +50,9 @@ void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	PointingStruct* ptr = g_Data.getClientInstance()->getPointerStruct();
 	if (ptr == nullptr) return;
 	if (ptr->entityPtr == nullptr && ptr->rayHitType == 0) {
+		C_Block* block = g_Data.getLocalPlayer()->region->getBlock(ptr->block);
+		AABB h = AABB(ptr->block.toVec3t(), ptr->block.add(1).toVec3t());
+		// outline
 		DrawUtils::setColor(Color[0], Color[1], Color[2], opacityVal);
 		//if (doOutline) {
 		//	vec3_t angles[3] = {
@@ -118,23 +64,38 @@ void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 		//} else {
 		DrawUtils::drawBox(ptr->block.toVec3t(), ptr->block.add(1).toVec3t(), thickness, doOutline);
 		//}
+		// Faces
 		if (selectRainbow)
 			Utils::ApplyRainbow(Color, 0.5f);
-		//AABB col = g_Data.getLocalPlayer()->region->getBlock(ptr->block)->toLegacy()->aabb;
-		AABB h = AABB(ptr->block.toVec3t(), ptr->block.add(1).toVec3t());
-		DrawUtils::setColor(Color[0], Color[1], Color[2], fOpacity);
+		MC_Color col = MC_Color(Color[0], Color[1], Color[2], fOpacity);
 		switch (FaceH.GetEntry()->GetValue()) {
 			case 0:
 				break;
 			case 1:
-				DrawUtils::drawAABB(h, MC_Color((const float*)Color), fOpacity, 1, ptr->blockSide);
+				DrawUtils::drawAABB(h, col, fOpacity, 1, ptr->blockSide);
 				break;
 			case 2:
-				DrawUtils::drawAABB(h, MC_Color((const float*)Color), fOpacity, 2, ptr->blockSide);
+				DrawUtils::drawAABB(h, col, fOpacity, 2, ptr->blockSide);
 				break;
 			case 3:
-				DrawUtils::drawAABB(h, MC_Color((const float*)Color), fOpacity, 3, ptr->blockSide);
+				DrawUtils::drawAABB(h, col, fOpacity, 3, ptr->blockSide);
 				break;
+		}
+		// Info
+		char n[0x41];
+		sprintf_s(n, 0x41, "%s", block->toLegacy()->name.getText());
+		if (n[0] != 0)
+			n[0] = toupper(n[0]);
+		std::string name = n;
+		std::replace<std::string::iterator, char>(name.begin(), name.end(), '_', ' ');
+		if (ShowName) {
+			DrawUtils::setColor(15 / 255.f, 30 / 255.f, 50 / 255.f, baOpacity);
+			DrawUtils::fillRectangle(
+				vec2_t((g_Data.getGuiData()->widthGame - DrawUtils::getTextWidth(&name, 1.5f)) /2.f - 3.f, 0.f),
+				vec2_t((g_Data.getGuiData()->widthGame + DrawUtils::getTextWidth(&name, 1.5f)) /2.f + 3.f,
+					   DrawUtils::getFontHeight(1.5f) + 3.5f));
+			moduleMgr->getModule<Compass>()->drawCenteredText(
+				vec2_t(g_Data.getGuiData()->widthGame / 2, -0.f), name , 1.5f, 1.f, col);
 		}
 	}
 }

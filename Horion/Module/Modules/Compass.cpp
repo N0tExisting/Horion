@@ -132,7 +132,7 @@ void Compass::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	DrawUtils::flush();
 }
 
-void Compass::drawCenteredText(vec2_t pos, std::string text, float size, float textOpacity) {
+void Compass::drawCenteredText(vec2_t pos, std::string text, float size, float textOpacity, MC_Color col) {
 	pos.x -= DrawUtils::getTextWidth(&text, size) / 2;
-	DrawUtils::drawText(pos, &text, MC_Color(255, 255, 255), size, textOpacity);
+	DrawUtils::drawText(pos, &text, col, size, textOpacity);
 }
