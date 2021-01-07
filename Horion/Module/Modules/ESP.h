@@ -8,7 +8,8 @@ public:
 	bool isMobEsp = true;
 	bool doRainbow = true;
 	bool is2d = false;
-	bool showInvis = true;
+	bool showInvis = false;
+	//bool 
 
 	ESP();
 	~ESP();

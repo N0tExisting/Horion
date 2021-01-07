@@ -5,17 +5,18 @@
 #include "../../../Utils/Utils.h"
 
 Reach::Reach() : IModule(0, Category::COMBAT, "Increases your reach") {
-	this->registerFloatSetting("Reach Value", &this->reachValue, this->reachValue, 3.f, 7.f);
+	//this->registerFloatSetting("Reach Value", &this->reachValue, this->reachValue, 3.f, 7.f);
 }
 
 Reach::~Reach() {
 }
 
 const char* Reach::getModuleName() {
-	return ("Reach");
+	return ("Lag Compensation");
 }
 
 void Reach::onTick(C_GameMode* gm) {
+	//g_Data.getRakNetInstance()->serverIp
 	if (reachPtr != 0) {
 		*reachPtr = reachValue;
 	}

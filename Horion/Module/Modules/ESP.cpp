@@ -4,14 +4,14 @@
 
 ESP::ESP() : IModule('O', Category::VISUAL, "Makes it easier to find entities around you") {
 	this->registerBoolSetting("rainbow", &this->doRainbow, this->doRainbow);
-	this->registerBoolSetting("MobEsp", &this->isMobEsp, this->isMobEsp);
+	this->registerBoolSetting("Mobs", &this->isMobEsp, this->isMobEsp);
 	this->registerBoolSetting("2d", &this->is2d, this->is2d);
-	this->registerBoolSetting("Show invis", &this->showInvis, this->showInvis);
+	//this->registerBoolSetting("Show invis", &this->showInvis, this->showInvis);
 }
 ESP::~ESP() {
 }
 const char* ESP::getModuleName() {
-	return ("ESP");
+	return ("Hitboxes");
 }
 
 static float rcolors[4];
@@ -53,20 +53,16 @@ void doRenderStuff(C_Entity* ent, bool isRegularEntitie) {
 }
 
 void ESP::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
-	C_LocalPlayer* localPlayer = g_Data.getLocalPlayer();
+	if (g_Data.getLocalPlayer() != nullptr && GameData::canUseMoveKeys()) {
 
-	if (localPlayer != nullptr && GameData::canUseMoveKeys()) {
 		// Rainbow colors
-		{
-			if (rcolors[3] < 1) {
-				rcolors[0] = 0.2f;
-				rcolors[1] = 0.2f;
-				rcolors[2] = 1.f;
-				rcolors[3] = 1;
-			}
-
-			Utils::ApplyRainbow(rcolors, 0.0015f);
+		if (rcolors[3] < 1) {
+			rcolors[0] = 0.2f;
+			rcolors[1] = 0.2f;
+			rcolors[2] = 1.f;
+			rcolors[3] = 1;
 		}
+		Utils::ApplyRainbow(rcolors, 0.0015f);
 
 		g_Data.forEachEntity(doRenderStuff);
 	}
