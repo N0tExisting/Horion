@@ -214,6 +214,11 @@
     <None Include=".clang-format" />
     <None Include=".gitignore" />
     <None Include="CppProperties.json" />
+    <None Include="include\Discord\lib\x86\discord_game_sdk.dll" />
+    <None Include="include\Discord\lib\x86_64\discord_game_sdk.bundle" />
+    <None Include="include\Discord\lib\x86_64\discord_game_sdk.dll" />
+    <None Include="include\Discord\lib\x86_64\discord_game_sdk.dylib" />
+    <None Include="include\Discord\README.md" />
     <None Include="LICENSE" />
     <None Include="packages.config" />
     <None Include="README.md" />
@@ -234,6 +239,7 @@
     <ResourceCompile Include="Horion.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Horion\Module\Modules\DiscordRPC.cpp" />
     <ClCompile Include="Horion\Command\CommandMgr.cpp" />
     <ClCompile Include="Horion\Command\Commands\BindCommand.cpp" />
     <ClCompile Include="Horion\Command\Commands\BruhCommand.cpp" />
@@ -392,6 +398,20 @@
     <ClCompile Include="Horion\Scripting\ScriptInstance.cpp" />
     <ClCompile Include="Horion\Scripting\ScriptManager.cpp" />
     <ClCompile Include="Horion\Scripting\Functions\Vector2Functions.cpp" />
+    <ClCompile Include="include\Discord\cpp\achievement_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\activity_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\application_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\core.cpp" />
+    <ClCompile Include="include\Discord\cpp\image_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\lobby_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\network_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\overlay_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\relationship_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\storage_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\store_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\types.cpp" />
+    <ClCompile Include="include\Discord\cpp\user_manager.cpp" />
+    <ClCompile Include="include\Discord\cpp\voice_manager.cpp" />
     <ClCompile Include="Memory\GameData.cpp" />
     <ClCompile Include="Memory\Hooks.cpp" />
     <ClCompile Include="Memory\SlimMem.cpp" />
@@ -420,6 +440,7 @@
     <ClCompile Include="WellThatsAnkward\selectionHighlight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Horion\Module\Modules\DiscordRPC.h" />
     <ClInclude Include="Horion\Command\CommandMgr.h" />
     <ClInclude Include="Horion\Command\Commands\BindCommand.h" />
     <ClInclude Include="Horion\Command\Commands\BruhCommand.h" />
@@ -589,6 +610,23 @@
     <ClInclude Include="include\d3dx11async.h" />
     <ClInclude Include="include\d3dx11core.h" />
     <ClInclude Include="include\d3dx11effect.h" />
+    <ClInclude Include="include\Discord\cpp\achievement_manager.h" />
+    <ClInclude Include="include\Discord\cpp\activity_manager.h" />
+    <ClInclude Include="include\Discord\cpp\application_manager.h" />
+    <ClInclude Include="include\Discord\cpp\core.h" />
+    <ClInclude Include="include\Discord\cpp\discord.h" />
+    <ClInclude Include="include\Discord\cpp\event.h" />
+    <ClInclude Include="include\Discord\cpp\ffi.h" />
+    <ClInclude Include="include\Discord\cpp\image_manager.h" />
+    <ClInclude Include="include\Discord\cpp\lobby_manager.h" />
+    <ClInclude Include="include\Discord\cpp\network_manager.h" />
+    <ClInclude Include="include\Discord\cpp\overlay_manager.h" />
+    <ClInclude Include="include\Discord\cpp\relationship_manager.h" />
+    <ClInclude Include="include\Discord\cpp\storage_manager.h" />
+    <ClInclude Include="include\Discord\cpp\store_manager.h" />
+    <ClInclude Include="include\Discord\cpp\types.h" />
+    <ClInclude Include="include\Discord\cpp\user_manager.h" />
+    <ClInclude Include="include\Discord\cpp\voice_manager.h" />
     <ClInclude Include="include\imgui\examples\imgui_impl_dx11.h" />
     <ClInclude Include="include\imgui\examples\imgui_impl_win32.h" />
     <ClInclude Include="include\imgui\imconfig.h" />
@@ -648,6 +686,10 @@
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Library Include="include\Discord\lib\x86\discord_game_sdk.dll.lib" />
+    <Library Include="include\Discord\lib\x86_64\discord_game_sdk.dll.lib" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\Microsoft.XAudio2.Redist.1.2.0\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('packages\Microsoft.XAudio2.Redist.1.2.0\build\native\Microsoft.XAudio2.Redist.targets')" />
@@ -655,7 +697,7 @@
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>Ce projet fait référence à des packages NuGet qui sont manquants sur cet ordinateur. Utilisez l'option de restauration des packages NuGet pour les télécharger. Pour plus d'informations, consultez http://go.microsoft.com/fwlink/?LinkID=322105. Le fichier manquant est : {0}.</ErrorText>
+      <ErrorText>This project references NuGet packages that are missing on this computer. Use the restore NuGet packages option to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is : {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\Microsoft.XAudio2.Redist.1.2.0\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.XAudio2.Redist.1.2.0\build\native\Microsoft.XAudio2.Redist.targets'))" />
     <Error Condition="!Exists('packages\directxtk_desktop_2017.2020.2.24.4\build\native\directxtk_desktop_2017.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\directxtk_desktop_2017.2020.2.24.4\build\native\directxtk_desktop_2017.targets'))" />

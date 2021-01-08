@@ -434,7 +434,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 	C_GuiData* dat = g_Data.getClientInstance()->getGuiData();
 
 	DrawUtils::setCtx(renderCtx, dat);
-
+	g_Hooks.screenName = g_Hooks.currentScreenName;
+	moduleMgr->getModule<DiscordRPC>()->scene = g_Hooks.screenName;
 	{
 		static bool wasConnectedBefore = false;
 		static LARGE_INTEGER start;
@@ -509,8 +510,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 
 	{
 		// Main Menu
-		std::string screenName(g_Hooks.currentScreenName);
-		if (strcmp(screenName.c_str(), "start_screen") == 0) {
+		if (strcmp(g_Hooks.screenName.c_str(), "start_screen") == 0) {
 			// Draw BIG epic horion watermark
 			if(hudModule->isEnabled() && hudModule->startScreen){
 				std::string text = "H O R E 0 N";
