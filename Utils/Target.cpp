@@ -22,13 +22,41 @@ bool Target::VanillaAttac(C_Entity* ent, bool inclLeash) {
 }
 
 bool Target::VanillaAttac(int id, bool inclLeash) {
-	if ((id == 64 || id == 65 || id == 66 || id == 67 || id == 68 || id == 69 || id == 70 || id == 72
-	|| id == 73 || id == 77 || id == 79 || id == 80 || id == 81 || id == 82 || id == 83 || id == 84
-	|| id == 85 || id == 86 || id == 87 || id == 88 || id == 89 || id == 90 || id == 91 || id == 93
-	|| id == 94 || id == 95 || id == 96 || id == 97 || id == 98 || id == 100 || id == 101 || id == 102
-	|| id == 103 || id == 104 || id == 105)|| id == 106/*Icebomb*/ || id == 117/*shield*/||(id == 88 && inclLeash))
-		return false;
-	return true;
+	switch (id) {
+		case 64: // Item
+		case 65: // TNT
+		case 66: // Falling Block
+		case 67: // Moving Block (piston)
+		case 68: // Thrown XP Bottle
+		case 69: // xp orb
+		case 70: // Thrown Eye of Ender
+		case 72: // Fireworks Rocket
+		case 73: // Thown Trident
+		case 77: // Fishing Bobber
+		case 79: // Dragon Fireball
+		case 80: // Arrow
+		case 81: // Thrown Snowball
+		case 82: // Thrown Egg
+		case 86: // Thrown splash Potion
+		case 87: // Thrown Ender Pearl
+		case 88: // Leash knot
+			if (!inclLeash)
+				return;
+		case 89: // Wither skull
+		case 91: // Blue Wither skull
+		case 93: // Lightning Bolt
+		case 94: // Blaze fireball
+		case 95: // Area Effect Cloud
+		case 101:// Thrown Lingering potion
+		case 102:// Lama Spit
+		case 103:// Evocation Fangs
+		case 106:// Icebomb
+		//case 107:// Ballon
+		case 117:// Shield
+			return false;
+		default:
+			return true;
+	}
 }
 
 bool Target::isValidTarget(C_Entity* ent) {
@@ -60,14 +88,23 @@ bool Target::isValidTarget(C_Entity* ent) {
 
 	if (id <= 122 && id != 63 && antibot->isEntityIdCheckEnabled())
 		return false;
-
-	if (antibot->isExtraCheckEnabled() && (!ent->canShowNameTag() || ent->getNameTag()->getTextLength() < 1 || std::string(ent->getNameTag()->getText()).find(std::string("\n")) != std::string::npos))
+	// name tag Checks
+	if (antibot->isNametagCheckEnabled() && !ent->canShowNameTag())
 		return false;
 
-	if ((ent->isSilent() || ent->isImmobile()) && antibot->isOtherCheckEnabled())
+	if (antibot->isNewlineCheckEnabled() && std::string(ent->getNameTag()->getText()).find(std::string("\n")) != std::string::npos)
 		return false;
 
-	if (AntiLag(ent) && antibot->isLagCheckEnabled())
+	if (antibot->isTextCheckEnabled() && ent->getNameTag()->getTextLength() < 1)
+		return false;
+	// other Checks
+	if (ent->isSilent() && antibot->isSilentCheckEnabled())
+		return false;
+
+	if (ent->isImmobile() && antibot->isImobileCheckEnabled())
+		return false;
+
+	if (!AntiLag(ent) && antibot->isLagCheckEnabled())
 		return false;
 
 	if (FriendList::findPlayer(ent->getNameTag()->getText()) && !moduleMgr->getModule<NoFriends>()->isEnabled())

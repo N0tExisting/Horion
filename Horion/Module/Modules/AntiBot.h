@@ -8,9 +8,12 @@ private:
 	// entId == 63
 	bool entityIdCheck = true;
 	// Nametag Checks
-	bool extraCheck = false;
+	bool NametagCheck = true;
+	bool NewlineCheck = true;
+	bool TextCheck = true;
 	// Other Checks
-	bool otherCheck = true;
+	bool silentCheck = true;
+	bool ImobileCheck = true;
 	// entId != (64 || 66 || 69(nice))
 	bool LagCheck = true;
 
@@ -18,25 +21,34 @@ public:
 	AntiBot();
 	~AntiBot();
 
-	bool isHitboxCheckEnabled() {
+	inline bool isHitboxCheckEnabled() {
 		return hitboxCheck && this->isEnabled();
 	}
-	bool isNameCheckEnabled() {
+	inline bool isNameCheckEnabled() {
 		return nameCheck && this->isEnabled();
 	}
-	bool isInvisibleCheckEnabled() {
+	inline bool isInvisibleCheckEnabled() {
 		return invisibleCheck && this->isEnabled();
 	}
-	bool isEntityIdCheckEnabled() {
+	inline bool isEntityIdCheckEnabled() {
 		return entityIdCheck && this->isEnabled();
 	}
-	bool isOtherCheckEnabled() {
-		return otherCheck && this->isEnabled();
+	inline bool isNametagCheckEnabled() {
+		return NametagCheck && this->isEnabled();
 	}
-	bool isExtraCheckEnabled() {
-		return this->extraCheck && this->isEnabled();
+	inline bool isNewlineCheckEnabled() {
+		return NewlineCheck && this->isEnabled();
 	}
-	bool isLagCheckEnabled() {
+	inline bool isTextCheckEnabled() {
+		return TextCheck && this->isEnabled();
+	}
+	inline bool isSilentCheckEnabled() {
+		return silentCheck && this->isEnabled();
+	}
+	inline bool isImobileCheckEnabled() {
+		return ImobileCheck && this->isEnabled();
+	}
+	inline bool isLagCheckEnabled() {
 		return this->LagCheck && this->isEnabled();
 	}
 
