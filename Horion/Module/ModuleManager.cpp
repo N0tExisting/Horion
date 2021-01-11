@@ -104,27 +104,22 @@ void ModuleManager::initModules() {
 		this->moduleList.push_back(std::shared_ptr<IModule>(new Twerk()));
 
 		this->moduleList.push_back(std::shared_ptr<IModule>(new FollowPathModule()));
-
 #ifdef _DEBUG
 		this->moduleList.push_back(std::shared_ptr<IModule>(new PacketLogger()));
 		this->moduleList.push_back(std::shared_ptr<IModule>(new TestModule()));
-
 #endif
-
 		// Sort modules alphabetically
 		std::sort(moduleList.begin(), moduleList.end(), [](auto lhs, auto rhs) {
 			auto current = lhs;
 			auto other = rhs;
 			return std::string{*current->getModuleName()} < std::string{*other->getModuleName()};
 		});
-
 		initialized = true;
+		for (auto& mod : this->moduleList)
+			if (!mod->allowAutoStart())
+				mod->setEnabled(false);
 	}
-	
-	//this->getModule<AntiBot>()->setEnabled(true);
 	this->getModule<HudModule>()->setEnabled(true);
-	this->getModule<ClickGuiMod>()->setEnabled(false);
-	//this->getModule<selectionHighlight>()->setEnabled(false);
 }
 
 void ModuleManager::disable() {
@@ -136,24 +131,22 @@ void ModuleManager::disable() {
 }
 
 void ModuleManager::onLoadConfig(void* confVoid) {
-	auto conf = reinterpret_cast<json*>(confVoid);
 	if (!isInitialized())
 		return;
+	auto conf = reinterpret_cast<json*>(confVoid);
 	auto lock = this->lockModuleList();
 	for (auto& mod : this->moduleList) {
 		mod->onLoadConfig(conf);
+		if (!mod->allowAutoStart())
+			mod->setEnabled(false);
 	}
-
-	//this->getModule<AntiBot>()->setEnabled(true);
 	this->getModule<HudModule>()->setEnabled(true);
-	this->getModule<ClickGuiMod>()->setEnabled(false);
-	//this->getModule<selectionHighlight>()->setEnabled(false);
 }
 
 void ModuleManager::onSaveConfig(void* confVoid) {
-	auto conf = reinterpret_cast<json*>(confVoid);
 	if (!isInitialized())
 		return;
+	auto conf = reinterpret_cast<json*>(confVoid);
 	auto lock = this->lockModuleList();
 	for (auto& mod : this->moduleList) {
 		mod->onSaveConfig(conf);
@@ -173,7 +166,6 @@ void ModuleManager::onTick(C_GameMode* gameMode) {
 void ModuleManager::onAttack(C_Entity* attackEnt) {
 	if (!isInitialized())
 		return;
-
 	auto lock = this->lockModuleList();
 	for (auto& mod : this->moduleList) {
 		if (mod->isEnabled() || mod->callWhenDisabled())
@@ -194,7 +186,6 @@ void ModuleManager::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	if (!isInitialized())
 		return;
 	auto mutex = this->lockModuleList();
-
 	for (auto& mod : this->moduleList) {
 		if (mod->isEnabled() || mod->callWhenDisabled())
 			mod->onPreRender(renderCtx);
@@ -205,7 +196,6 @@ void ModuleManager::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	if (!isInitialized())
 		return;
 	auto mutex = this->lockModuleList();
-
 	for (auto& mod : this->moduleList) {
 		if (mod->isEnabled() || mod->callWhenDisabled())
 			mod->onPostRender(renderCtx);
@@ -256,5 +246,4 @@ void ModuleManager::onLevelRender() {
 			it->onLevelRender();
 	}
 }
-
 ModuleManager* moduleMgr = new ModuleManager(&g_Data);

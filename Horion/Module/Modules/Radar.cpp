@@ -57,8 +57,33 @@ void renderEntity(C_Entity* currentEntity, bool isRegularEntity) {
 	if (!currentEntity->isAlive())
 		return;
 
-	if (!Target::isValidTarget(currentEntity))
+	if (!Target::isValidTarget(currentEntity)) {
+		MC_Color Col;
+		int id = currentEntity->getEntityTypeId();
+		if (id == x)
+			Col = ;
+		else if (id == x)
+			Col = ;
+		else if (id == x)
+			Col = ;
+		else
+			return;
+
+		vec3_t* start = currentEntity->getPosOld();
+		vec3_t* end = currentEntity->getPos();
+		vec3_t lerped = start->lerp(end, DrawUtils::getLerpTime());
+
+		const auto delta = lerped.sub(playerPos);
+		const float dist = delta.magnitudexz();
+		const vec2_t relPos = vec2_t(
+			cent - ((delta.x * c) - (delta.z * s)),
+			topPad - ((delta.x * s) + (delta.z * c)));
+
+		if (relPos.x > 0 && relPos.x < size && relPos.y > topPad - cent && relPos.y < topPad + cent) {
+			DrawUtils::fillRectangle(vec4_t(relPos.x - pxSize, relPos.y - pxSize, relPos.x + pxSize, relPos.y + pxSize), MC_Color(rcolors[0], rcolors[1], rcolors[2]), pxOpacity / 2.f);
+		}
 		return;
+	}
 
 	vec3_t* start = currentEntity->getPosOld();
 	vec3_t* end = currentEntity->getPos();
