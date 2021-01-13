@@ -41,7 +41,7 @@ bool Target::VanillaAttac(int id, bool inclLeash) {
 		case 87: // Thrown Ender Pearl
 		case 88: // Leash knot
 			if (!inclLeash)
-				return;
+				return true;
 		case 89: // Wither skull
 		case 91: // Blue Wither skull
 		case 93: // Lightning Bolt

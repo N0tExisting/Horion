@@ -40,7 +40,6 @@ bool C_BlockLegacy::hasWater(C_BlockSource* reg, const vec3_ti& pos) {
 	if(this->material->isLiquid){
 		return !this->material->isSuperHot;
 	}
-
 	auto liquidBlock = reg->getLiquidBlock(pos)->toLegacy();
 	return this != liquidBlock && liquidBlock->material->isLiquid && !liquidBlock->material->isSuperHot;
 }

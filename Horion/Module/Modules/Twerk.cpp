@@ -25,6 +25,7 @@ void Twerk::onTick(C_GameMode* gm) {
 		shouldSneak = false;
 		Odelay = 0;
 	}
+#pragma warning(suppress : 4805)
 	if (Pl->isSneakDown != shouldSneak)
 		Pl->isSneakDown = shouldSneak;
 }

@@ -60,12 +60,12 @@ void renderEntity(C_Entity* currentEntity, bool isRegularEntity) {
 	if (!Target::isValidTarget(currentEntity)) {
 		MC_Color Col;
 		int id = currentEntity->getEntityTypeId();
-		if (id == x)
-			Col = ;
-		else if (id == x)
-			Col = ;
-		else if (id == x)
-			Col = ;
+		if (id == 69 || id == 64)
+			Col = MC_Color(1.f, 1.f, 0.f);
+		//else if ()
+		//	Col = ;
+		//else if (id == x)
+		//	Col = ;
 		else
 			return;
 
@@ -80,7 +80,9 @@ void renderEntity(C_Entity* currentEntity, bool isRegularEntity) {
 			topPad - ((delta.x * s) + (delta.z * c)));
 
 		if (relPos.x > 0 && relPos.x < size && relPos.y > topPad - cent && relPos.y < topPad + cent) {
-			DrawUtils::fillRectangle(vec4_t(relPos.x - pxSize, relPos.y - pxSize, relPos.x + pxSize, relPos.y + pxSize), MC_Color(rcolors[0], rcolors[1], rcolors[2]), pxOpacity / 2.f);
+			DrawUtils::fillRectangle(vec4_t(relPos.x - pxSize / 2.f, relPos.y - pxSize / 2.f,
+											relPos.x + pxSize / 2.f, relPos.y + pxSize / 2.f),
+									Col, pxOpacity / 2.f);
 		}
 		return;
 	}
