@@ -17,7 +17,7 @@ bool Target::AntiLag(C_Entity* ent) {
 	return true;
 }
 
-bool Target::VanillaAttac(C_Entity* ent, bool inclLeash) {
+inline bool Target::VanillaAttac(C_Entity* ent, bool inclLeash) {
 	return VanillaAttac(ent->getEntityTypeId(), inclLeash);
 }
 
@@ -40,8 +40,9 @@ bool Target::VanillaAttac(int id, bool inclLeash) {
 		case 86: // Thrown splash Potion
 		case 87: // Thrown Ender Pearl
 		case 88: // Leash knot
-			if (!inclLeash)
+			if (!inclLeash && id == 88)
 				return true;
+			__fallthrough;
 		case 89: // Wither skull
 		case 91: // Blue Wither skull
 		case 93: // Lightning Bolt
@@ -64,7 +65,7 @@ bool Target::isValidTarget(C_Entity* ent) {
 		return false;
 	if (ent == g_Data.getLocalPlayer())
 		return false;
-	if (!(*localPlayer)->canAttack(ent, false))
+	if (!ent->isAlive())
 		return false;
 
 	static auto antibot = moduleMgr->getModule<AntiBot>();
@@ -72,14 +73,14 @@ bool Target::isValidTarget(C_Entity* ent) {
 	static auto teams = moduleMgr->getModule<Teams>();
 	int id = ent->getEntityTypeId();
 
-	if (!ent->isAlive())
+	if (antibot->isAttackCheckEnabled() && !(*localPlayer)->canAttack(ent, false))
 		return false;
 
-	// Temporarily removed from gui, tons of false negatives
 	if	(!hitboxMod->isEnabled() && antibot->isHitboxCheckEnabled() &&
 		(ent->height < 1.5f || ent->width < 0.49f || ent->height > 2.1f || ent->width > 0.9f))
 			return false;
 
+	// Temporarily removed from gui, tons of false negatives
 	if (!Target::containsOnlyASCII(ent->getNameTag()->getText()) && antibot->isNameCheckEnabled())
 		return false;
 
@@ -102,6 +103,9 @@ bool Target::isValidTarget(C_Entity* ent) {
 		return false;
 
 	if (ent->isImmobile() && antibot->isImobileCheckEnabled())
+		return false;
+	// custom checks
+	if (!VanillaAttac(ent, false) && antibot->isVanilaCheckEnabled())
 		return false;
 
 	if (!AntiLag(ent) && antibot->isLagCheckEnabled())
@@ -127,7 +131,6 @@ bool Target::isValidTarget(C_Entity* ent) {
 				return false;
 		}
 	}
-
 	return true;
 }
 

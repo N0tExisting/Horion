@@ -25,7 +25,7 @@ void doRenderStuff(C_Entity* ent, bool isRegularEntitie) {
 			return;
 		float a = (float)fmax(0.1f, (float)fmin(1.f, 15 / (ent->damageTime + 1)));
 		if (ent->isInvisible() && !espMod->showInvis)
-			a = 0;
+			return;
 		else if (ent->isInvisible())
 			a = (float)fmax(0.1f, (float)fmin(0.5f, 15 / (ent->damageTime + 1)));
 		if (FriendList::findPlayer(ent->getNameTag()->getText()) && !moduleMgr->getModule<NoFriends>()->isEnabled()) {

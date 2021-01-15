@@ -41,6 +41,10 @@ struct MC_Color {
 		this->g = other.g;
 		this->b = other.b;
 		this->a = other.a;
+		this->arr[0] = other.arr[0];
+		this->arr[1] = other.arr[1];
+		this->arr[2] = other.arr[2];
+		this->arr[3] = other.arr[3];
 		this->shouldDelete = other.shouldDelete;
 	}
 
@@ -74,8 +78,29 @@ struct MC_Color {
 	};
 };
 
-enum VertexFormat {
+struct GradientEntry {
+	friend struct Gradient;
+public:
+	union {
+		MC_Color col;
+		float pos;
+	};
+	GradientEntry(MC_Color, float);
+	GradientEntry(const GradientEntry&);
+	GradientEntry();
+};
 
+struct Gradient {
+	friend struct GradientEntry;
+public:
+	std::vector<GradientEntry> entrys;
+	Gradient(MC_Color First, MC_Color Last);
+	Gradient(const Gradient& gra);
+	Gradient* AddEntry(GradientEntry entry);
+	MC_Color GetColor(float pos);
+};
+
+enum VertexFormat {
 };
 
 class MatrixStack;
@@ -132,4 +157,3 @@ public:
 
 	static vec2_t worldToScreen(const vec3_t& world);
 };
-

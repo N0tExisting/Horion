@@ -6,8 +6,9 @@
 
 selectionHighlight::selectionHighlight() : IModule(0x0, Category::VISUAL, "Custom selection box!") {
 	FaceH.addEntry(EnumEntry("None", 0)).addEntry(EnumEntry("Selected", 1)).addEntry(EnumEntry("All", 3));
-	//ShowName.addEntry(EnumEntry("No", 0)).addEntry(EnumEntry("Yes", 1)).addEntry(EnumEntry("w/ Backround", 2));
-	registerBoolSetting("Block Info", &this->ShowName, this->ShowName);
+	ShowName.addEntry(EnumEntry("None", 0)).addEntry(EnumEntry("Simple", 1)).addEntry(EnumEntry("Detailed", 2));
+	registerEnumSetting("Blockinfo", &ShowName, 2);
+	//registerBoolSetting("Block Info", &this->ShowName, this->ShowName);
 	registerFloatSetting("Backround opacity", &this->baOpacity, this->baOpacity, 0.f, 1.f);
 	registerEnumSetting("Highlight Faces", &FaceH, 1);
 	registerFloatSetting("Face Opacity", &this->fOpacity, this->fOpacity, 0.05f, 1.f);
@@ -50,7 +51,7 @@ void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 	}
 	PointingStruct* ptr = g_Data.getClientInstance()->getPointerStruct();
 	if (ptr == nullptr) return;
-	if (ptr->entityPtr == nullptr && ptr->rayHitType == 0) {
+	if (/*ptr->entityPtr == nullptr && */ptr->rayHitType == 0) {
 		C_Block* block = g_Data.getLocalPlayer()->region->getBlock(ptr->block);
 		AABB h = block->toLegacy()->aabb;
 		if (h.isFullBlock() || h.upper.x == h.lower.x || h.upper.y == h.lower.y || h.upper.z == h.lower.z)
@@ -85,16 +86,49 @@ void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 				break;
 		}
 		// Info
-		std::string name = /*->*/GetShownName(block);
-		std::replace<std::string::iterator, char>(name.begin(), name.end(), '_', ' ');
-		if (ShowName) {
+		BlockInfo Data = BlockInfo(block);
+		if (ShowName.GetEntry()->GetValue() == 1) {
 			DrawUtils::setColor(15 / 255.f, 30 / 255.f, 50 / 255.f, baOpacity);
 			DrawUtils::fillRectangle(
-				vec2_t((g_Data.getGuiData()->widthGame - DrawUtils::getTextWidth(&name, 1.5f)) /2.f - 3.f, 0.f),
-				vec2_t((g_Data.getGuiData()->widthGame + DrawUtils::getTextWidth(&name, 1.5f)) /2.f + 3.f,
+				vec2_t((g_Data.getGuiData()->widthGame - DrawUtils::getTextWidth(&Data.name, 1.5f)) /2.f - 3.f, 0.f),
+				vec2_t((g_Data.getGuiData()->widthGame + DrawUtils::getTextWidth(&Data.name, 1.5f)) / 2.f + 3.f,
 					   DrawUtils::getFontHeight(1.5f) + 3.5f));
 			moduleMgr->getModule<Compass>()->drawCenteredText(
-				vec2_t(g_Data.getGuiData()->widthGame / 2, -0.f), name , 1.5f, 1.f, col);
+				vec2_t(g_Data.getGuiData()->widthGame / 2, -0.f), Data.name, 1.5f, 1.f, col);
+		} else if (ShowName.GetEntry()->GetValue() == 2) {
+			DrawUtils::setColor(15 / 255.f, 30 / 255.f, 50 / 255.f, baOpacity);
+			float with = DrawUtils::getTextWidth(&Data.name, 1.5f) +
+						 std::fmaxf(DrawUtils::getTextWidth(&Data.GetLevel(), .75f),
+									DrawUtils::getTextWidth(&Data.GetType(), .75f));
+			DrawUtils::fillRectangle(vec2_t((g_Data.getGuiData()->widthGame - with) / 2.f - 3.f, 0.f),
+									 vec2_t((g_Data.getGuiData()->widthGame + with) / 2.f + 3.f, 5.f));
+		}
+	}
+	if (ptr->entityPtr != 0) {
+		C_Entity* ent = ptr->entityPtr;
+		Gradient dist = *Gradient(MC_Color(0.f, 1.f, 1.f, fOpacity), MC_Color(1.f, 0.f,0.f, fOpacity))
+							 .AddEntry(GradientEntry(MC_Color(.75f, .75f, .0f), .5f)) // yellow color at the middle
+							 ->AddEntry(GradientEntry(MC_Color(.0f, .875f, .0f), .75f));
+		float avgBlob = ((ent->aabb.upper.x - ent->aabb.lower.x) + (ent->aabb.upper.y - ent->aabb.lower.y)
+			+ (ent->aabb.upper.z - ent->aabb.lower.z)) / 3.f;
+		float estimatedDist = (g_Data.getLocalPlayer()->eyePos0.dist(ent->aabb.centerPoint()) + avgBlob);
+		MC_Color col = dist.GetColor(estimatedDist / moduleMgr->getModule<Reach>()->GetCurrentReach());
+		AABB rendered = AABB(ent->getPos()->lerp(ent->getPosOld(), DrawUtils::getLerpTime()),
+			ent->width, ent->height, ent->getPos()->y - ent->aabb.lower.y);
+		//rendered.upper.y = rendered.upper.y + moduleMgr->getModule<TestModule>()->float1;
+		DrawUtils::drawAABB(ent->aabb, col, fOpacity, 1, -1);
+		//std::string name = ent->getNameTag()->getText();
+		char n[0xf];
+		sprintf_s(n, 0xf, "%.3f / %.3f", estimatedDist, moduleMgr->getModule<Reach>()->GetCurrentReach());
+		std::string name = n;
+		if (ShowName.GetEntry()->GetValue() > 0/* && name.length() > 1*/) {
+			DrawUtils::setColor(15 / 255.f, 30 / 255.f, 50 / 255.f, baOpacity);
+			DrawUtils::fillRectangle(
+				vec2_t((g_Data.getGuiData()->widthGame - DrawUtils::getTextWidth(&name, 1.5f)) / 2.f - 3.f, 0.f),
+				vec2_t((g_Data.getGuiData()->widthGame + DrawUtils::getTextWidth(&name, 1.5f)) / 2.f + 3.f,
+					   DrawUtils::getFontHeight(1.5f) + 3.5f));
+			moduleMgr->getModule<Compass>()->drawCenteredText(
+				vec2_t(g_Data.getGuiData()->widthGame / 2, -0.f), name, 1.5f, 1.f, col);
 		}
 	}
 }
@@ -107,84 +141,107 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 		case 1:
 			switch (block->data) {
 				case 0:
-					return "Stone";
+					Name = "Stone";
+					break;
 				case 1:
-					return "Granite";
+					Name = "Granite";
+					break;
 				case 2:
-					return "Polished Granite";
+					Name = "Polished Granite";
+					break;
 				case 3:
-					return "Diorite";
+					Name = "Diorite";
+					break;
 				case 4:
-					return "Polished Diorite";
+					Name = "Polished Diorite";
+					break;
 				case 5:
-					return "Andesite";
+					Name = "Andesite";
+					break;
 				case 6:
-					return "Polished Andesite";
+					Name = "Polished Andesite";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 2:
-			return "Grass Block";
+			Name = "Grass Block";
 			break;
 		case 3:
 			switch (block->data) {
 				case 0:
-					return "Dirt";
+					Name = "Dirt";
+					break;
 				case 1:
-					return "Coarse Dirt";
+					Name = "Coarse Dirt";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 5:
 			switch (block->data) {
 				case 0:
-					return "Oak Planks";
+					Name = "Oak Planks";
+					break;
 				case 1:
-					return "Spruce Planks";
+					Name = "Spruce Planks";
+					break;
 				case 2:
-					return "Birch Planks";
+					Name = "Birch Planks";
+					break;
 				case 3:
-					return "Jungle Planks";
+					Name = "Jungle Planks";
+					break;
 				case 4:
-					return "Acacia Planks";
+					Name = "Acacia Planks";
+					break;
 				case 5:
-					return "Dark Oak Planks";
+					Name = "Dark Oak Planks";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 6:
 			switch (block->data) {
 				case 0:
-					return "Oak Sapling";
+					Name = "Oak Sapling";
+					break;
 				case 1:
-					return "Spruce Sapling";
+					Name = "Spruce Sapling";
+					break;
 				case 2:
-					return "Birch Sapling";
+					Name = "Birch Sapling";
+					break;
 				case 3:
-					return "Jungle Sapling";
+					Name = "Jungle Sapling";
+					break;
 				case 4:
-					return "Acacia Sapling";
+					Name = "Acacia Sapling";
+					break;
 				case 5:
-					return "Dark Oak Sapling";
+					Name = "Dark Oak Sapling";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 12:
 			switch (block->data) {
 				case 0:
-					return "Sand";
+					Name = "Sand";
+					break;
 				case 1:
-					return "Red Sand";
+					Name = "Red Sand";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
@@ -193,19 +250,23 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 				RawData -= 4;
 			switch (RawData) {
 				case 0:
-					return "Oak Log";
+					Name = "Oak Log";
+					break;
 				case 1:
-					return "Spruce Log";
+					Name = "Spruce Log";
+					break;
 				case 2:
-					return "Birch Log";
+					Name = "Birch Log";
+					break;
 				case 3:
-					return "Jungle Log";
+					Name = "Jungle Log";
+					break;
 				//case 4:
-				//	return "Acacia Log";
+				//	Name = "Acacia Log";
 				//case 5:
-				//	return "Dark Oak Log";
+				//	Name = "Dark Oak Log";
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
@@ -214,11 +275,13 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 				RawData -= 4;
 			switch (RawData) {
 				case 0:
-					return "Acacia Log";
+					Name = "Acacia Log";
+					break;
 				case 1:
-					return "Dark Oak Log";
+					Name = "Dark Oak Log";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
@@ -228,19 +291,23 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 				RawData -= 4;
 			switch (RawData) {
 				case 0:
-					return "Oak Leaves";
+					Name = "Oak Leaves";
+					break;
 				case 1:
-					return "Spruce Leaves";
+					Name = "Spruce Leaves";
+					break;
 				case 2:
-					return "Birch Leaves";
+					Name = "Birch Leaves";
+					break;
 				case 3:
-					return "Jungle Leaves";
+					Name = "Jungle Leaves";
+					break;
 				//case 4:
-				//	return "Acacia Leaves";
+				//	Name = "Acacia Leaves";
 				//case 5:
-				//	return "Dark Oak Leaves";
+				//	Name = "Dark Oak Leaves";
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
@@ -249,193 +316,254 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 				RawData -= 4;
 			switch (RawData) {
 				case 0:
-					return "Acacia Leaves";
+					Name = "Acacia Leaves";
+					break;
 				case 1:
-					return "Dark Oak Leaves";
+					Name = "Dark Oak Leaves";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 19:
 			switch (block->data) {
 				case 0:
-					return "Dry Sponge";
+					Name = "Dry Sponge";
+					break;
 				case 1:
-					return "Wet Sponge";
+					Name = "Wet Sponge";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 24:
 			switch (block->data) {
 				case 0:
-					return "Sandstone";
+					Name = "Sandstone";
+					break;
 				case 1:
-					return "Chiseled Sandstone";
+					Name = "Chiseled Sandstone";
+					break;
 				case 2:
-					return "Cut Sandstone";
+					Name = "Cut Sandstone";
+					break;
 				case 3:
-					return "Smooth Sandstone";
+					Name = "Smooth Sandstone";
+					break;
 				default:
 					break;
 			}
 			break;
 		case 27:
-			return "Powered Rail";
+			Name = "Powered Rail";
 			break;
 		case 31:
-			return "Grass";
+			Name = "Grass";
 			break;
 		case 35:
-			return "Wool";
+			Name = "Wool";
 			break;
 		case 38:
 			switch (block->data) {
 				case 0:
-					return "Poppy";
+					Name = "Poppy";
+					break;
 				case 1:
-					return "Blue Orchid";
+					Name = "Blue Orchid";
+					break;
 				case 2:
-					return "Allium";
+					Name = "Allium";
+					break;
 				case 3:
-					return "Azure Bluet";
+					Name = "Azure Bluet";
+					break;
 				case 4:
-					return "Red Tulip";
+					Name = "Red Tulip";
+					break;
 				case 5:
-					return "Orange Tulip";
+					Name = "Orange Tulip";
+					break;
 				case 6:
-					return "White Tulip";
+					Name = "White Tulip";
+					break;
 				case 7:
-					return "Pink Tulip";
+					Name = "Pink Tulip";
+					break;
 				case 8:
-					return "Oxeye Daisy";
+					Name = "Oxeye Daisy";
+					break;
 				case 9:
-					return "Cornflower";
+					Name = "Cornflower";
+					break;
 				case 10:
-					return "Lily of the Valley";
+					Name = "Lily of the Valley";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 43:
 			switch (block->data) {
 				case 0:
-					return "Double Smooth Stone Slab";
+					Name = "Double Smooth Stone Slab";
+					break;
 				case 1:
-					return "Double Sandstone Slab";
+					Name = "Double Sandstone Slab";
+					break;
 				case 2:
-					return "Double Alpha Wood Slab";
+					Name = "Double Alpha-Wood Slab";
+					break;
 				case 3:
-					return "Double Cobblestone Slab";
+					Name = "Double Cobblestone Slab";
+					break;
 				case 4:
-					return "Double Brick Slab";
+					Name = "Double Brick Slab";
+					break;
 				case 5:
-					return "Double Stone Brick Slab";
+					Name = "Double Stone Brick Slab";
+					break;
 				case 6:
-					return "Double Quartz Slab";
+					Name = "Double Quartz Slab";
+					break;
 				case 7:
-					return "Double Nether Brick Slab";
+					Name = "Double Nether Brick Slab";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 44:
 			switch (block->data) {
 				case 0:
-					return "Lower Smooth Stone Slab";
+					Name = "Lower Smooth Stone Slab";
+					break;
 				case 1:
-					return "Lower Sandstone Slab";
+					Name = "Lower Sandstone Slab";
+					break;
 				case 2:
-					return "Lower Alpha Wood Slab";
+					Name = "Lower Alpha Wood Slab";
+					break;
 				case 3:
-					return "Lower Cobblestone Slab";
+					Name = "Lower Cobblestone Slab";
+					break;
 				case 4:
-					return "Lower Brick Slab";
+					Name = "Lower Brick Slab";
+					break;
 				case 5:
-					return "Lower Stone Brick Slab";
+					Name = "Lower Stone Brick Slab";
+					break;
 				case 6:
-					return "Lower Quartz Slab";
+					Name = "Lower Quartz Slab";
+					break;
 				case 7:
-					return "Lower Nether Brick Slab";
+					Name = "Lower Nether Brick Slab";
+					break;
 				case 8:
-					return "Upper Smooth Stone Slab";
+					Name = "Upper Smooth Stone Slab";
+					break;
 				case 9:
-					return "Upper Sandstone Slab";
+					Name = "Upper Sandstone Slab";
+					break;
 				case 10:
-					return "Upper Alpha Wood Slab";
+					Name = "Upper Alpha Wood Slab";
+					break;
 				case 11:
-					return "Upper Cobblestone Slab";
+					Name = "Upper Cobblestone Slab";
+					break;
 				case 12:
-					return "Upper Brick Slab";
+					Name = "Upper Brick Slab";
+					break;
 				case 13:
-					return "Upper Stone Brick Slab";
+					Name = "Upper Stone Brick Slab";
+					break;
 				case 14:
-					return "Upper Quartz Slab";
+					Name = "Upper Quartz Slab";
+					break;
 				case 15:
-					return "Upper Nether Brick Slab";
+					Name = "Upper Nether Brick Slab";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 83:
-			return "Sugarcane";
+			Name = "Sugarcane";
+			break;
 		case 85:
 			switch (block->data) {
 				case 0:
-					return "Oak Fence";
+					Name = "Oak Fence";
+					break;
 				case 1:
-					return "Spruce Fence";
+					Name = "Spruce Fence";
+					break;
 				case 2:
-					return "Birch Fence";
+					Name = "Birch Fence";
+					break;
 				case 3:
-					return "Jungle Fence";
+					Name = "Jungle Fence";
+					break;
 				case 4:
-					return "Acacia Fence";
+					Name = "Acacia Fence";
+					break;
 				case 5:
-					return "Dark Oak Fence";
+					Name = "Dark Oak Fence";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 97:
 			switch (block->data) {
 				case 0:
-					return "Infested Stone";
+					Name = "Infested Stone";
+					break;
 				case 1:
-					return "Infested Cobblestone";
+					Name = "Infested Cobblestone";
+					break;
 				case 2:
-					return "Infested Stone Bricks";
+					Name = "Infested Stone Bricks";
+					break;
 				case 3:
-					return "Infested Mossy Stone Bricks";
+					Name = "Infested Mossy Stone Bricks";
+					break;
 				case 4:
-					return "Infested Cracked Stone Bricks";
+					Name = "Infested Cracked Stone Bricks";
+					break;
 				case 5:
-					return "Infested Chiseled Stone Bricks";
+					Name = "Infested Chiseled Stone Bricks";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 98:
 			switch (block->data) {
 				case 0:
-					return "Stone Bricks";
+					Name = "Stone Bricks";
+					break;
 				case 1:
-					return "Mossy Stone Bricks";
+					Name = "Mossy Stone Bricks";
+					break;
 				case 2:
-					return "Cracked Stone Bricks";
+					Name = "Cracked Stone Bricks";
+					break;
 				case 3:
-					return "Chiseled Stone Bricks";
+					Name = "Chiseled Stone Bricks";
+					break;
 				case 4:
-					return "Smooth Stone Bricks";
+					Name = "Smooth Stone Bricks";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
@@ -444,22 +572,28 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 				break;
 			__fallthrough;
 		case 99:
-			if (block->data == 15 || block->data == 10)
-				return "Mushroom Stem";
-			Name = GetInfo(block);
+			if (block->data == 15 || block->data == 10) {
+				Name = "Mushroom Stem";
+				break;
+			}
+			Name = GetData(block);
 			break;
 		case 155:
 			while (RawData > 4)
 				RawData -= 4;
 			switch (RawData) {
 				case 0:
-					return "Quartz Block";
+					Name = "Quartz Block";
+					break;
 				case 1:
-					return "Chiseled Quartz Block";
+					Name = "Chiseled Quartz Block";
+					break;
 				case 2:
-					return "Pillar Quartz Block";
+					Name = "Pillar Quartz Block";
+					break;
 				case 3:
-					return "Smooth Quartz Block";
+					Name = "Smooth Quartz Block";
+					break;
 				default:
 					break;
 			}
@@ -467,138 +601,181 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 		case 157:
 			switch (block->data) {
 				case 0:
-					return "Oak Wood Double Slab";
+					Name = "Oak Wood Double Slab";
+					break;
 				case 1:
-					return "Spruce Wood Double Slab";
+					Name = "Spruce Wood Double Slab";
+					break;
 				case 2:
-					return "Birch Wood Double Slab";
+					Name = "Birch Wood Double Slab";
+					break;
 				case 3:
-					return "Jungle Wood Double Slab";
+					Name = "Jungle Wood Double Slab";
+					break;
 				case 4:
-					return "Acacia Wood Double Slab";
+					Name = "Acacia Wood Double Slab";
+					break;
 				case 5:
-					return "Dark Oak Wood Double Slab";
+					Name = "Dark Oak Wood Double Slab";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 158:
 			switch (block->data) {
 				case 0:
-					return "Lower Oak slab";
+					Name = "Lower Oak slab";
+					break;
 				case 1:
-					return "Lower Spruce slab";
+					Name = "Lower Spruce slab";
+					break;
 				case 2:
-					return "Lower Birch slab";
+					Name = "Lower Birch slab";
+					break;
 				case 3:
-					return "Lower Jungle slab";
+					Name = "Lower Jungle slab";
+					break;
 				case 4:
-					return "Lower Acacia slab";
+					Name = "Lower Acacia slab";
+					break;
 				case 5:
-					return "Lower Dark Oak slab";
+					Name = "Lower Dark Oak slab";
+					break;
 				case 8:
-					return "Upper Oak slab";
+					Name = "Upper Oak slab";
+					break;
 				case 9:
-					return "Upper Spruce slab";
+					Name = "Upper Spruce slab";
+					break;
 				case 10:
-					return "Upper Birch slab";
+					Name = "Upper Birch slab";
+					break;
 				case 11:
-					return "Upper Jungle slab";
+					Name = "Upper Jungle slab";
+					break;
 				case 12:
-					return "Upper Acacia slab";
+					Name = "Upper Acacia slab";
+					break;
 				case 13:
-					return "Upper Dark Oak slab";
+					Name = "Upper Dark Oak slab";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 159:
-			return "Stained Clay";
+			Name = "Stained Clay";
 			break;
 		case 160:
-			return "Stained Glass Pane";
+			Name = "Stained Glass Pane";
 			break;
 		case 168:
 			switch (block->data) {
 				case 0:
-					return "Prismarine";
+					Name = "Prismarine";
+					break;
 				case 1:
-					return "Dark Prismarine";
+					Name = "Dark Prismarine";
+					break;
 				case 2:
-					return "Prismarine Bricks";
+					Name = "Prismarine Bricks";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 171:
-			return "Carpet";
+			Name = "Carpet";
 			break;
 		case 175:
 			while (RawData > 7)
 				RawData -= 8;
 			switch (RawData) {
 				case 0:
-					return "Sunflower";
+					Name = "Sunflower";
+					break;
 				case 1:
-					return "Lilac";
+					Name = "Lilac";
+					break;
 				case 2:
-					return "Double Tallgrass";
+					Name = "Double Tallgrass";
+					break;
 				case 3:
-					return "Large Fern";
+					Name = "Large Fern";
+					break;
 				case 4:
-					return "Rose Bush";
+					Name = "Rose Bush";
+					break;
 				case 5:
-					return "Peony";
+					Name = "Peony";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
 		case 179:
 			switch (block->data) {
 				case 0:
-					return "Red Sandstone";
+					Name = "Red Sandstone";
+					break;
 				case 1:
-					return "Chiseled Red Sandstone";
+					Name = "Chiseled Red Sandstone";
+					break;
 				case 2:
-					return "Cut Red Sandstone";
+					Name = "Cut Red Sandstone";
+					break;
 				case 3:
-					return "Smooth Red Sandstone";
+					Name = "Smooth Red Sandstone";
+					break;
 				default:
 					break;
 			}
 			break;
 		case 199:
-			return "Item Frame";
+			Name = "Item Frame";
+			break;
 		case 202:
-			return "Red Torch";
+			Name = "Red Torch";
+			break;
 		case 204:
-			return "Blue Torch";
+			Name = "Blue Torch";
+			break;
 		case 205:
-			return "Shulker Box";
+			Name = "Shulker Box";
+			break;
 		case 218:
-			return "Colred Shulker Box";
+			Name = "Colred Shulker Box";
+			break;
 		case 236:
-			return "Concrete";
+			Name = "Concrete";
+			break;
 		case 237:
-			return "Concrete Powder";
+			Name = "Concrete Powder";
+			break;
 		case 241:
-			return "Stained Glass";
+			Name = "Stained Glass";
+			break;
 		case 246:
-			return "Glowing Obsidian";
+			Name = "Glowing Obsidian";
+			break;
 		case 247:
 			switch (block->data) {
 				case 0:
-					return "Nether Reactor Core";
+					Name = "Nether Reactor Core";
+					break;
 				case 1:
-					return "Initialized Nether Reactor Core";
+					Name = "Initialized Nether Reactor Core";
+					break;
 				case 2:
-					return "Finished Nether Reactor Core";
+					Name = "Finished Nether Reactor Core";
+					break;
 				default:
-					Name = GetInfo(block);
+					Name = GetData(block);
 					break;
 			}
 			break;
@@ -639,10 +816,11 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 					N += "Red Nether Brick Slab";
 					break;
 				default:
-					N = GetInfo(block);
+					N = GetData(block);
 					break;
 			}
-			return N;
+			Name = N;
+			break;
 		case 417: // Stone Slab 3
 			N = "Lower ";
 			if (RawData > 7)
@@ -679,10 +857,11 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 					N += "Polished Granite Slab";
 					break;
 				default:
-					N = GetInfo(block);
+					N = GetData(block);
 					break;
 			}
-			return N;
+			Name = N;
+			break;
 		case 421: // Stone Slab 4
 			N = "Lower ";
 			if (RawData > 7)
@@ -710,10 +889,11 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 					N += "Cut Red Sandstone Slab";
 					break;
 				default:
-					N = GetInfo(block);
+					N = GetData(block);
 					break;
 			}
-			return N;
+			Name = N;
+			break;
 		case 465:
 			N = "";
 			if (RawData > 7) {
@@ -740,27 +920,30 @@ std::string inline selectionHighlight::GetShownName(C_Block* block) {
 					N += "Dark Oak";
 					break;
 				default:
-					N = GetInfo(block);
+					N = GetData(block);
 					break;
 			}
 			N += " Bark Wood";
-			return N;
+			Name = N;
+			break;
 		default:
+#ifdef _DEBUG
+			Name = GetData(block);
+#else
 			Name = block->toLegacy()->name.getText();
+#endif
 			break;
 	}
-#ifdef _DEBUG
-	return GetInfo(block);
-#else
 	char n[0x65];
 	sprintf_s(n, 0x65, "%s", Name.c_str());
 	if (n[0] != 0)
 		n[0] = toupper(n[0]);
-	return std::string(n);
-#endif
+	N = std::string(n);
+	std::replace<std::string::iterator, char>(N.begin(), N.end(), '_', ' ');
+	return N;
 }
 
-std::string inline selectionHighlight::GetInfo(C_Block* block) {
+std::string inline selectionHighlight::GetData(C_Block* block) {
 	char N[0x41];
 	char n[0x65];
 	std::string _N = block->toLegacy()->name.getText();
@@ -778,3 +961,67 @@ std::string inline selectionHighlight::GetInfo(C_Block* block) {
 		n[0] = toupper(n[0]);
 	return std::string(n);
 }
+
+BlockInfo::BlockInfo(C_Block* block) {
+	name = selectionHighlight::GetShownName(block);
+	switch (block->toLegacy()->blockId) {
+		default:
+			Type = ToolType::hand;
+			force = false;
+			min = ToolLevel::noLvl;
+			silktouch = no;
+			break;
+	}
+}
+std::string BlockInfo::GetType() {
+	switch (Type) {
+		case _Unknown:
+			return "?Unknown?";
+		case hand:
+			return "Hand";
+		case picaxe:
+			return "Picaxe";
+		case axe:
+			return "Axe";
+		case shovel:
+			return "Shovel";
+		case hoe:
+			return "Hoe";
+		case sword:
+			return "Sword";
+		case shears:
+			return "Shears";
+	}
+}
+std::string BlockInfo::GetLevel() {
+	switch (min) {
+		case _unknown:
+			return "?Unknown?";
+		case noLvl:
+			return "None";
+		case all:
+			return "All";
+		case wood:
+			return "Wood";
+		case gold:
+			return "Gold";
+		case stone:
+			return "Stone";
+		case iron:
+			return "Irond";
+		case diamond:
+			return "Diamond";
+		case netherite:
+			return "Netherite";
+	}
+}
+//std::string BlockInfo::GetSilkTouch() {
+//	switch (silktouch) {
+//		case no:
+//			break;
+//		case maybe:
+//			break;
+//		case yes:
+//			break;
+//	}
+//}

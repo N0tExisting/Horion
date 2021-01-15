@@ -1,10 +1,52 @@
 #pragma once
 #include "../Horion/Module/Modules/Module.h"
+#include "../Horion/DrawUtils.h"
+
+enum ToolType {
+	_Unknown = -1,
+	hand,
+	picaxe,
+	axe,
+	shovel,
+	hoe,
+	sword,
+	shears,
+};
+enum ToolLevel {
+	_unknown = -2,
+	noLvl = -1,
+	all = 0,
+	wood,
+	stone,
+	gold,
+	iron,
+	diamond,
+	netherite,
+};
+enum SilkTouch {
+	no = -1,
+	maybe = 0,
+	yes = 1,
+};
+
+struct BlockInfo {
+public:
+	std::string name;
+	bool force = false;
+	ToolType Type = ToolType::_Unknown;
+	ToolLevel min = _unknown;
+	SilkTouch silktouch = no;
+	BlockInfo(C_Block*);
+	std::string GetType();
+	std::string GetLevel();
+	//std::string GetSilkTouch();
+};
 
 class selectionHighlight : public IModule {
 private:
 	SettingEnum FaceH;
-	bool ShowName;
+	SettingEnum ShowName;
+	//bool ShowName;
 	//bool faceH = true;
 	bool doOutline = false;
 	//bool InfoBackround = true;
@@ -26,6 +68,7 @@ public:
 	//virtual void onEnable() override;
 	virtual const char* getModuleName() override;
 	virtual void onPreRender(C_MinecraftUIRenderContext* renderCtx) override;
-	std::string inline GetShownName(C_Block*);
-	std::string inline GetInfo(C_Block* block);
+	std::string static inline GetShownName(C_Block*);
+	std::string static inline GetData(C_Block* block);
+	//BlockInfo inline GetInfo(C_Block* block);
 };

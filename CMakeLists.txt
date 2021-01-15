@@ -21,9 +21,13 @@ include_directories(.)
 include_directories(include)
 include_directories(include/glm/)
 
-link_directories(minhook)
+link_directories(
+        minhook
+)
 
 add_library(Horion SHARED
+        Horion/Command/CommandMgr.cpp
+        Horion/Command/CommandMgr.h
         Horion/Command/Commands/BindCommand.cpp
         Horion/Command/Commands/BindCommand.h
         Horion/Command/Commands/BruhCommand.cpp
@@ -64,6 +68,8 @@ add_library(Horion SHARED
         Horion/Command/Commands/NbtCommand.h
         Horion/Command/Commands/PanicCommand.cpp
         Horion/Command/Commands/PanicCommand.h
+        Horion/Command/Commands/PathCommand.cpp
+        Horion/Command/Commands/PathCommand.h
         Horion/Command/Commands/PlayerTeleportCommand.cpp
         Horion/Command/Commands/PlayerTeleportCommand.h
         Horion/Command/Commands/RelativeTeleportCommand.cpp
@@ -88,18 +94,26 @@ add_library(Horion SHARED
         Horion/Command/Commands/ToggleCommand.h
         Horion/Command/Commands/UnbindCommand.cpp
         Horion/Command/Commands/UnbindCommand.h
-        Horion/Command/CommandMgr.cpp
-        Horion/Command/CommandMgr.h
         Horion/Config/AccountInformation.cpp
         Horion/Config/AccountInformation.h
         Horion/Config/ConfigManager.cpp
         Horion/Config/ConfigManager.h
+        Horion/DrawUtils.cpp
+        Horion/DrawUtils.h
         Horion/FriendList/FriendList.cpp
         Horion/FriendList/FriendList.h
+        Horion/GuiUtils.cpp
+        Horion/GuiUtils.h
+        Horion/ImmediateGui.cpp
+        Horion/ImmediateGui.h
+        Horion/Loader.cpp
+        Horion/Loader.h
         Horion/Menu/ClickGui.cpp
         Horion/Menu/ClickGui.h
         Horion/Menu/TabGui.cpp
         Horion/Menu/TabGui.h
+        Horion/Module/ModuleManager.cpp
+        Horion/Module/ModuleManager.h
         Horion/Module/Modules/Aimbot.cpp
         Horion/Module/Modules/Aimbot.h
         Horion/Module/Modules/AirJump.cpp
@@ -110,6 +124,8 @@ add_library(Horion SHARED
         Horion/Module/Modules/AirSwim.h
         Horion/Module/Modules/AntiBot.cpp
         Horion/Module/Modules/AntiBot.h
+        Horion/Module/Modules/AntiImmobile.cpp
+        Horion/Module/Modules/AntiImmobile.h
         Horion/Module/Modules/AntiVoid.cpp
         Horion/Module/Modules/AntiVoid.h
         Horion/Module/Modules/AutoArmor.cpp
@@ -152,14 +168,20 @@ add_library(Horion SHARED
         Horion/Module/Modules/EditionFaker.h
         Horion/Module/Modules/ESP.cpp
         Horion/Module/Modules/ESP.h
+        Horion/Module/Modules/ExtendedBlockReach.cpp
+        Horion/Module/Modules/ExtendedBlockReach.h
         Horion/Module/Modules/FastEast.cpp
         Horion/Module/Modules/FastEat.h
         Horion/Module/Modules/FastLadder.cpp
         Horion/Module/Modules/FastLadder.h
         Horion/Module/Modules/Fly.cpp
         Horion/Module/Modules/Fly.h
+        Horion/Module/Modules/FollowPathModule.cpp
+        Horion/Module/Modules/FollowPathModule.h
         Horion/Module/Modules/Freecam.cpp
         Horion/Module/Modules/Freecam.h
+        Horion/Module/Modules/Freelook.cpp
+        Horion/Module/Modules/Freelook.h
         Horion/Module/Modules/Fucker.cpp
         Horion/Module/Modules/Fucker.h
         Horion/Module/Modules/FullBright.cpp
@@ -174,8 +196,6 @@ add_library(Horion SHARED
         Horion/Module/Modules/Hitbox.h
         Horion/Module/Modules/HudModule.cpp
         Horion/Module/Modules/HudModule.h
-        Horion/Module/Modules/ExtendedBlockReach.cpp
-        Horion/Module/Modules/ExtendedBlockReach.h
         Horion/Module/Modules/InfiniteReach.cpp
         Horion/Module/Modules/InfiniteReach.h
         Horion/Module/Modules/InstaBreak.cpp
@@ -206,6 +226,8 @@ add_library(Horion SHARED
         Horion/Module/Modules/NoFall.h
         Horion/Module/Modules/NoFriends.cpp
         Horion/Module/Modules/NoFriends.h
+        Horion/Module/Modules/NoHurtcam.cpp
+        Horion/Module/Modules/NoHurtcam.h
         Horion/Module/Modules/NoPacket.cpp
         Horion/Module/Modules/NoPacket.h
         Horion/Module/Modules/NoPaintingCrash.cpp
@@ -256,10 +278,28 @@ add_library(Horion SHARED
         Horion/Module/Modules/Xray.h
         Horion/Module/Modules/Zoom.cpp
         Horion/Module/Modules/Zoom.h
-        Horion/Module/ModuleManager.cpp
-        Horion/Module/ModuleManager.h
+        Horion/path/goals/JoeGoal.cpp
+        Horion/path/goals/JoeGoal.h
+        Horion/path/goals/JoeGoalXYZ.cpp
+        Horion/path/goals/JoeGoalXYZ.h
+        Horion/path/goals/JoeGoalXZ.cpp
+        Horion/path/goals/JoeGoalXZ.h
+        Horion/path/goals/JoeGoalY.cpp
+        Horion/path/goals/JoeGoalY.h
+        Horion/path/JoeConstants.cpp
+        Horion/path/JoeConstants.h
+        Horion/path/JoeMovementController.cpp
+        Horion/path/JoeMovementController.h
+        Horion/path/JoePath.cpp
+        Horion/path/JoePath.h
+        Horion/path/JoePathFinder.cpp
+        Horion/path/JoePathFinder.h
+        Horion/path/JoeSegment.cpp
+        Horion/path/JoeSegment.h
         Horion/Scripting/Functions/CommandManagerFunctions.cpp
         Horion/Scripting/Functions/CommandManagerFunctions.h
+        Horion/Scripting/Functions/DrawFunctions.cpp
+        Horion/Scripting/Functions/DrawFunctions.h
         Horion/Scripting/Functions/EntityFunctions.cpp
         Horion/Scripting/Functions/EntityFunctions.h
         Horion/Scripting/Functions/GameFunctions.cpp
@@ -268,6 +308,8 @@ add_library(Horion SHARED
         Horion/Scripting/Functions/GlobalFunctions.h
         Horion/Scripting/Functions/HorionFunctions.cpp
         Horion/Scripting/Functions/HorionFunctions.h
+        Horion/Scripting/Functions/LevelFunctions.cpp
+        Horion/Scripting/Functions/LevelFunctions.h
         Horion/Scripting/Functions/LocalPlayerFunctions.cpp
         Horion/Scripting/Functions/LocalPlayerFunctions.h
         Horion/Scripting/Functions/ModuleManagerFunctions.cpp
@@ -280,20 +322,12 @@ add_library(Horion SHARED
         Horion/Scripting/ScriptInstance.h
         Horion/Scripting/ScriptManager.cpp
         Horion/Scripting/ScriptManager.h
-        Horion/DrawUtils.cpp
-        Horion/DrawUtils.h
-        Horion/GuiUtils.cpp
-        Horion/GuiUtils.h
-        Horion/ImmediateGui.cpp
-        Horion/ImmediateGui.h
-        Horion/Loader.cpp
-        Horion/Loader.h
+        include/atlrx.h
         include/chakra/ChakraCommon.h
         include/chakra/ChakraCommonWindows.h
         include/chakra/ChakraCore.h
         include/chakra/ChakraCoreWindows.h
         include/chakra/ChakraDebug.h
-        include/atlrx.h
         include/d3dx11.h
         include/d3dx11async.h
         include/d3dx11core.h
@@ -308,27 +342,44 @@ add_library(Horion SHARED
         Memory/MinHook.h
         Memory/SlimMem.cpp
         Memory/SlimMem.h
+        resource.h
+        SDK/CBlockLegacy.cpp
         SDK/CBlockLegacy.h
+        SDK/CCamera.cpp
+        SDK/CCamera.h
+        SDK/CChestBlockActor.cpp
         SDK/CChestBlockActor.h
+        SDK/CClientInstance.cpp
         SDK/CClientInstance.h
         SDK/CClientInstanceScreenModel.h
+        SDK/CComplexInventoryTransaction.cpp
         SDK/CComplexInventoryTransaction.h
+        SDK/CEntity.cpp
         SDK/CEntity.h
         SDK/CEntityList.h
         SDK/CGameMode.h
         SDK/CGameSettingsInput.h
         SDK/CHIDController.h
+        SDK/CImageBuffer.h
+        SDK/CInventory.cpp
         SDK/CInventory.h
+        SDK/CInventoryTransaction.cpp
         SDK/CInventoryTransaction.h
+        SDK/CItem.cpp
         SDK/CItem.h
         SDK/CLoopbackPacketSender.h
+        SDK/CMinecraftUIRenderContext.cpp
         SDK/CMinecraftUIRenderContext.h
+        SDK/CMoveInputHandler.cpp
         SDK/CMoveInputHandler.h
+        SDK/CPacket.cpp
         SDK/CPacket.h
         SDK/CRakNetInstance.h
         SDK/CUIScene.h
         SDK/MojangsonToken.h
+        SDK/Tag.cpp Utils/keys.h 
         SDK/Tag.h
+        SDK/TextHolder.cpp
         SDK/TextHolder.h
         Utils/ChakraHelper.h
         Utils/DllHelper.h
@@ -345,4 +396,4 @@ add_library(Horion SHARED
         Utils/Utils.cpp
         Utils/Utils.h
         Utils/xorstr.h
-        resource.h SDK/TextHolder.cpp SDK/CChestBlockActor.cpp SDK/Tag.cpp Utils/keys.h SDK/CBlockLegacy.cpp SDK/CItem.cpp SDK/CInventory.cpp SDK/CInventoryTransaction.cpp SDK/CEntity.cpp SDK/CComplexInventoryTransaction.cpp SDK/CPacket.cpp SDK/CMinecraftUIRenderContext.cpp SDK/CClientInstance.cpp SDK/CMoveInputHandler.cpp SDK/CImageBuffer.h Horion/Module/Modules/Freelook.cpp Horion/Module/Modules/Freelook.h SDK/CCamera.h SDK/CCamera.cpp Horion/Module/Modules/NoHurtcam.cpp Horion/Module/Modules/NoHurtcam.h Horion/Module/Modules/AntiImmobile.cpp Horion/Module/Modules/AntiImmobile.h Horion/path/JoePathFinder.cpp Horion/path/JoePathFinder.h Horion/path/JoePath.cpp Horion/path/JoePath.h Horion/path/JoeSegment.cpp Horion/path/JoeSegment.h Horion/path/JoeMovementController.cpp Horion/path/JoeMovementController.h Horion/path/goals/JoeGoal.cpp Horion/path/goals/JoeGoal.h Horion/path/goals/JoeGoalXYZ.cpp Horion/path/goals/JoeGoalXYZ.h Horion/path/goals/JoeGoalXZ.cpp Horion/path/goals/JoeGoalXZ.h Horion/path/JoeConstants.h Horion/path/goals/JoeGoalY.cpp Horion/path/goals/JoeGoalY.h Horion/Module/Modules/FollowPathModule.cpp Horion/Module/Modules/FollowPathModule.h Horion/Command/Commands/PathCommand.cpp Horion/Command/Commands/PathCommand.h Horion/path/JoeConstants.cpp Horion/Scripting/Functions/LevelFunctions.cpp Horion/Scripting/Functions/LevelFunctions.h Horion/Scripting/Functions/DrawFunctions.cpp Horion/Scripting/Functions/DrawFunctions.h)
+)

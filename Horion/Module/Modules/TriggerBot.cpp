@@ -17,10 +17,7 @@ void TriggerBot::onTick(C_GameMode* gm) {
 	C_Entity* target = g_Data.getClientInstance()->getPointerStruct()->entityPtr;
 	
 	Odelay++;
-	if (target != 0 && Odelay >= delay) {
-		if (!Target::isValidTarget(target))
-			return;
-
+	if (target != 0 && Odelay >= delay && Target::isValidTarget(target)) {
 		if (!moduleMgr->getModule<NoSwing>()->isEnabled()) 
 			localPlayer->swingArm();
 		gm->attack(target);

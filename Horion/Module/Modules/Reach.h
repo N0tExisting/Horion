@@ -17,4 +17,10 @@ public:
 	virtual void onEnable() override;
 	virtual void onDisable() override;
 	virtual void onTick(C_GameMode* gm) override;
+
+	inline float GetCurrentReach() {
+		if (reachPtr != nullptr)
+			return *reachPtr;
+		return 4.f;
+	}
 };

@@ -30,7 +30,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{499784D2-7EA3-4CBE-BD93-EC0DBBC42FCD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -234,6 +234,7 @@
     <ResourceCompile Include="Horion.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Horion\Module\Modules\AutoBucket.cpp" />
     <ClCompile Include="Horion\Command\CommandMgr.cpp" />
     <ClCompile Include="Horion\Command\Commands\BindCommand.cpp" />
     <ClCompile Include="Horion\Command\Commands\BruhCommand.cpp" />
@@ -420,6 +421,7 @@
     <ClCompile Include="WellThatsAnkward\selectionHighlight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Horion\Module\Modules\AutoBucket.h" />
     <ClInclude Include="Horion\Command\CommandMgr.h" />
     <ClInclude Include="Horion\Command\Commands\BindCommand.h" />
     <ClInclude Include="Horion\Command\Commands\BruhCommand.h" />

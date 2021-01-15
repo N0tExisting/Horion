@@ -11,6 +11,8 @@ AntiBot::AntiBot() : IModule(0, Category::PLAYER, "Enable this module to filter 
 	registerBoolSetting("silent Check", &this->silentCheck, this->silentCheck);
 	registerBoolSetting("Imobile Check", &this->ImobileCheck, this->ImobileCheck);
 	registerBoolSetting("AntiLag Check", &this->LagCheck, this->LagCheck);
+	registerBoolSetting("Attack Check", &this->AtackCheck, this->AtackCheck);
+	registerBoolSetting("Vanila Check", &this->VanilaCheck, this->VanilaCheck);
 }
 AntiBot::~AntiBot() {
 }

@@ -342,6 +342,10 @@ void DrawUtils::drawImage(std::string FilePath, vec2_t& imagePos, vec2_t& ImageD
 }
 
 bool DrawUtils::ignoreFace(int currFace, int mode, int selecFace) {
+	if (selecFace == -1) {
+		return false;
+		// TODO: Filter faces based of view angles
+	}
 	switch (mode) {
 		case 1:
 			return currFace != selecFace;
@@ -640,4 +644,71 @@ void DrawUtils::drawLinestrip3d(const std::vector<vec3_t>& points) {
 	}
 
 	tess_end(game3dContext, myTess, entityFlatStaticMaterial);
+}
+
+GradientEntry::GradientEntry(MC_Color Col, float Pos) {
+	col = Col;
+	pos = Pos;
+}
+
+GradientEntry::GradientEntry(const GradientEntry& entr) {
+	this->col = entr.col;
+	this->pos = entr.pos;
+}
+
+GradientEntry::GradientEntry() {
+	pos = 0;
+	col = MC_Color();
+}
+
+Gradient::Gradient(MC_Color First, MC_Color Last) {
+	entrys.push_back(GradientEntry(Last, 1.0f));
+	entrys.push_back(GradientEntry(First, 0.0f));
+	std::sort(entrys.begin(), entrys.end(), [](GradientEntry rhs, GradientEntry lhs) {
+		return rhs.pos < lhs.pos;
+	});
+}
+
+Gradient::Gradient(const Gradient& gra) {
+	this->entrys = gra.entrys;
+}
+
+Gradient* Gradient::AddEntry(GradientEntry entry) {
+	for (auto i = entrys.begin(); i != entrys.end(); i++)
+		if (i._Ptr->pos == entry.pos)
+			throw "Entry had the same pos as another value";
+	entrys.push_back(entry);
+	std::sort(entrys.begin(), entrys.end(), [](GradientEntry rhs, GradientEntry lhs) {
+		return rhs.pos < lhs.pos;
+	});
+	return this;
+}
+
+MC_Color Gradient::GetColor(float pos) {
+	if (pos <= 0)
+		return entrys.at(0).col;
+	else if (pos >= 1)
+		return entrys.at(entrys.size() - 1).col;
+	float dist;
+	MC_Color col, col1, col2;
+	GradientEntry before, after;
+	for (size_t i = 0; i < entrys.size(); i++) {
+		if (entrys.at(i).pos < pos)
+			before = entrys.at(i);
+		else if (entrys.at(i).pos == pos)
+			return entrys.at(i).col;
+		else {
+			after = entrys.at(i);
+			break;
+		}
+	}
+	col1 = before.col;
+	col2 = after.col;
+	dist = (pos - before.pos) * (1 / (after.pos - before.pos));
+
+	col.r = lerp(col1.r, col2.r, dist);
+	col.g = lerp(col1.g, col2.g, dist);
+	col.b = lerp(col1.b, col2.b, dist);
+	col.a = lerp(col1.a, col2.a, dist);
+	return col;
 }

@@ -16,6 +16,8 @@ private:
 	bool ImobileCheck = true;
 	// entId != (64 || 66 || 69(nice))
 	bool LagCheck = true;
+	bool AtackCheck = true;
+	bool VanilaCheck = true;
 
 public:
 	AntiBot();
@@ -50,6 +52,12 @@ public:
 	}
 	inline bool isLagCheckEnabled() {
 		return this->LagCheck && this->isEnabled();
+	}
+	inline bool isAttackCheckEnabled() {
+		return this->AtackCheck && this->isEnabled();
+	}
+	inline bool isVanilaCheckEnabled() {
+		return this->VanilaCheck && this->isEnabled();
 	}
 
 	// Inherited via IModule

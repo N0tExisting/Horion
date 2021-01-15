@@ -25,9 +25,9 @@ void Tracer::onLevelRender() {
 
 	const vec3_t origin = g_Data.getClientInstance()->levelRenderer->origin.add(forward.mul(0.2f) /*place the start of the line slightly forward so it won't get clipped*/);
 	g_Data.forEachEntity([&](C_Entity* ent, bool valid) {
-	  if(ent != g_Data.getLocalPlayer() && Target::isValidTarget(ent)){
+		if(ent != g_Data.getLocalPlayer() && Target::isValidTarget(ent)){
 		  DrawUtils::setColor(255, 255, 255, 1);
-		  DrawUtils::drawLine3d(origin, *ent->getPos());
-	  }
+		  DrawUtils::drawLine3d(origin, ent->aabb.centerPoint());
+		}
 	});
 }
