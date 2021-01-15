@@ -21,7 +21,11 @@ include_directories(.)
 include_directories(include)
 include_directories(include/glm/)
 
-link_directories(minhook)
+link_directories(
+        minhook
+        include/Discord/lib/x86
+        include/Discord/lib/x86_64
+)
 
 add_library(Horion SHARED
         Horion/Command/Commands/BindCommand.cpp
