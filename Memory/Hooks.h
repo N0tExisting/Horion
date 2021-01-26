@@ -65,6 +65,7 @@ class Hooks {
 private:
 	bool shouldRender = true;
 	char currentScreenName[100];
+	std::string screenName;
 		 
 public:
 	std::vector<std::shared_ptr<FuncHook>> lambdaHooks;
