@@ -283,11 +283,13 @@ public:
 	void setUserData(std::unique_ptr<Tag> tag);
 
 	bool isValid() {
-		return this->item != nullptr && *this->item != nullptr;
+		return this->getItem() != nullptr;
 	}
 
 	inline C_Item* getItem() {
-		return *this->item;
+		if (this->item != nullptr)
+			return *this->item;
+		return nullptr;
 	}
 
 	void reinit(C_BlockLegacy& legacy, int count);
