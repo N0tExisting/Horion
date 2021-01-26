@@ -4,7 +4,7 @@
 
 class ChestAura : public IModule {
 private:
-	int range = 3;
+	int range = 5;
 
 public:
 	C_MoveInputHandler* inputHandler = nullptr;

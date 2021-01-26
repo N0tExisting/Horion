@@ -536,6 +536,10 @@ struct AABB {
 		lower = vec3_t(aabb.lower);
 		upper = vec3_t(aabb.upper);
 	}
+	AABB(vec3_t lower, float width, float height) {
+		this->lower = lower;
+		this->upper = {lower.x + width, lower.y + height, lower.z + width};
+	}
 	AABB(vec3_t lower, float width, float height, float eyeHeight) {
 		lower = lower.sub(vec3_t(width, eyeHeight * 2, width).div(2));
 		this->lower = lower;
@@ -576,12 +580,9 @@ struct AABB {
 	}
 };
 
-/*
-inline int random(int start, int end) {
-	return rand() % (end - start + 1) + start;
-}
-
-inline float randomf(int start, int end) {
-	return (float)random(start, end);
-}
-*/
+//inline float randomf(float start, float end) {
+//	return (start + (float)rand() / RAND_MAX) * (end - start);
+//}
+//inline int random(int start, int end) {
+//	return (int)randomf(start, end);
+//}

@@ -3,8 +3,8 @@
 class Teleport : public IModule {
 private:
 	bool hasClicked = false;
-	bool onlyHand = false;
-	bool bypass = false;
+	bool onlyHand = true;
+	bool bypass = true;
 	bool shouldTP = false;
 	vec3_t tpPos;
 

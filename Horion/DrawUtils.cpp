@@ -353,10 +353,29 @@ void DrawUtils::drawImage(std::string FilePath, vec2_t& imagePos, vec2_t& ImageD
 	}
 }
 
+bool DrawUtils::ignoreFace(int currFace, int mode, int selecFace) {
+	if (selecFace == -1) {
+		return false;
+		// TODO: Filter faces based of view angles
+	}
+	switch (mode) {
+		case 1:
+			return currFace != selecFace;
+		case 3:
+			return currFace == selecFace;
+		case 2:
+			return false;
+		case 0:
+		default:
+			return true;
+	}
+}
+
 void DrawUtils::drawNameTags(C_Entity* ent, float textSize, bool drawHealth, bool useUnicodeFont) {
 	vec2_t textPos;
 	vec4_t rectPos;
 	std::string text = ent->getNameTag()->getText();
+	//ent->health
 	text = Utils::sanitize(text);
 
 	float textWidth = getTextWidth(&text, textSize);
@@ -413,6 +432,72 @@ void DrawUtils::drawEntityBox(C_Entity* ent, float lineWidth) {
 	render.upper.y += 0.1f;
 
 	drawBox(render.lower, render.upper, lineWidth, true);
+}
+
+void DrawUtils::drawAABB(AABB h, MC_Color Col, float opacity, int mode, int face) {
+	setColor(Col.r, Col.g, Col.b, opacity);
+	vec2_t c1, c2, c3, c4;
+	// y-
+	if (!ignoreFace(0, mode, face)) {
+		c1 = DrawUtils::worldToScreen(h.lower);
+		c2 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.upper.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.upper.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.lower.z));
+		if (face != 1) // dont draw other side
+			DrawUtils::drawQuad(c4, c3, c2, c1);
+		if (face != 0)
+			DrawUtils::drawQuad(c1, c2, c3, c4);
+	} // y+
+	if (!ignoreFace(1, mode, face)) {
+		c1 = DrawUtils::worldToScreen(h.upper);
+		c2 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.lower.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.lower.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.upper.z));
+		if (face != 0)
+			DrawUtils::drawQuad(c1, c2, c3, c4);
+		if (face != 1)
+			DrawUtils::drawQuad(c4, c3, c2, c1);
+	} // z-
+	if (!ignoreFace(2, mode, face)) {
+		c1 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.lower.z));
+		c2 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.lower.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.lower.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.lower.z));
+		if (face != 3)
+			DrawUtils::drawQuad(c4, c2, c1, c3);
+		if (face != 2)
+			DrawUtils::drawQuad(c3, c1, c2, c4);
+	} // z+
+	if (!ignoreFace(3, mode, face)) {
+		c1 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.upper.z));
+		c2 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.upper.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.upper.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.upper.z));
+		if (face != 3)
+			DrawUtils::drawQuad(c4, c2, c1, c3);
+		if (face != 2)
+			DrawUtils::drawQuad(c3, c1, c2, c4);
+	} // x-
+	if (!ignoreFace(4, mode, face)) {
+		c1 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.upper.z));
+		c2 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.lower.y, h.lower.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.upper.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.lower.x, h.upper.y, h.lower.z));
+		if (face != 5)
+			DrawUtils::drawQuad(c2, c1, c3, c4);
+		if (face != 4)
+			DrawUtils::drawQuad(c4, c3, c1, c2);
+	} // x+
+	if (!ignoreFace(5, mode, face)) {
+		c1 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.lower.z));
+		c2 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.upper.y, h.upper.z));
+		c3 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.lower.z));
+		c4 = DrawUtils::worldToScreen(vec3_t(h.upper.x, h.lower.y, h.upper.z));
+		if (face != 4)
+			DrawUtils::drawQuad(c4, c3, c1, c2);
+		if (face != 5)
+			DrawUtils::drawQuad(c2, c1, c3, c4);
+	}
 }
 
 void DrawUtils::draw2D(C_Entity* ent, float lineWidth) {
@@ -628,4 +713,71 @@ void DrawUtils::drawLinestrip3d(const std::vector<vec3_t>& points) {
 	
 
 	meshHelper_renderImm(game3dContext, myTess, entityFlatStaticMaterial);
+}
+
+GradientEntry::GradientEntry(MC_Color Col, float Pos) {
+	col = Col;
+	pos = Pos;
+}
+
+GradientEntry::GradientEntry(const GradientEntry& entr) {
+	this->col = entr.col;
+	this->pos = entr.pos;
+}
+
+GradientEntry::GradientEntry() {
+	pos = 0;
+	col = MC_Color();
+}
+
+Gradient::Gradient(MC_Color First, MC_Color Last) {
+	entrys.push_back(GradientEntry(Last, 1.0f));
+	entrys.push_back(GradientEntry(First, 0.0f));
+	std::sort(entrys.begin(), entrys.end(), [](GradientEntry rhs, GradientEntry lhs) {
+		return rhs.pos < lhs.pos;
+	});
+}
+
+Gradient::Gradient(const Gradient& gra) {
+	this->entrys = gra.entrys;
+}
+
+Gradient* Gradient::AddEntry(GradientEntry entry) {
+	for (auto i = entrys.begin(); i != entrys.end(); i++)
+		if (i._Ptr->pos == entry.pos)
+			throw "Entry had the same pos as another value";
+	entrys.push_back(entry);
+	std::sort(entrys.begin(), entrys.end(), [](GradientEntry rhs, GradientEntry lhs) {
+		return rhs.pos < lhs.pos;
+	});
+	return this;
+}
+
+MC_Color Gradient::GetColor(float pos) {
+	if (pos <= 0)
+		return entrys.at(0).col;
+	else if (pos >= 1)
+		return entrys.at(entrys.size() - 1).col;
+	float dist;
+	MC_Color col, col1, col2;
+	GradientEntry before, after;
+	for (size_t i = 0; i < entrys.size(); i++) {
+		if (entrys.at(i).pos < pos)
+			before = entrys.at(i);
+		else if (entrys.at(i).pos == pos)
+			return entrys.at(i).col;
+		else {
+			after = entrys.at(i);
+			break;
+		}
+	}
+	col1 = before.col;
+	col2 = after.col;
+	dist = (pos - before.pos) * (1 / (after.pos - before.pos));
+
+	col.r = lerp(col1.r, col2.r, dist);
+	col.g = lerp(col1.g, col2.g, dist);
+	col.b = lerp(col1.b, col2.b, dist);
+	col.a = lerp(col1.a, col2.a, dist);
+	return col;
 }

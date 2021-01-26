@@ -19,8 +19,8 @@ TextHolder styledReturnText;
 //#define TEST_DEBUG
 
 void Hooks::Init() {
-	logF("Setting up Hooks...");
 	// clang-format off
+	logF("Setting up Hooks...");
 	// Vtables
 	{
 		// GameMode::vtable
@@ -271,6 +271,15 @@ void Hooks::Init() {
 		g_Hooks.InventoryTransactionManager__addActionHook = std::make_unique<FuncHook>(addAction, Hooks::InventoryTransactionManager__addAction);
 #endif
 		
+		if(g_Data.getVersion() == GAMEVERSION::g_1_16_0)
+			void* prepFeaturedServers = reinterpret_cast<void*>(FindSignature("48 8B C4 55 57 41 56 48 8D ?? ?? 48 81 EC ?? ?? ?? ?? 48 C7 44 24 ?? FE FF FF FF 48 89 58 ?? 48 89 70 ?? 0F 29 70 ?? 48 8B 05"));
+		else
+			void* prepFeaturedServers = reinterpret_cast<void*>(FindSignature("48 8B C4 55 48 8D 68 98 48 81 EC ? ? ? ? 48 C7 44 24 ? ? ? ? ? 48 89 58 10 48 89 78 18 0F 29 70 E8 48 8B 05 ? ? ? ? 48 33 C4"));
+		g_Hooks.prepFeaturedServersHook = std::make_unique<FuncHook>(prepFeaturedServers, Hooks::prepFeaturedServers);
+		
+		void* prepFeaturedServersFirstTime = reinterpret_cast<void*>(FindSignature("48 8B C4 57 41 54 41 55 41 56 41 57 48 83 EC ?? 48 C7 40 ?? FE FF FF FF 48 89 58 ?? 48 89 68 ?? 48 89 70 ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 ?? 48 8B FA"));
+		g_Hooks.prepFeaturedServersFirstTimeHook = std::make_unique<FuncHook>(prepFeaturedServersFirstTime, Hooks::prepFeaturedServersFirstTime);
+
 		void* localPlayerUpdateFromCam = reinterpret_cast<void*>(FindSignature("48 89 5C 24 ?? 57 48 83 EC ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 ?? 80 BA"));
 		g_Hooks.LocalPlayer__updateFromCameraHook = std::make_unique<FuncHook>(localPlayerUpdateFromCam, Hooks::LocalPlayer__updateFromCamera);
 
@@ -323,6 +332,10 @@ void Hooks::Enable() {
 	MH_EnableHook(MH_ALL_HOOKS);
 	
 }
+
+//std::string Hooks::GetScreenName() {
+//	return currentScreenName;
+//}
 
 void Hooks::GameMode_tick(C_GameMode* _this) {
 	static auto oTick = g_Hooks.GameMode_tickHook->GetFastcall<void, C_GameMode*>();
@@ -488,7 +501,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 		disabledRcolors[0] = std::min(1.f, rcolors[0] * 0.4f + 0.2f);
 		disabledRcolors[1] = std::min(1.f, rcolors[1] * 0.4f + 0.2f);
 		disabledRcolors[2] = std::min(1.f, rcolors[2] * 0.4f + 0.2f);
-		disabledRcolors[3] = 1;
+		disabledRcolors[3] = 0.0f;
 	}
 
 	{
@@ -496,14 +509,14 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 		std::string screenName(g_Hooks.currentScreenName);
 		if (strcmp(screenName.c_str(), "start_screen") == 0) {
 			// Draw BIG epic horion watermark
-			/*{
-				std::string text = "H O R I O N";
+			if(hudModule->isEnabled() && hudModule->startScreen){
+				std::string text = "H O R E 0 N";
 				vec2_t textPos = vec2_t(wid.x / 2.f - DrawUtils::getTextWidth(&text, 8.f) / 2.f, wid.y / 9.5f);
-				vec4_t rectPos = vec4_t(textPos.x - 55.f, textPos.y - 15.f, textPos.x + DrawUtils::getTextWidth(&text, 8.f) + 55.f, textPos.y + 75.f);
+				vec4_t rectPos = vec4_t(textPos.x - 5.f, textPos.y, textPos.x + DrawUtils::getTextWidth(&text, 8.f) + 5.f, textPos.y + DrawUtils::getFontHeight(8.f) + 5.f);
 				DrawUtils::fillRectangle(rectPos, MC_Color(13, 29, 48, 1), 1.f);
 				DrawUtils::drawRectangle(rectPos, rcolors, 1.f, 2.f);
 				DrawUtils::drawText(textPos, &text, MC_Color(255, 255, 255, 1), 8.f);
-			}*/
+			}
 
 			// Draw Custom Geo Button
 			if (g_Data.allowWIPFeatures()) {
@@ -631,7 +644,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 				shouldRenderWatermark = false;
 			}
 
-			if (shouldRenderTabGui) TabGui::render();
+			if (shouldRenderTabGui)
+				TabGui::render();
 
 			{
 				// Display ArrayList on the Right?
@@ -649,13 +663,13 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 				if (shouldRenderWatermark) {
 					constexpr float nameTextSize = 1.5f;
 					constexpr float versionTextSize = 0.7f;
-					static const float textHeight = (nameTextSize + versionTextSize * 0.7f /* We don't quite want the version string in its own line, just a bit below the name */) * DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight();
+					static const float textHeight = (nameTextSize + versionTextSize * 0.7f) * DrawUtils::getFont(Fonts::SMOOTH)->getLineHeight();//We don't quite want the version string in its own line, just a bit below the name
 					constexpr float borderPadding = 1;
 					constexpr float margin = 5;
 
-					static std::string name = "Horion";
+					static std::string name = "Hore0n";
 #ifdef _DEBUG
-					static std::string version = "dev";
+					static std::string version = "Custom";
 #elif defined _BETA
 					static std::string version = "beta";
 #else
@@ -670,10 +684,10 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 						windowSize.x - margin + borderPadding,
 						windowSize.y - margin);
 
-					DrawUtils::drawRectangle(rect, MC_Color(13, 29, 48), 1.f, 2.f);
-					DrawUtils::fillRectangle(rect, MC_Color(rcolors), 1.f);
-					DrawUtils::drawText(vec2_t(rect.x + borderPadding, rect.y), &name, MC_Color(6, 15, 24), nameTextSize);
-					DrawUtils::drawText(vec2_t(rect.x + borderPadding + nameLength, rect.w - 7), &version, MC_Color(0, 0, 0), versionTextSize);
+					DrawUtils::drawRectangle(rect, MC_Color(13, 29, 48), 0.f, 2.f);
+					DrawUtils::fillRectangle(rect, MC_Color(rcolors), 0.f);
+					DrawUtils::drawText(vec2_t(rect.x + borderPadding, rect.y), &name, MC_Color(rcolors), nameTextSize);
+					DrawUtils::drawText(vec2_t(rect.x + borderPadding + nameLength, rect.w - 7), &version, MC_Color(rcolors), versionTextSize);
 				}
 
 				// Draw ArrayList
@@ -710,8 +724,10 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 								moduleName = text;
 							}
 
-							if (!this->enabled && *this->pos == vec2_t(0.f, 0.f))
+							if (!this->enabled /* && *this->pos == vec2_t(0.f, 0.f)*/) {
 								this->shouldRender = false;
+								*this->pos = vec2_t(0.f, 0.f);
+							}
 							this->textWidth = DrawUtils::getTextWidth(&moduleName, hudModule->scale);
 						}
 
@@ -800,8 +816,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 						currColor[0] += 1.f / a * c;
 						Utils::ColorConvertHSVtoRGB(currColor[0], currColor[1], currColor[2], currColor[0], currColor[1], currColor[2]);
 
-						DrawUtils::fillRectangle(rectPos, MC_Color(13, 29, 48), 1.f);
-						DrawUtils::fillRectangle(leftRect, MC_Color(currColor), 1.f);
+						DrawUtils::fillRectangle(rectPos, MC_Color(13, 29, 48), 0.f);
+						DrawUtils::fillRectangle(leftRect, MC_Color(currColor), 0.f);
 						if (!GameData::canUseMoveKeys() && rectPos.contains(&mousePos) && hudModule->clickToggle) {
 							vec4_t selectedRect = rectPos;
 							selectedRect.x = leftRect.z;
@@ -826,7 +842,8 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 	// Zoom calc
 	{
 		static auto zoomModule = moduleMgr->getModule<Zoom>();
-		if (zoomModule->isEnabled()) zoomModule->target = zoomModule->strength;
+		if (zoomModule->isEnabled())
+			zoomModule->target = zoomModule->strength;
 		zoomModule->modifier = zoomModule->target - ((zoomModule->target - zoomModule->modifier) * 0.8f);
 		if (abs(zoomModule->modifier - zoomModule->target) < 0.1f && !zoomModule->isEnabled())
 			zoomModule->zooming = false;

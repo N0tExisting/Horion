@@ -6,7 +6,7 @@
 class Hitbox : public IModule {
 public:
 	float height = 2;
-	float width = 4;
+	float width = 1;
 	float range = 8;
 
 	Hitbox();

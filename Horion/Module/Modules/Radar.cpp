@@ -7,7 +7,7 @@ float pixelSize = 2.5f;
 float cent = size / 2.f;
 float pxSize = pixelSize / 2.f;
 float topPad = -1;
-float zoom = 1;
+float zoom = .75;
 float pxOpacity = 1;
 bool grid = true;
 // didn't bother puting this onto the header file and making it non-static...
@@ -57,8 +57,35 @@ void renderEntity(C_Entity* currentEntity, bool isRegularEntity) {
 	if (!currentEntity->isAlive())
 		return;
 
-	if (!Target::isValidTarget(currentEntity))
+	if (!Target::isValidTarget(currentEntity)) {
+		MC_Color Col;
+		int id = currentEntity->getEntityTypeId();
+		if (id == 69 || id == 64)
+			Col = MC_Color(1.f, 1.f, 0.f);
+		//else if ()
+		//	Col = ;
+		//else if (id == x)
+		//	Col = ;
+		else
+			return;
+
+		vec3_t* start = currentEntity->getPosOld();
+		vec3_t* end = currentEntity->getPos();
+		vec3_t lerped = start->lerp(end, DrawUtils::getLerpTime());
+
+		const auto delta = lerped.sub(playerPos);
+		const float dist = delta.magnitudexz();
+		const vec2_t relPos = vec2_t(
+			cent - ((delta.x * c) - (delta.z * s)),
+			topPad - ((delta.x * s) + (delta.z * c)));
+
+		if (relPos.x > 0 && relPos.x < size && relPos.y > topPad - cent && relPos.y < topPad + cent) {
+			DrawUtils::fillRectangle(vec4_t(relPos.x - pxSize / 2.f, relPos.y - pxSize / 2.f,
+											relPos.x + pxSize / 2.f, relPos.y + pxSize / 2.f),
+									Col, pxOpacity / 2.f);
+		}
 		return;
+	}
 
 	vec3_t* start = currentEntity->getPosOld();
 	vec3_t* end = currentEntity->getPos();

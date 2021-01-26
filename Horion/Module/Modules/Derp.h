@@ -3,8 +3,8 @@
 class Derp : public IModule {
 private:
 	int counter = 0;
-	bool epicStroke = false;
-	bool packetMode = false;
+	bool epicStroke = true;
+	bool packetMode = true;
 
 public:
 	Derp();

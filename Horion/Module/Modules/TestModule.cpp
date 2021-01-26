@@ -20,7 +20,12 @@ using json = nlohmann::json;
 
 
 TestModule::TestModule() : IModule(0, Category::MISC, "For testing purposes") {
+	enum1 = *(*new SettingEnum(this)).addEntry(EnumEntry("1", 1)).addEntry(EnumEntry("2", 2))
+		.addEntry(EnumEntry("3", 3)).Enum;
 	registerFloatSetting("float1", &this->float1, 0, -10, 10);
+	registerIntSetting("int1", &this->int1, 0, -10, 10);
+	registerEnumSetting("Enum1", &enum1, 0);
+	registerBoolSetting("bool1", &this->bool1, true);
 }
 
 TestModule::~TestModule() {
@@ -34,20 +39,39 @@ bool TestModule::isFlashMode() {
 	return false;
 }
 
+//<<<<<<< Official
 
 
 __forceinline unsigned __int64 rotBy(int in, unsigned int by) {
 	auto mut = static_cast<unsigned __int64>(in);
 	return ((mut & 0x7FFFFFui64) | ((static_cast<unsigned int>(in) >> 8u) & 0x800000u) /*copy sign bit*/) << by;
+//=======
+//std::vector<vec3_ti> lastPos;
+//void TestModule::onEnable() {
+//	lastPos.clear();
+//>>>>>>> Test-Merg
 }
 
 size_t posToHash(const vec3_ti& pos) {
 	return rotBy(pos.x, 0) | rotBy(pos.z, 24) | (static_cast<unsigned __int64>(pos.y) << 48u);
 }
 
+//<<<<<<< Official
 struct PosHasher {
 	size_t operator()(const vec3_ti& i) const { return posToHash(i); };
 };
+//=======
+	//if(std::find(lastPos.begin(), lastPos.end(), startNode) == lastPos.end()){
+	//	lastPos.push_back(startNode);
+	//}*/
+	//if (gm->player->velocity.y > 0)
+		
+	//auto ptr = g_Data.getClientInstance()->getPointerStruct();
+	//static int lastStat = 0;
+	//if (ptr->entityPtr == nullptr && ptr->rayHitType == 0 && ptr->block.y > 0) {
+	//	bool isDestroyed = false;
+	//	gm->survivalDestroyBlockHack(ptr->block, ptr->blockSide, isDestroyed, lastStat == 0);
+//>>>>>>> Test-Merg
 
 std::unordered_set<vec3_ti, PosHasher> renderPos(8);
 

@@ -2,7 +2,7 @@
 
 #include "../../../Utils/Target.h"
 
-TriggerBot::TriggerBot() : IModule(0, Category::COMBAT, "Attacks entities you're looking at") {
+TriggerBot::TriggerBot() : IModule('K', Category::COMBAT, "Attacks entities you're looking at") {
 	this->registerIntSetting("delay", &this->delay, this->delay, 0, 20);
 }
 
@@ -17,10 +17,7 @@ void TriggerBot::onTick(C_GameMode* gm) {
 	C_Entity* target = g_Data.getClientInstance()->getPointerStruct()->entityPtr;
 	
 	Odelay++;
-	if (target != 0 && Odelay >= delay) {
-		if (!Target::isValidTarget(target))
-			return;
-
+	if (target != 0 && Odelay >= delay && Target::isValidTarget(target)) {
 		if (!moduleMgr->getModule<NoSwing>()->isEnabled()) 
 			localPlayer->swingArm();
 		gm->attack(target);

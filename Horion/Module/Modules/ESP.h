@@ -5,9 +5,11 @@
 
 class ESP : public IModule {
 public:
-	bool isMobEsp = false;
+	bool isMobEsp = true;
 	bool doRainbow = true;
 	bool is2d = false;
+	bool showInvis = true;
+
 	ESP();
 	~ESP();
 

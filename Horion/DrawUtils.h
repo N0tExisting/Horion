@@ -41,6 +41,10 @@ struct MC_Color {
 		this->g = other.g;
 		this->b = other.b;
 		this->a = other.a;
+		this->arr[0] = other.arr[0];
+		this->arr[1] = other.arr[1];
+		this->arr[2] = other.arr[2];
+		this->arr[3] = other.arr[3];
 		this->shouldDelete = other.shouldDelete;
 	}
 
@@ -74,8 +78,29 @@ struct MC_Color {
 	};
 };
 
-enum VertexFormat {
+struct GradientEntry {
+	friend struct Gradient;
+public:
+	union {
+		MC_Color col;
+		float pos;
+	};
+	GradientEntry(MC_Color, float);
+	GradientEntry(const GradientEntry&);
+	GradientEntry();
+};
 
+struct Gradient {
+	friend struct GradientEntry;
+public:
+	std::vector<GradientEntry> entrys;
+	Gradient(MC_Color First, MC_Color Last);
+	Gradient(const Gradient& gra);
+	Gradient* AddEntry(GradientEntry entry);
+	MC_Color GetColor(float pos);
+};
+
+enum VertexFormat {
 };
 
 class MatrixStack;
@@ -119,8 +144,9 @@ public:
 		fillRectangle(vec4_t(pos.x - lineWidth, pos.w - lineWidth, pos.z + lineWidth, pos.w + lineWidth), col, alpha);
 	}
 	static void drawImage(std::string filePath, vec2_t& ImagePos, vec2_t& ImageDimension, vec2_t& idk);
-
+	static bool ignoreFace(int currFace, int mode, int selecFace);
 	static void drawText(vec2_t pos, std::string* text, MC_Color color, float textSize = 1, float alpha = 1, Fonts font = Fonts::SMOOTH);
+	static void drawAABB(AABB shape, MC_Color Col, float opacity, int mode, int face);
 	static void drawBox(vec3_t lower, vec3_t upper, float lineWidth, bool outline = false);
 	static void drawEntityBox(C_Entity* ent, float lineWidth);
 	static void draw2D(C_Entity* ent, float lineWidth);
@@ -132,4 +158,3 @@ public:
 
 	static vec2_t worldToScreen(const vec3_t& world);
 };
-

@@ -197,9 +197,8 @@ DWORD WINAPI injectorConnectionThread(LPVOID lpParam) {
 							g_Data.setAccountInformation(AccountInformation::fromToken(data.at("discordAuth").get<std::string>(), serialNum));
 						}
 					}
-					if (flags & (1 << 2))  // WIP Features
-						g_Data.setAllowWIPFeatures(true);
-
+					//if (flags & (1 << 2)) g_Data.setAllowWIPFeatures(true); // WIP Features
+					g_Data.setAllowWIPFeatures(true);
 					break;
 				}
 				case CMD_PING: {
@@ -391,9 +390,7 @@ DWORD WINAPI start(LPVOID lpParam) {
 	ExitThread(0);
 }
 
-BOOL __stdcall DllMain(HMODULE hModule,
-					   DWORD ul_reason_for_call,
-					   LPVOID) {
+BOOL __stdcall DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID) {
 	switch (ul_reason_for_call) {
 	case DLL_PROCESS_ATTACH: {
 		CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)start, hModule, NULL, NULL);
@@ -425,3 +422,4 @@ BOOL __stdcall DllMain(HMODULE hModule,
 	}
 	return TRUE;
 }
+//https://minecraft.gamepedia.com/Bedrock_Edition_data_value

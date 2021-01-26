@@ -24,14 +24,12 @@ void AutoClicker::onTick(C_GameMode* gm) {
 			auto selectedItem = localPlayer->getSelectedItem();
 			if (weapons && selectedItem->getAttackingDamageWithEnchants() < 1)
 				return;
-
-			g_Data.leftclickCount++;
-
-			if(!moduleMgr->getModule<NoSwing>()->isEnabled()) 
-				localPlayer->swingArm();
-
-			if (target != 0)
+			if (target != 0) {
+				g_Data.leftclickCount++;
 				gm->attack(target);
+				if(!moduleMgr->getModule<NoSwing>()->isEnabled()) 
+					localPlayer->swingArm();
+			}
 			Odelay = 0;
 		}
 	}

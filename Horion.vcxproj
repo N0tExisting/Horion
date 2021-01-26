@@ -30,7 +30,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{499784D2-7EA3-4CBE-BD93-EC0DBBC42FCD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -212,7 +212,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include=".clang-format" />
+    <None Include=".gitignore" />
+    <None Include="CppProperties.json" />
+    <None Include="LICENSE" />
     <None Include="packages.config" />
+    <None Include="README.md" />
     <None Include="resources\coolroblox.json" />
     <None Include="resources\Steve.dat" />
   </ItemGroup>
@@ -230,6 +234,7 @@
     <ResourceCompile Include="Horion.rc" />
   </ItemGroup>
   <ItemGroup>
+    <!--<ClCompile Include="Horion\Module\Modules\AutoBucket.cpp" />-->
     <ClCompile Include="Horion\Command\CommandMgr.cpp" />
     <ClCompile Include="Horion\Command\Commands\BindCommand.cpp" />
     <ClCompile Include="Horion\Command\Commands\BruhCommand.cpp" />
@@ -285,7 +290,7 @@
     <ClCompile Include="Horion\Module\Modules\AntiVoid.cpp" />
     <ClCompile Include="Horion\Module\Modules\AutoArmor.cpp" />
     <ClCompile Include="Horion\Module\Modules\AutoClicker.cpp" />
-    <ClCompile Include="Horion\Module\Modules\AutoGapple.cpp" />
+    <!--<ClCompile Include="Horion\Module\Modules\AutoGapple.cpp" />-->
     <ClCompile Include="Horion\Module\Modules\AutoSneak.cpp" />
     <ClCompile Include="Horion\Module\Modules\AutoSprint.cpp" />
     <ClCompile Include="Horion\Module\Modules\AutoTotem.cpp" />
@@ -359,6 +364,7 @@
     <ClCompile Include="Horion\Module\Modules\Tower.cpp" />
     <ClCompile Include="Horion\Module\Modules\Tracer.cpp" />
     <ClCompile Include="Horion\Module\Modules\TriggerBot.cpp" />
+    <ClCompile Include="Horion\Module\Modules\Twerk.cpp" />
     <ClCompile Include="Horion\Module\Modules\VanillaPlus.cpp" />
     <ClCompile Include="Horion\Module\Modules\Velocity.cpp" />
     <ClCompile Include="Horion\Module\Modules\Waypoints.cpp" />
@@ -413,8 +419,10 @@
     <ClCompile Include="Utils\TextFormat.cpp" />
     <ClCompile Include="Utils\Utils.cpp" />
     <ClCompile Include="Utils\VoxelIntersector.cpp" />
+    <ClCompile Include="WellThatsAnkward\selectionHighlight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <!--<ClInclude Include="Horion\Module\Modules\AutoBucket.h" />-->
     <ClInclude Include="Horion\Command\CommandMgr.h" />
     <ClInclude Include="Horion\Command\Commands\BindCommand.h" />
     <ClInclude Include="Horion\Command\Commands\BruhCommand.h" />
@@ -468,9 +476,10 @@
     <ClInclude Include="Horion\Module\Modules\AntiBot.h" />
     <ClInclude Include="Horion\Module\Modules\AntiImmobile.h" />
     <ClInclude Include="Horion\Module\Modules\AntiVoid.h" />
+    <ClInclude Include="Horion\Module\Modules\ArmourStruct.h" />
     <ClInclude Include="Horion\Module\Modules\AutoArmor.h" />
     <ClInclude Include="Horion\Module\Modules\AutoClicker.h" />
-    <ClInclude Include="Horion\Module\Modules\AutoGapple.h" />
+    <!--<ClInclude Include="Horion\Module\Modules\AutoGapple.h" />-->
     <ClInclude Include="Horion\Module\Modules\AutoSneak.h" />
     <ClInclude Include="Horion\Module\Modules\AutoSprint.h" />
     <ClInclude Include="Horion\Module\Modules\AutoTotem.h" />
@@ -545,6 +554,7 @@
     <ClInclude Include="Horion\Module\Modules\Tracer.h" />
     <ClInclude Include="Horion\Module\Modules\TriggerBot.h" />
     <ClInclude Include="Horion\Module\Modules\VanillaPlus.h" />
+    <ClInclude Include="Horion\Module\Modules\Twerk.h" />
     <ClInclude Include="Horion\Module\Modules\Velocity.h" />
     <ClInclude Include="Horion\Module\Modules\Waypoints.h" />
     <ClInclude Include="Horion\Module\Modules\Xray.h" />
@@ -599,6 +609,7 @@
     <ClInclude Include="Memory\Hooks.h" />
     <ClInclude Include="Memory\MinHook.h" />
     <ClInclude Include="Memory\SlimMem.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SDK\CBlockLegacy.h" />
     <ClInclude Include="SDK\CCamera.h" />
     <ClInclude Include="SDK\CChestBlockActor.h" />
@@ -636,6 +647,10 @@
     <ClInclude Include="Utils\Utils.h" />
     <ClInclude Include="Utils\VoxelIntersector.h" />
     <ClInclude Include="Utils\xorstr.h" />
+    <ClInclude Include="WellThatsAnkward\selectionHighlight.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

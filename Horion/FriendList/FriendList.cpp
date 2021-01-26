@@ -17,13 +17,15 @@ std::vector<std::string> FriendList::getList() {
 }
 
 bool FriendList::findPlayer(std::string name) {
+	if (name.size() > 1) return false;
 	//std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-	for (std::vector<std::string>::iterator it = g_friend.List.begin(); it != g_friend.List.end(); ++it) {
+	for (auto it = g_friend.List.begin(); it != g_friend.List.end(); ++it) {
 		//std::string copy = *it;
 		//std::transform(copy.begin(), copy.end(), copy.begin(), ::tolower);
-		if (it->find(name) != std::string::npos) {
+		if (it->find(name) != std::string::npos)
 			return true;
-		}
+		if (strstr(name.c_str(), it._Ptr->c_str()) == 0)
+			return true;
 	}
 	return false;
 }
