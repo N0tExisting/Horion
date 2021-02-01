@@ -1,4 +1,4 @@
-#include "CrystalAura.h"
+#include "CrystalAura2.h"
 
 CrystalAura2::CrystalAura2() : IModule(VK_NUMPAD0, Category::COMBAT, "Destroys nearby Crystals") {
 	registerIntSetting("range", &range, range, 1, 10);
@@ -67,13 +67,13 @@ void findEntity3(C_Entity* currentEntity, bool isRegularEntity) {
 }
 
 bool checkTargCollision(vec3_t* block, C_Entity* ent) {
-	std::vector<vec3_t*> corners;
+	std::vector<vec3_t> corners;
 	corners.clear();
 
-	corners.push_back(new vec3_t(ent->aabb.lower.x, ent->aabb.lower.y, ent->aabb.lower.z));
-	corners.push_back(new vec3_t(ent->aabb.lower.x, ent->aabb.lower.y, ent->aabb.upper.z));
-	corners.push_back(new vec3_t(ent->aabb.upper.x, ent->aabb.lower.y, ent->aabb.upper.z));
-	corners.push_back(new vec3_t(ent->aabb.upper.x, ent->aabb.lower.y, ent->aabb.lower.z));
+	corners.push_back(vec3_t(ent->aabb.lower.x, ent->aabb.lower.y, ent->aabb.lower.z));
+	corners.push_back(vec3_t(ent->aabb.lower.x, ent->aabb.lower.y, ent->aabb.upper.z));
+	corners.push_back(vec3_t(ent->aabb.upper.x, ent->aabb.lower.y, ent->aabb.upper.z));
+	corners.push_back(vec3_t(ent->aabb.upper.x, ent->aabb.lower.y, ent->aabb.lower.z));
 	int n = 0;
 	if (!corners.empty())
 		for (auto corner : corners) {
@@ -84,7 +84,7 @@ bool checkTargCollision(vec3_t* block, C_Entity* ent) {
 			//	DrawUtils::drawBox(vec3_t(floor(corners[n]->x), floor(corners[n]->y - 0.5f), floor(corners[n]->z)), vec3_t(floor(corners[n]->x) + 1.f, floor(corners[n]->y - 0.5f) + 1.f, floor(corners[n]->z) + 1.f), 2.f);
 			n++;
 
-			if ((floor(corner->x) == floor(block->x)) && (floor(corner->y) == floor(block->y)) && (floor(corner->z) == floor(block->z))) {
+			if ((floor(corner.x) == floor(block->x)) && (floor(corner.y) == floor(block->y)) && (floor(corner.z) == floor(block->z))) {
 				//	DrawUtils::setColor(1.f, 0.f, 0.f, 0.5f);
 				//	DrawUtils::drawBox(block->floor(), {floor(block->x) + 1.f, floor(block->y) + 1.f, floor(block->z) + 1.f}, 0.7f, false);
 				return true;
@@ -99,18 +99,18 @@ bool checkSurrounded2(C_Entity* ent) {
 	vec3_t entPos = ent->getPos()->floor();
 	entPos.y -= 1;
 
-	std::vector<vec3_ti*> blockChecks;
+	std::vector<vec3_ti> blockChecks;
 	blockChecks.clear();
 
 	if (blockChecks.empty()) {
-		blockChecks.push_back(new vec3_ti(entPos.x, entPos.y, entPos.z + 1));
-		blockChecks.push_back(new vec3_ti(entPos.x, entPos.y, entPos.z - 1));
-		blockChecks.push_back(new vec3_ti(entPos.x + 1, entPos.y, entPos.z));
-		blockChecks.push_back(new vec3_ti(entPos.x - 1, entPos.y, entPos.z));
+		blockChecks.push_back(vec3_ti(entPos.x, entPos.y, entPos.z + 1));
+		blockChecks.push_back(vec3_ti(entPos.x, entPos.y, entPos.z - 1));
+		blockChecks.push_back(vec3_ti(entPos.x + 1, entPos.y, entPos.z));
+		blockChecks.push_back(vec3_ti(entPos.x - 1, entPos.y, entPos.z));
 	}
 
 	for (auto blocks : blockChecks) {
-		if (!checkTargCollision(&blocks->toVec3t(), ent)) {
+		if (!checkTargCollision(&blocks.toVec3t(), ent)) {
 			return false;
 		}
 	}
@@ -135,8 +135,8 @@ std::vector<vec3_t*> getGucciPlacement2(C_Entity* ent) {
 		auto blkID = g_Data.getLocalPlayer()->region->getBlock(*blocks)->toLegacy()->blockId;
 		auto blkIDL = g_Data.getLocalPlayer()->region->getBlock(vec3_ti(blocks->x, blocks->y - 1, blocks->z))->toLegacy()->blockId;
 		auto blkIDLL = g_Data.getLocalPlayer()->region->getBlock(vec3_ti(blocks->x, blocks->y - 2, blocks->z))->toLegacy()->blockId;
-		auto blkIDLLL = g_Data.getLocalPlayer()->region->getBlock(vec3_ti(blocks->x, blocks->y - 3, blocks->z))->toLegacy()->blockId;
-		auto blkIDLLLL = g_Data.getLocalPlayer()->region->getBlock(vec3_ti(blocks->x, blocks->y - 4, blocks->z))->toLegacy()->blockId;
+		//auto blkIDLLL = g_Data.getLocalPlayer()->region->getBlock(vec3_ti(blocks->x, blocks->y - 3, blocks->z))->toLegacy()->blockId;
+		//auto blkIDLLLL = g_Data.getLocalPlayer()->region->getBlock(vec3_ti(blocks->x, blocks->y - 4, blocks->z))->toLegacy()->blockId;
 
 		if (!checkTargCollision(&blocks->toVec3t(), ent)) {  //very efficient coding here
 

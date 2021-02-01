@@ -418,6 +418,8 @@
     <ClCompile Include="Utils\Target.cpp" />
     <ClCompile Include="Utils\TextFormat.cpp" />
     <ClCompile Include="Utils\Utils.cpp" />
+    <ClCompile Include="WellThatsAnkward\HudEditor.cpp" />
+    <ClCompile Include="WellThatsAnkward\HudModule2.cpp" />
     <ClCompile Include="WellThatsAnkward\selectionHighlight.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -637,6 +639,7 @@
     <ClInclude Include="Utils\ChakraHelper.h" />
     <ClInclude Include="Utils\DllHelper.h" />
     <ClInclude Include="Utils\HMath.h" />
+    <ClInclude Include="Utils\Intersect.h" />
     <ClInclude Include="Utils\Json.hpp" />
     <ClInclude Include="Utils\keys.h" />
     <ClInclude Include="Utils\Logger.h" />
@@ -645,6 +648,8 @@
     <ClInclude Include="Utils\TextFormat.h" />
     <ClInclude Include="Utils\Utils.h" />
     <ClInclude Include="Utils\xorstr.h" />
+    <ClInclude Include="WellThatsAnkward\HudEditor.h" />
+    <ClInclude Include="WellThatsAnkward\HudModule2.h" />
     <ClInclude Include="WellThatsAnkward\selectionHighlight.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,10 +1,10 @@
 #pragma once
 #include "../Horion/Module/Modules/Module.h"
 
-class HudModule : public IModule {
+class HudModule2 : public IModule {
 public:
-	HudModule();
-	~HudModule();
+	HudModule2();
+	~HudModule2();
 	bool tabgui = false;
 	bool arraylist = true;
 	bool clickToggle = true;

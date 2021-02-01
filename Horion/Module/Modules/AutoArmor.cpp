@@ -5,11 +5,11 @@
 #include "AutoArmor.h"
 
 AutoArmor::AutoArmor() : IModule(0, Category::PLAYER, "Automatically equips the best armor") {
-	registerFloatSetting("Prottection multpl", &prottM, prottM, 0.1f, 2.f);
-	registerFloatSetting("Thorns multplier", &thornM, thornM, 0.1f, 2.f);
-	registerFloatSetting("BlastProt multpl", &bProtM, bProtM, 0.1f, 2.f);
-	registerFloatSetting("FireProt multpl", &fProtM, fProtM, 0.1f, 2.f);
-	registerFloatSetting("PojecProt multpl", &pProtM, pProtM, 0.1f, 2.f);
+	registerFloatSetting("Prottection multpl", &this->prottM, this->prottM, 0.1f, 2.f);
+	registerFloatSetting("Thorns multplier", &this->thornM, this->thornM, 0.1f, 2.f);
+	registerFloatSetting("BlastProt multpl", &this->bProtM, this->bProtM, 0.1f, 2.f);
+	registerFloatSetting("FireProt multpl", &this->fProtM, this->fProtM, 0.1f, 2.f);
+	registerFloatSetting("PojecProt multpl", &this->pProtM, this->pProtM, 0.1f, 2.f);
 }
 AutoArmor::~AutoArmor() {
 }

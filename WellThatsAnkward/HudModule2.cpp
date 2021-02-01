@@ -1,9 +1,10 @@
-#include "HudModule.h"
+#include "HudModule2.h"
 #include "../Horion/DrawUtils.h"
 #include "../Horion/Scripting/ScriptManager.h"
 #include "../Utils/Logger.h"
+#include "HudEditor.h"
 
-HudModule::HudModule() : IModule(0x0, Category::VISUAL, "Edit HUD elements") {
+HudModule2::HudModule2() : IModule(0x0, Category::VISUAL, "Edit HUD elements") {
 	registerBoolSetting("TabGui", &this->tabgui, this->tabgui);
 	registerBoolSetting("ArrayList", &this->arraylist, this->arraylist);
 	registerBoolSetting("ClickToggle", &this->clickToggle, this->clickToggle);
@@ -33,15 +34,13 @@ HudModule::HudModule() : IModule(0x0, Category::VISUAL, "Edit HUD elements") {
 
 	//*/
 }
-
-HudModule::~HudModule() {
+HudModule2::~HudModule2() {
 }
-
-const char* HudModule::getModuleName() {
+const char* HudModule2::getModuleName() {
 	return ("HUD");
 }
-static std::vector<C_Entity*> playerList;
 
+static std::vector<C_Entity*> playerList;
 void findPlayers(C_Entity* currentEntity, bool isRegularEntity) {
 	//log(*currentEntity->getNameTag()->getText());
 	if (currentEntity == nullptr)
@@ -60,7 +59,7 @@ int Odelay = 0;
 float xDiff = -1.f;
 float yDiff = -1.f;
 
-void HudModule::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
+void HudModule2::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	
 	vec2_t windowSize = g_Data.getClientInstance()->getGuiData()->windowSize;
 	vec2_t windowSizeReal = g_Data.getClientInstance()->getGuiData()->windowSizeReal;
@@ -457,15 +456,12 @@ void HudModule::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 					}
 				}
 			}
-
-
-
-
+			//?*/
 		}
 	}
 }
 
-/*int HudModule::countItem(C_ItemStack* itemC) {
+/*int HudModule2::countItem(C_ItemStack* itemC) {
 	int mafs = 0;
 	for (int i = 0; i < 36; i++) {
 		int itemIDC = itemC->getItem()->itemId;
@@ -479,7 +475,7 @@ void HudModule::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 
 }*/
 
-bool HudModule::isThereTotem() {
+bool HudModule2::isThereTotem() {
 	int mafs = 0;
 	for (int i = 0; i < 36; i++) {
 		int itemIDC = 450;
@@ -496,7 +492,7 @@ bool HudModule::isThereTotem() {
 	}
 }
 
-bool HudModule::isThereCrystal() {
+bool HudModule2::isThereCrystal() {
 	int mafs = 0;
 	for (int i = 0; i < 36; i++) {
 		int itemIDC = 426;
@@ -513,7 +509,7 @@ bool HudModule::isThereCrystal() {
 	}
 }
 
-bool HudModule::isThereGapples() {
+bool HudModule2::isThereGapples() {
 	int mafs = 0;
 	for (int i = 0; i < 36; i++) {
 		int itemIDC = 466;
@@ -530,7 +526,7 @@ bool HudModule::isThereGapples() {
 	}
 }
 
-bool HudModule::isThereXp() {
+bool HudModule2::isThereXp() {
 	int mafs = 0;
 	for (int i = 0; i < 36; i++) {
 		int itemIDC = 384;
@@ -547,7 +543,7 @@ bool HudModule::isThereXp() {
 	}
 }
 
-int HudModule::countItem(int itemIDCount) {
+int HudModule2::countItem(int itemIDCount) {
 	int mafs = 0;
 	for (int i = 0; i < 36; i++) {
 		C_ItemStack* itemToCount = g_Data.getLocalPlayer()->getSupplies()->inventory->getItemStack(i);
@@ -560,7 +556,7 @@ int HudModule::countItem(int itemIDCount) {
 	//mafs = 0;
 }
 
-int HudModule::pullSlot(int itemIDPog) {
+int HudModule2::pullSlot(int itemIDPog) {
 	int mafs = 0;
 	for (int i = 0; i < 36; i++) {
 		C_ItemStack* itemToCount = g_Data.getLocalPlayer()->getSupplies()->inventory->getItemStack(i);
@@ -570,8 +566,8 @@ int HudModule::pullSlot(int itemIDPog) {
 	}
 }
 
-void HudModule::onTick(C_GameMode* gm) {
+void HudModule2::onTick(C_GameMode* gm) {
 }
 
-void HudModule::onDisable() {
+void HudModule2::onDisable() {
 }

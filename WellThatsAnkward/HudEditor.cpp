@@ -15,12 +15,8 @@ HudEditor::HudEditor() : IModule(0x0, Category::VISUAL, "Edit HUD element positi
 	registerFloatSetting("modulesY", &this->arrayY, this->arrayY, 0.f, g_Data.getClientInstance()->getGuiData()->windowSize.y);
 
 }
-
-
-
 HudEditor::~HudEditor() {
 }
-
 const char* HudEditor::getModuleName() {
 	return ("Hud Editor");
 }
@@ -36,15 +32,15 @@ void HudEditor::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	mousePosition = mousePosition.mul(windowSize);
 	
 	//*/
-	static auto clickGuiMod2 = moduleMgr->getModule<ClickGuiMod>();
+	//static auto clickGuiMod2 = moduleMgr->getModule<ClickGuiMod>();
 
 	//clickGuiMod2->setEnabled(false);
 
 
-	if (g_Data.isKeyDown(VK_ESCAPE)) {
-	//	clickGuiMod2->setEnabled(true);
-		this->setEnabled(false);
-	}
+	//if (g_Data.isKeyDown(VK_ESCAPE)) {
+	////	clickGuiMod2->setEnabled(true);
+	//	this->setEnabled(false);
+	//}
 
 
 
@@ -53,16 +49,7 @@ void HudEditor::onPostRender(C_MinecraftUIRenderContext* renderCtx) {
 	if (g_Data.getClientInstance()->getMouseGrabbed())
 		g_Data.getClientInstance()->releaseMouse();
 		//*/
-
-
-
-
-
-
-
 }
-
-
 
 void HudEditor::onDisable() {
 

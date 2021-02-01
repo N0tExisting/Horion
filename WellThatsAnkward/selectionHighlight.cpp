@@ -8,7 +8,7 @@ selectionHighlight::selectionHighlight() : IModule(0x0, Category::VISUAL, "Custo
 	FaceH.addEntry(EnumEntry("None", 0)).addEntry(EnumEntry("Selected", 1)).addEntry(EnumEntry("All", 3));
 	ShowName.addEntry(EnumEntry("None", 0)).addEntry(EnumEntry("Simple", 1)).addEntry(EnumEntry("Detailed", 2));
 	registerEnumSetting("Blockinfo", &ShowName, 2);
-	//registerBoolSetting("Block Info", &this->ShowName, this->ShowName);
+	registerFloatSetting("Best Point Width", &this->bestPoint, this->bestPoint, 0.f, 2.f);
 	registerFloatSetting("Backround opacity", &this->baOpacity, this->baOpacity, 0.f, 1.f);
 	registerEnumSetting("Highlight Faces", &FaceH, 1);
 	registerFloatSetting("Face Opacity", &this->fOpacity, this->fOpacity, 0.05f, 1.f);
@@ -21,10 +21,8 @@ selectionHighlight::selectionHighlight() : IModule(0x0, Category::VISUAL, "Custo
 	registerFloatSetting("Blue", &this->bSelect, this->bSelect, 0.f, 1.f);
 	//registerBoolSetting("FaceHighlight", &this->faceH, this->faceH);
 }
-
 selectionHighlight::~selectionHighlight() {
 }
-
 const char* selectionHighlight::getModuleName() {
 	return ("Highlight Selection");
 }
@@ -66,7 +64,7 @@ void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 		//	};
 		//	g_Data.getLocalPlayer()->region->getBlock(angles[0])->toLegacy()->blockId == 0
 		//} else {
-		DrawUtils::drawBox(ptr->block.toVec3t(), ptr->block.add(1).toVec3t(), thickness, doOutline);
+			DrawUtils::drawBox(ptr->block.toVec3t(), ptr->block.add(1).toVec3t(), thickness, doOutline);
 		//}
 		// Faces
 		if (selectRainbow)
@@ -85,6 +83,12 @@ void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 				DrawUtils::drawAABB(h, col, fOpacity, 3, ptr->blockSide);
 				break;
 		}
+
+		Utils::ApplyRainbow(Color, 0.5f);
+		DrawUtils::setColor(Color[0], Color[1], Color[2], fOpacity);
+		vec2_t proj = DrawUtils::worldToScreen(h.ClosestPointAABB(g_Data.getLocalPlayer()->eyePos0));
+		DrawUtils::drawLine(proj.sub(bestPoint), proj.add(bestPoint), bestPoint);
+
 		// Info
 		BlockInfo Data = BlockInfo(block);
 		if (ShowName.GetEntry()->GetValue() == 1) {
@@ -105,30 +109,48 @@ void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 		}
 	}
 	if (ptr->entityPtr != 0) {
-		C_Entity* ent = ptr->entityPtr;
-		Gradient dist = *Gradient(MC_Color(0.f, 1.f, 1.f, fOpacity), MC_Color(1.f, 0.f,0.f, fOpacity))
-							 .AddEntry(GradientEntry(MC_Color(.75f, .75f, .0f), .5f)) // yellow color at the middle
-							 ->AddEntry(GradientEntry(MC_Color(.0f, .875f, .0f), .75f));
-		float avgBlob = ((ent->aabb.upper.x - ent->aabb.lower.x) + (ent->aabb.upper.y - ent->aabb.lower.y)
-			+ (ent->aabb.upper.z - ent->aabb.lower.z)) / 3.f;
-		float estimatedDist = (g_Data.getLocalPlayer()->eyePos0.dist(ent->aabb.centerPoint()) + avgBlob);
-		MC_Color col = dist.GetColor(estimatedDist / moduleMgr->getModule<Reach>()->GetCurrentReach());
-		AABB rendered = AABB(ent->getPos()->lerp(ent->getPosOld(), DrawUtils::getLerpTime()),
-			ent->width, ent->height, ent->getPos()->y - ent->aabb.lower.y);
-		//rendered.upper.y = rendered.upper.y + moduleMgr->getModule<TestModule>()->float1;
-		DrawUtils::drawAABB(ent->aabb, col, fOpacity, 1, -1);
-		//std::string name = ent->getNameTag()->getText();
-		char n[0xf];
-		sprintf_s(n, 0xf, "%.3f / %.3f", estimatedDist, moduleMgr->getModule<Reach>()->GetCurrentReach());
-		std::string name = n;
-		if (ShowName.GetEntry()->GetValue() > 0/* && name.length() > 1*/) {
-			DrawUtils::setColor(15 / 255.f, 30 / 255.f, 50 / 255.f, baOpacity);
-			DrawUtils::fillRectangle(
-				vec2_t((g_Data.getGuiData()->widthGame - DrawUtils::getTextWidth(&name, 1.5f)) / 2.f - 3.f, 0.f),
-				vec2_t((g_Data.getGuiData()->widthGame + DrawUtils::getTextWidth(&name, 1.5f)) / 2.f + 3.f,
-					   DrawUtils::getFontHeight(1.5f) + 3.5f));
-			moduleMgr->getModule<Compass>()->drawCenteredText(
-				vec2_t(g_Data.getGuiData()->widthGame / 2, -0.f), name, 1.5f, 1.f, col);
+		try {
+			C_Entity* ent = ptr->entityPtr;
+			Gradient dist = *Gradient(MC_Color(0.f, 1.f, 1.f, fOpacity), MC_Color(1.f, 0.f,0.f, fOpacity))
+							.AddEntry(GradientEntry(MC_Color(.75f, .75f, .0f), .5f))// yellow color at the middle
+							->AddEntry(GradientEntry(MC_Color(.0f, .875f, .0f), .75f));//better transition to green & blue
+			AABB aabb = ent->aabb;
+			vec3_t* hitPos = new vec3_t();
+			aabb.RayAABB(g_Data.getLocalPlayer()->eyePos0, ptr->rayHitVec, hitPos);
+			float Dist = aabb.DistToAABB(g_Data.getLocalPlayer()->eyePos0);//hitPos->dist(g_Data.getLocalPlayer()->eyePos0);
+			MC_Color col = dist.GetColor(Dist / moduleMgr->getModule<Reach>()->GetCurrentReach());
+			AABB rendered = AABB(ent->getPos()->lerp(ent->getPosOld(), DrawUtils::getLerpTime()),
+				ent->width, ent->height, ent->getPos()->y - aabb.lower.y);
+			rendered.upper.y += .1f;
+			DrawUtils::drawAABB(rendered, col, fOpacity, 1, -1);
+			delete hitPos;
+
+			Utils::ApplyRainbow(Color, 0.5f);
+			DrawUtils::setColor(Color[0], Color[1], Color[2], fOpacity);
+			vec2_t proj = DrawUtils::worldToScreen(rendered.ClosestPointAABB(g_Data.getLocalPlayer()->eyePos0));
+			DrawUtils::drawLine(proj.sub(bestPoint), proj.add(bestPoint), bestPoint);
+
+			char n[0x23];
+			char _n[0x23];
+			sprintf_s(n, 0x23, "%.3f / %.3f", Dist,
+				moduleMgr->getModule<Reach>()->GetCurrentReach());
+			std::string name = ent->getNameTag()->getText();
+			if (name.length() > 1) {
+				sprintf_s(_n, 0x23, "%s (%s)", ent->getNameTag()->getText(), n);
+				name = _n;
+			} else
+				name = n;
+			if (ShowName.GetEntry()->GetValue() > 0) {
+				DrawUtils::setColor(15 / 255.f, 30 / 255.f, 50 / 255.f, baOpacity);
+				DrawUtils::fillRectangle(
+					vec2_t((g_Data.getGuiData()->widthGame - DrawUtils::getTextWidth(&name, 1.5f)) / 2.f - 3.f, 0.f),
+					vec2_t((g_Data.getGuiData()->widthGame + DrawUtils::getTextWidth(&name, 1.5f)) / 2.f + 3.f,
+						   DrawUtils::getFontHeight(1.5f) + 3.5f));
+				moduleMgr->getModule<Compass>()->drawCenteredText(
+					vec2_t(g_Data.getGuiData()->widthGame / 2, -0.f), name, 1.5f, 1.f, col);
+			}
+		} catch (std::exception e) {
+			logF(e.what());
 		}
 	}
 }

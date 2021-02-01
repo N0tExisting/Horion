@@ -2,6 +2,7 @@
 #define PI (3.1415927f)
 
 #include <math.h>
+#include <exception>
 
 static constexpr float DEG_RAD2 = PI / 360.0f;
 static constexpr float DEG_RAD = 180.0f / PI;
@@ -138,6 +139,7 @@ struct vec3_t {
 	bool operator==(const vec3_t &o) const { return x == o.x && y == o.y && z == o.z; };
 	bool operator!=(const vec3_t &o) const { return x != o.x || y != o.y || z != o.z; };
 	vec3_t operator-() const { return vec3_t(-x, -y, -z); };
+	float operator[](int i) { return getElement(i); }
 
 	vec3_t mul(const vec3_t& o) {
 		return vec3_t(x * o.x, y * o.y, z * o.z);
@@ -251,6 +253,31 @@ struct vec3_t {
 		angles.y = (float)-atan2f(diff.x, diff.z) * DEG_RAD;
 
 		return angles;
+	}
+	float getElement(int i) const{
+		//float* it = nullptr;
+		switch (i) {
+			case 0:
+				return x;
+			case 1:
+				return y;
+			case 2:
+				return z;
+			default:
+				throw std::exception("Parameter was outside the given range");
+		}
+	}
+	float* getElementPtr(int i) const{
+		switch (i) {
+			case 0:
+				return (float *)&x;
+			case 1:
+				return (float *)&y;
+			case 2:
+				return (float*)&z;
+			default:
+				return nullptr;
+		}
 	}
 };
 
@@ -531,6 +558,8 @@ struct AABB {
 	vec3_t upper;
 	bool isZero = false;
 	char padding[3];
+#pragma warning(push)
+#pragma warning(disable : 26495)
 	AABB() {}
 	AABB(vec3_t l, vec3_t h) : lower(l), upper(h){};
 	AABB(const AABB &aabb) {
@@ -546,7 +575,7 @@ struct AABB {
 		this->lower = lower;
 		this->upper = {lower.x + width, lower.y + height, lower.z + width};
 	}
-
+#pragma warning(pop)
 	bool operator==(const AABB &rhs) const {
 		return lower == rhs.lower && upper == rhs.upper;
 	}
@@ -579,11 +608,397 @@ struct AABB {
 		return aabb.upper.x > lower.x && upper.x > aabb.lower.x &&
 			   aabb.upper.z > lower.z && upper.z > aabb.lower.z;
 	}
+
+	bool contains(vec3_t p) {
+		return this->lower.x < p.x && this->upper.x > p.x &&
+			   this->lower.y < p.y && this->upper.y > p.y &&
+			   this->lower.z < p.z && this->upper.z > p.z;
+	}
+
+	float DistToAABB(vec3_t p) {
+		if (contains(p))
+			return 0.f;
+		return p.dist(ClosestPointAABB(p));
+	}
+
+	vec3_t ClosestPointAABB(vec3_t p) {
+		vec3_t q;
+		// For each coordinate axis, if the point coordinate value is
+		// outside box, clamp it to the box, else keep it as is
+		float v = p.x;
+		if (v < this->lower.x)
+			v = this->lower.x;
+		else if (v > this->upper.x)
+			v = this->upper.x;
+		q.x = v;
+
+		v = p.y;
+		if (v < this->lower.y)
+			v = this->lower.y;
+		else if (v > this->upper.y)
+			v = this->upper.y;
+		q.y = v;
+
+		v = p.z;
+		if (v < this->lower.z)
+			v = this->lower.z;
+		else if (v > this->upper.z)
+			v = this->upper.z;
+		q.z = v;
+		
+		return q;
+	}
+	
+	// http://www.codercorner.com/RayAABB.cpp
+	
+	typedef unsigned int udword;
+	
+	//! Integer representation of a floating-point value.
+	#define IR(x) ((udword&)x)
+	
+	#define RAYAABB_EPSILON 0.00001f
+	//#define Point vec3_t
+	
+//////////////////////////////////////////////////////////////////////////////////////*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *	A method to compute a ray-AABB intersection.
+ *	Original code by Andrew Woo, from "Graphics Gems", Academic Press, 1990
+ *	Optimized code by Pierre Terdiman, 2000 (~20-30% faster on my Celeron 500)
+ *	Epsilon value added by Klaus Hartmann. (discarding it saves a few cycles only)
+ *
+ *	Hence this version is faster as well as more robust than the original one.
+ *
+ *	Should work provided:
+ *	1) the integer representation of 0.0f is 0x00000000
+ *	2) the sign bit of the float is the most significant one
+ *
+ *	Report bugs: p.terdiman@codercorner.com
+ *
+ *	\param		aabb		[in] the axis-aligned bounding box
+ *	\param		origin		[in] ray origin
+ *	\param		dir			[in] ray direction
+ *	\param		coord		[out] impact coordinates
+ *	\return		true if ray intersects AABB
+ */
+//////////////////////////////////////////////////////////////////////////////////////*////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	bool RayAABB(/*const AABB& aabb, */ const vec3_t &origin, const vec3_t &dir, vec3_t* &coord) {
+		
+		bool Inside = true;
+		vec3_t MinB = this->lower;
+		vec3_t MaxB = this->upper;
+		vec3_t MaxT;
+		MaxT.x = MaxT.y = MaxT.z = -1.0f;
+
+		// Find candidate planes.
+		for (udword i = 0; i < 3; i++) {
+			if (origin.getElement(i) < MinB.getElement(i)) {
+				*coord->getElementPtr(i) = MinB.getElement(i);
+				Inside = false;
+				float curDir = dir.getElement(i);
+				// Calculate T distances to candidate planes
+				if (IR(curDir)) *MaxT.getElementPtr(i) = (MinB.getElement(i) - origin.getElement(i)) / dir.getElement(i);
+			} else if (origin.getElement(i) > MaxB.getElement(i)) {
+				*coord->getElementPtr(i) = MaxB.getElement(i);
+				Inside = false;
+				float curDir = dir.getElement(i);
+				// Calculate T distances to candidate planes
+				if (IR(curDir)) *MaxT.getElementPtr(i) = (MaxB.getElement(i) - origin.getElement(i)) / dir.getElement(i);
+			}
+		}
+		// Ray origin inside bounding box
+		if (Inside) {
+			*coord = origin;
+			return true;
+		}
+		// Get largest of the maxT's for final choice of intersection
+		udword WhichPlane = 0;
+		if (MaxT.getElement(1) > MaxT.getElement(WhichPlane)) WhichPlane = 1;
+		if (MaxT.getElement(2) > MaxT.getElement(WhichPlane)) WhichPlane = 2;
+		// Check final candidate actually inside box
+		float curDir = MaxT.getElement(WhichPlane);
+		if (IR(curDir) & 0x80000000) return false;
+
+		for (udword i = 0; i < 3; i++) {
+			if (i != WhichPlane) {
+				*coord->getElementPtr(i) = origin.getElement(i) + MaxT.getElement(WhichPlane) * dir.getElement(i);
+#ifdef RAYAABB_EPSILON
+				if (coord->getElement(i) < MinB.getElement(i) - RAYAABB_EPSILON || coord->getElement(i) > MaxB.getElement(i) + RAYAABB_EPSILON) return false;
+#else
+				if (coord->getElement(i) < MinB.getElement(i) || coord->getElement(i) > MaxB.getElement(i)) return false;
+#endif
+			}
+		}
+		return true;  // ray hits box
+	}
+#define USE_MINMAX
+	/*
+Updated October, 5, 2001 :
+	- Below is an alternative version, up to ~25% faster than the one above on my Celeron.
+	- Not fully tested so handle with care. It's not that much different anyway.
+
+Updated October, 9, 2001:
+	- Fixed a slight bug......
+	- Compiles for (Min, Max) or (Center, Extents) boxes
+	- I did some tests with Adam Moravanszky, and the fastest version apparently depends on the machine. See for yourself.
+	- You should also take a look at Tim Schröder's version in GDMag. It's sometimes faster thanks to early exits, sometimes
+	slower (at least on my machine!).
+*/
+
+	
+	#ifndef USE_MINMAX
+	// Unroll loop, do the div early to let it pair with CPU code
+	#define FIND_CANDIDATE_PLANE(i)                                   \
+		if (origin[i] < MinB[i]) {                                    \
+			/* Calculate T distances to candidate planes */           \
+			if (IR(dir[i])) MaxT[i] = (MinB[i] - origin[i]) / dir[i]; \
+	                                                                  \
+			Inside = FALSE;                                           \
+			coord[i] = MinB[i];                                       \
+		} else if (origin[i] > MaxB[i]) {                             \
+			/* Calculate T distances to candidate planes */           \
+			if (IR(dir[i])) MaxT[i] = (MaxB[i] - origin[i]) / dir[i]; \
+	                                                                  \
+			Inside = FALSE;                                           \
+			coord[i] = MaxB[i];                                       \
+		}
+	#else
+	#define FIND_CANDIDATE_PLANE(i)                                          \
+		if (origin[i] < aabb.GetMin(i)) {                                    \
+			/* Calculate T distances to candidate planes */                  \
+			if (IR(dir[i])) MaxT[i] = (aabb.GetMin(i) - origin[i]) / dir[i]; \
+	                                                                         \
+			Inside = false;                                                  \
+			coord[i] = aabb.GetMin(i);                                       \
+		} else if (origin[i] > aabb.GetMax(i)) {                             \
+			/* Calculate T distances to candidate planes */                  \
+			if (IR(dir[i])) MaxT[i] = (aabb.GetMax(i) - origin[i]) / dir[i]; \
+	                                                                         \
+			Inside = false;                                                  \
+			coord[i] = aabb.GetMax(i);                                       \
+		}
+	#endif
+	
+	// Unroll loop
+	#ifndef USE_MINMAX
+	
+	#ifndef RAYAABB_EPSILON
+	#define COMPUTE_INTERSECT(i)                                        \
+		if (i != WhichPlane) {                                          \
+			coord[i] = origin[i] + MaxT[WhichPlane] * dir[i];           \
+			if (coord[i] < MinB[i] || coord[i] > MaxB[i]) return false; \
+		}
+	#else
+	#define COMPUTE_INTERSECT(i)                                                                            \
+		if (i != WhichPlane) {                                                                              \
+			coord[i] = origin[i] + MaxT[WhichPlane] * dir[i];                                               \
+			if (coord[i] < MinB[i] - RAYAABB_EPSILON || coord[i] > MaxB[i] + RAYAABB_EPSILON) return false; \
+		}
+	#endif
+	
+	#else
+	
+	#ifndef RAYAABB_EPSILON
+	#define COMPUTE_INTERSECT(i)                                                      \
+		if (i != WhichPlane) {                                                        \
+			coord[i] = origin[i] + MaxT[WhichPlane] * dir[i];                         \
+			if (coord[i] < aabb.GetMin(i) || coord[i] > aabb.GetMax(i)) return false; \
+		}
+	#else
+	#define COMPUTE_INTERSECT(i)                                                                                          \
+		if (i != WhichPlane) {                                                                                            \
+			coord[i] = origin[i] + MaxT[WhichPlane] * dir[i];                                                             \
+			if (coord[i] < aabb.GetMin(i) - RAYAABB_EPSILON || coord[i] > aabb.GetMax(i) + RAYAABB_EPSILON) return false; \
+		}
+	#endif // RayAABB_Epsilon
+	
+	#endif
+/*
+	bool RayAABB4(const AABB &aabb, const vec3_t &origin, const vec3_t &dir, vec3_t &coord) {
+		bool Inside = true;
+	#ifndef USE_MINMAX
+		vec3_t MinB;
+		aabb.GetMin(MinB);
+		vec3_t MaxB;
+		aabb.GetMax(MaxB);
+	#endif
+		vec3_t MaxT;
+		MaxT.x = MaxT.y = MaxT.z = -1.0f;
+	
+		// Find candidate planes.
+		FIND_CANDIDATE_PLANE(0)
+		FIND_CANDIDATE_PLANE(1)
+		FIND_CANDIDATE_PLANE(2)
+	
+		// Ray origin inside bounding box
+		if (Inside) {
+			coord = origin;
+			return true;
+		}
+	
+		// Get largest of the MaxT's for final choice of intersection
+		// - this version without FPU compares
+		// - but branch prediction might suffer
+		// - a bit faster on my Celeron, duno how it behaves on something like a P4
+		udword WhichPlane;
+		if (IR(MaxT[0]) & 0x80000000) {
+			// T[0]<0
+			if (IR(MaxT[1]) & 0x80000000) {
+				// T[0]<0
+				// T[1]<0
+				if (IR(MaxT[2]) & 0x80000000) {
+					// T[0]<0
+					// T[1]<0
+					// T[2]<0
+					return false;
+				} else {
+					WhichPlane = 2;
+				}
+			} else if (IR(MaxT[2]) & 0x80000000) {
+				// T[0]<0
+				// T[1]>0
+				// T[2]<0
+				WhichPlane = 1;
+			} else {
+				// T[0]<0
+				// T[1]>0
+				// T[2]>0
+				if (IR(MaxT[2]) > IR(MaxT[1])) {
+					WhichPlane = 2;
+				} else {
+					WhichPlane = 1;
+				}
+			}
+		} else {
+			// T[0]>0
+			if (IR(MaxT[1]) & 0x80000000) {
+				// T[0]>0
+				// T[1]<0
+				if (IR(MaxT[2]) & 0x80000000) {
+					// T[0]>0
+					// T[1]<0
+					// T[2]<0
+					WhichPlane = 0;
+				} else {
+					// T[0]>0
+					// T[1]<0
+					// T[2]>0
+					if (IR(MaxT[2]) > IR(MaxT[0])) {
+						WhichPlane = 2;
+					} else {
+						WhichPlane = 0;
+					}
+				}
+			} else if (IR(MaxT[2]) & 0x80000000) {
+				// T[0]>0
+				// T[1]>0
+				// T[2]<0
+				if (IR(MaxT[1]) > IR(MaxT[0])) {
+					WhichPlane = 1;
+				} else {
+					WhichPlane = 0;
+				}
+			} else {
+				// T[0]>0
+				// T[1]>0
+				// T[2]>0
+				WhichPlane = 0;
+				if (IR(MaxT[1]) > IR(MaxT[WhichPlane])) WhichPlane = 1;
+				if (IR(MaxT[2]) > IR(MaxT[WhichPlane])) WhichPlane = 2;
+			}
+		}*/
+	
+		// Old code below:
+		/*
+		// Get largest of the maxT's for final choice of intersection
+		udword WhichPlane = 0;
+		if(MaxT[1] > MaxT[WhichPlane])	WhichPlane = 1;
+		if(MaxT[2] > MaxT[WhichPlane])	WhichPlane = 2;
+	
+		// Check final candidate actually inside box
+		if(IR(MaxT[WhichPlane])&0x80000000) return false;
+	*//*
+	
+		COMPUTE_INTERSECT(0)
+		COMPUTE_INTERSECT(1)
+		COMPUTE_INTERSECT(2)
+	
+		return true;  // ray hits box
+	}
+	
+	// Versions usint the SAT. Original code for OBBs from MAGIC.
+	// Rewritten for AABBs and reorganized for early exits.
+	
+	// For a segment
+	bool Meshmerizer::SegmentAABB(const Segment& segment, const AABB& aabb) {
+		Point BoxExtents, Diff, Dir;
+		float fAWdU[3];
+	
+		Dir.x = 0.5f * (segment.mP1.x - segment.mP0.x);
+		BoxExtents.x = aabb.GetExtents(0);
+		Diff.x = (0.5f * (segment.mP1.x + segment.mP0.x)) - aabb.GetCenter(0);
+		fAWdU[0] = fabsf(Dir.x);
+		if (fabsf(Diff.x) > BoxExtents.x + fAWdU[0]) return false;
+	
+		Dir.y = 0.5f * (segment.mP1.y - segment.mP0.y);
+		BoxExtents.y = aabb.GetExtents(1);
+		Diff.y = (0.5f * (segment.mP1.y + segment.mP0.y)) - aabb.GetCenter(1);
+		fAWdU[1] = fabsf(Dir.y);
+		if (fabsf(Diff.y) > BoxExtents.y + fAWdU[1]) return false;
+	
+		Dir.z = 0.5f * (segment.mP1.z - segment.mP0.z);
+		BoxExtents.z = aabb.GetExtents(2);
+		Diff.z = (0.5f * (segment.mP1.z + segment.mP0.z)) - aabb.GetCenter(2);
+		fAWdU[2] = fabsf(Dir.z);
+		if (fabsf(Diff.z) > BoxExtents.z + fAWdU[2]) return false;
+	
+		float f;
+		f = Dir.y * Diff.z - Dir.z * Diff.y;
+		if (fabsf(f) > BoxExtents.y * fAWdU[2] + BoxExtents.z * fAWdU[1]) return false;
+		f = Dir.z * Diff.x - Dir.x * Diff.z;
+		if (fabsf(f) > BoxExtents.x * fAWdU[2] + BoxExtents.z * fAWdU[0]) return false;
+		f = Dir.x * Diff.y - Dir.y * Diff.x;
+		if (fabsf(f) > BoxExtents.x * fAWdU[1] + BoxExtents.y * fAWdU[0]) return false;
+	
+		return true;
+	}
+	
+	// For a ray
+	bool Meshmerizer::RayAABB(const Ray& ray, const AABB& aabb) {
+		Point BoxExtents, Diff;
+	
+		Diff.x = ray.mOrig.x - aabb.GetCenter(0);
+		BoxExtents.x = aabb.GetExtents(0);
+		if (fabsf(Diff.x) > BoxExtents.x && Diff.x * ray.mDir.x >= 0.0f) return false;
+	
+		Diff.y = ray.mOrig.y - aabb.GetCenter(1);
+		BoxExtents.y = aabb.GetExtents(1);
+		if (fabsf(Diff.y) > BoxExtents.y && Diff.y * ray.mDir.y >= 0.0f) return false;
+	
+		Diff.z = ray.mOrig.z - aabb.GetCenter(2);
+		BoxExtents.z = aabb.GetExtents(2);
+		if (fabsf(Diff.z) > BoxExtents.z && Diff.z * ray.mDir.z >= 0.0f) return false;
+	
+		float fAWdU[3];
+		fAWdU[0] = fabsf(ray.mDir.x);
+		fAWdU[1] = fabsf(ray.mDir.y);
+		fAWdU[2] = fabsf(ray.mDir.z);
+	
+		float f;
+		f = ray.mDir.y * Diff.z - ray.mDir.z * Diff.y;
+		if (fabsf(f) > BoxExtents.y * fAWdU[2] + BoxExtents.z * fAWdU[1]) return false;
+		f = ray.mDir.z * Diff.x - ray.mDir.x * Diff.z;
+		if (fabsf(f) > BoxExtents.x * fAWdU[2] + BoxExtents.z * fAWdU[0]) return false;
+		f = ray.mDir.x * Diff.y - ray.mDir.y * Diff.x;
+		if (fabsf(f) > BoxExtents.x * fAWdU[1] + BoxExtents.y * fAWdU[0]) return false;
+	
+		return true;
+	}*/
 };
 
-//inline float randomf(float start, float end) {
-//	return (start + (float)rand() / RAND_MAX) * (end - start);
-//}
-//inline int random(int start, int end) {
-//	return (int)randomf(start, end);
-//}
+inline float randomf(float start, float end) {
+	return (start + (float)rand() / RAND_MAX) * (end - start);
+}
+inline int random(int start, int end) {
+#pragma warning(suppress : 4244)
+	return (int)roundf(randomf(start, end));
+}

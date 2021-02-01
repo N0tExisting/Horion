@@ -46,16 +46,13 @@ class selectionHighlight : public IModule {
 private:
 	SettingEnum FaceH;
 	SettingEnum ShowName;
-	//bool ShowName;
-	//bool faceH = true;
 	bool doOutline = false;
-	//bool InfoBackround = true;
 	bool selectRainbow = true;
+	float bestPoint = .5f;
 	float thickness = .3f;
 	float rSelect = 1.f;
 	float gSelect = 1.f;
 	float bSelect = 1.f;
-	//float yOffset = 0.f;
 	float opacityVal = 1.f;
 	float fOpacity = 0.15f;
 	float baOpacity = 0.f;
