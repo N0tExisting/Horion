@@ -212,6 +212,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include=".clang-format" />
+    <None Include=".github\workflows\Build.yml" />
+    <None Include=".github\workflows\Check.yml" />
     <None Include=".gitignore" />
     <None Include="CppProperties.json" />
     <None Include="LICENSE" />
