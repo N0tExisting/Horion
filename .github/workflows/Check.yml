@@ -32,10 +32,10 @@ jobs:
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{matrix.build}} ${{env.SOLUTION_FILE_PATH}}
-    
-    #- uses: LouisBrunner/checks-action@v1.1.1
-    #  if: always()
-    #  with:
-    #    token: ${{secrets.GITHUB_TOKEN}}
-    #    name: Test &{{matrix.build}}
-    #    conclusion: ${{job.status}}
+      
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v2
+      if: success()
+      with:
+          name: Horion
+          path: x64\Debug\Horion.dll

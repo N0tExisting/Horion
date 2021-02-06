@@ -162,7 +162,7 @@ struct vec3_t {
 	vec3_t add(float f) {
 		return vec3_t(x + f, y + f, z + f);
 	};
-	vec3_t add(float x1, float y1, float z1) {
+	vec3_t add(float x1, float y1, float z1) const{
 		return vec3_t(x + x1, y + y1, z + z1);
 	};
 	vec3_t sub(float f) {
@@ -570,6 +570,10 @@ struct AABB {
 		this->lower = lower;
 		this->upper = {lower.x + width, lower.y + height, lower.z + width};
 	}
+	AABB(float width, float height, vec3_t Middle) {
+		this->lower = Middle.sub(height / 2, width / 2, height / 2);
+		this->upper = Middle.add(height / 2, width / 2, height / 2);
+	}
 	AABB(vec3_t lower, float width, float height, float eyeHeight) {
 		lower = lower.sub(vec3_t(width, eyeHeight * 2, width).div(2));
 		this->lower = lower;
@@ -580,7 +584,7 @@ struct AABB {
 		return lower == rhs.lower && upper == rhs.upper;
 	}
 
-	bool isFullBlock(){
+	bool isFullBlock() const {
 		auto diff = lower.sub(upper);
 		return fabsf(diff.y) == 1 && fabsf(diff.x) == 1 && fabsf(diff.z) == 1;
 	}
@@ -593,7 +597,7 @@ struct AABB {
 		return AABB(lower.sub(amount, 0.f, amount), upper.add(amount, 0.f, amount));
 	}
 
-	vec3_t centerPoint() {
+	vec3_t centerPoint() const {
 		vec3_t diff = upper.sub(lower);
 		return lower.add(diff.mul(0.5f));
 	}
@@ -640,6 +644,56 @@ struct AABB {
 		q.y = v;
 
 		v = p.z;
+		if (v < this->lower.z)
+			v = this->lower.z;
+		else if (v > this->upper.z)
+			v = this->upper.z;
+		q.z = v;
+		
+		return q;
+	}
+
+	vec3_t ClosestPointAABB(AABB p) {
+		vec3_t q;
+		// For each coordinate axis, if the point coordinate value is
+		// outside box, clamp it to the box, else keep it as is
+		float v = p.lower.x;
+		if (v < this->lower.x)
+			v = this->lower.x;
+		else if (v > this->upper.x)
+			v = this->upper.x;
+		q.x = v;
+
+		v = p.lower.y;
+		if (v < this->lower.y)
+			v = this->lower.y;
+		else if (v > this->upper.y)
+			v = this->upper.y;
+		q.y = v;
+
+		v = p.lower.z;
+		if (v < this->lower.z)
+			v = this->lower.z;
+		else if (v > this->upper.z)
+			v = this->upper.z;
+		q.z = v;
+		
+
+		v = p.upper.x;
+		if (v < this->lower.x)
+			v = this->lower.x;
+		else if (v > this->upper.x)
+			v = this->upper.x;
+		q.x = v;
+
+		v = p.upper.y;
+		if (v < this->lower.y)
+			v = this->lower.y;
+		else if (v > this->upper.y)
+			v = this->upper.y;
+		q.y = v;
+
+		v = p.upper.z;
 		if (v < this->lower.z)
 			v = this->lower.z;
 		else if (v > this->upper.z)
