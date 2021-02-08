@@ -832,8 +832,7 @@ private:
 	virtual __int64 onMoveC_PlayerPacketNormal(vec3_t const &, vec2_t const &, float);
 };
 
-class C_ServerPlayer : public C_Player {
-};
+class C_ServerPlayer : public C_Player {};
 
 class C_LocalPlayer : public C_Player {
 public:
