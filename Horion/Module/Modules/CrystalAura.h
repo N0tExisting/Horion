@@ -8,10 +8,11 @@ private:
 	int prevSlot;
 	int delay = 0;
 	int eRange = 3;
+	bool Multi = true;
+	bool Preview = true;
 	bool autoplace = true;
 	bool pEnhanced = true;
 	bool dEnhanced = true;
-	bool Preview = true;
 	bool AutoSelect= true;
 	bool FinishSelect = false;
 	C_PlayerInventoryProxy* supplies = nullptr;
@@ -32,6 +33,7 @@ public:
 	int pRange = 5;
 	int range = 10;
 
-	void CPlace(C_GameMode* gm, vec3_t* pos);
+	void CPlace(C_GameMode* gm, C_Entity* pos);
 	void DestroyC (C_Entity* ent, int range);
+	inline bool isMulti() { return Multi; }
 };

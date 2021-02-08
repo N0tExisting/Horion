@@ -1,4 +1,5 @@
 #include "CrystalAura.h"
+#include "../../../Utils/Explosion.hpp"
 
 CrystalAura::CrystalAura() : IModule(VK_NUMPAD0, Category::COMBAT, "Destroys nearby Crystals") {
 	registerIntSetting("Range", &this->range, this->range, 1, 10);
@@ -27,11 +28,6 @@ void CrystalAura::onEnable() {
 
 bool CfindEntity(C_Entity* curEnt, bool isRegularEntity) {
 	if (curEnt == nullptr) return false;
-	if (curEnt == g_Data.getLocalPlayer()) return false; // Skip Local player
-	if (!curEnt->isAlive()) return false;
-	if (!g_Data.getLocalPlayer()->isAlive()) return false;
-	//if (!g_Data.getLocalPlayer()->canAttack(curEnt, false)) return false;
-	//if (Target::VanillaAttac(curEnt, true)) return false;
 	if (curEnt->getEntityTypeId() == 71) return false; // endcrystal
 	if (curEnt->getEntityTypeId() == 66) return false; // falling block
 	if (curEnt->getEntityTypeId() == 64) return false; // item
@@ -62,20 +58,11 @@ bool CanPlaceC(vec3_ti* pos) {
 #undef space
 #undef _pos
 
-void CrystalAura::CPlace(C_GameMode* gm, vec3_t* pos) {
-	if (!pEnhanced) {
-#pragma warning(push)
-#pragma warning(disable: 4244)
-		vec3_ti blockPos = vec3_ti(pos->x, pos->y, pos->z);
-		vec3_ti upperBlockPos = vec3_ti(pos->x, pos->y + 1, pos->z);
-#pragma warning(pop)
-		C_Block* block = gm->player->region->getBlock(blockPos);
-		C_Block* upperBlock = gm->player->region->getBlock(upperBlockPos);
-		gm->buildBlock(&blockPos, g_Data.getClientInstance()->getPointerStruct()->blockSide);
-		return;
-	}
+void CrystalAura::CPlace(C_GameMode* gm, C_Entity* ent) {
+	vec3_t* pos = &ent->currentPos;
 	vec3_ti bestPos;
 	bool ValidPos = false;
+	float damage = 0;
 	for (int x = (int)pos->x - eRange; x < pos->x + eRange; x++) {
 		for (int z = (int)pos->z - eRange; z < pos->z + eRange; z++) {
 			for (int y = (int)pos->y - eRange; y < pos->y + eRange; y++) {
@@ -83,15 +70,19 @@ void CrystalAura::CPlace(C_GameMode* gm, vec3_t* pos) {
 				vec3_ti upperBlockPos = vec3_ti(x, y + 1, z);
 				C_Block* block = gm->player->region->getBlock(blockPos);
 				C_Block* upperBlock = gm->player->region->getBlock(upperBlockPos);
-				if (block != nullptr) {
+				if (block != nullptr && upperBlock != nullptr) {
 					int blockId = block->toLegacy()->blockId;
 					int upperBlockId = upperBlock->toLegacy()->blockId;
+					Explosion curent = Explosion(/*gm->player->region, */blockPos, 6);
+					float currentD = curent.getExplosionDamage(ent, true);
 					if ((blockId == 49 || blockId == 7) && upperBlockId == 0 && CanPlaceC(&blockPos)){//Check for awailable block
 						if (!ValidPos) {
 							ValidPos = true;
 							bestPos = blockPos;
-						} else if (blockPos.toVec3t().dist(*pos) < bestPos.toVec3t().dist(*pos)) {
+							damage = currentD;
+						} else if (currentD < damage)/*(blockPos.toVec3t().dist(*pos) < bestPos.toVec3t().dist(*pos))*/ {
 							bestPos = blockPos;
+							damage = currentD;
 						}
 					}
 				}
@@ -136,12 +127,12 @@ void CrystalAura::onTick(C_GameMode* gm) {
 	}
 	if (this->delay == 1 && AutoSelect) {
 		prevSlot = supplies->selectedHotbarSlot;
-		FinishSelect = true;
 		for (int n = 0; n < 9; n++) {
 			C_ItemStack* stack = inv->getItemStack(n);
 			if (stack->item != nullptr) {
 				if (stack->getItem()->itemId == 0x1aa) {
 					supplies->selectedHotbarSlot = n;
+					FinishSelect = true;
 					return;
 				}
 			}
@@ -152,11 +143,28 @@ void CrystalAura::onTick(C_GameMode* gm) {
 		if (autoplace && g_Data.getLocalPlayer()->getSelectedItemId() == 0x1aa) {  //endcrystal
 			if (pEnhanced)
 				for (auto& i : targetList)
-					CPlace(gm, i->getPos());
+					CPlace(gm, i);
 			else {
 				auto ptr = g_Data.getClientInstance()->getPointerStruct();
 				if (ptr->entityPtr == nullptr && ptr->rayHitType == 0)
-					CPlace(gm, &ptr->block.toFloatVector());
+					ptr->block; // idk why but vs shows an error with blockPos without this
+#pragma warning(push)
+#pragma warning(disable : 4244)
+					vec3_ti blockPos = ptr->block;
+					vec3_ti upperBlockPos = ptr->block.add(0, 1, 0);
+#pragma warning(pop)
+					C_Block* block = gm->player->region->getBlock(blockPos);
+					C_Block* upperBlock = gm->player->region->getBlock(upperBlockPos);
+					if (block != nullptr && upperBlock != nullptr) {
+						int blockId = block->toLegacy()->blockId;
+						int upperBlockId = upperBlock->toLegacy()->blockId;
+						// TODO: Anti suicide;
+						//Explosion curent = Explosion(/*gm->player->region, */ blockPos, 6);
+						//float currentD = curent.getExplosionDamage(ent, true);
+						if ((blockId == 49 || blockId == 7) && upperBlockId == 0 && CanPlaceC(&blockPos)) //Check for awailable block
+							gm->buildBlock(&blockPos, g_Data.getClientInstance()->getPointerStruct()->blockSide);
+					}
+					return;
 			}
 		}
 		return;
@@ -173,9 +181,11 @@ void CrystalAura::onTick(C_GameMode* gm) {
 			int range;
 			if (moduleMgr->getModule<CrystalAura>()->dEnhanced)
 				range = moduleMgr->getModule<CrystalAura>()->cRange;
-			else
+			else {
 				range = moduleMgr->getModule<CrystalAura>()->range;
+			}
 			moduleMgr->getModule<CrystalAura>()->DestroyC(ent, range);
+			if (!moduleMgr->getModule<CrystalAura>()->isMulti()) return;
 		});
 		return;
 	}
@@ -184,9 +194,10 @@ void CrystalAura::onTick(C_GameMode* gm) {
 		return;
 	}
 }
+#undef shouldChange
 
 void CrystalAura::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
-	if (!Preview || (!pEnhanced && autoplace) ||
+	if ((!Preview && !pEnhanced && autoplace) ||
 		g_Data.getClientInstance() == nullptr ||
 		g_Data.getPtrLocalPlayer() == nullptr ||
 		g_Data.getLocalPlayer() == nullptr)

@@ -423,6 +423,7 @@
     <ClCompile Include="WellThatsAnkward\HudEditor.cpp" />
     <ClCompile Include="WellThatsAnkward\HudModule2.cpp" />
     <ClCompile Include="WellThatsAnkward\selectionHighlight.cpp" />
+    <ClCompile Include="Utils\Explosion.hpp" />
   </ItemGroup>
   <ItemGroup>
     <!--<ClInclude Include="Horion\Module\Modules\AutoBucket.h" />-->
