@@ -2,6 +2,7 @@
 #define PI (3.1415927f)
 
 #include <math.h>
+#include <vector>
 #include <exception>
 
 static constexpr float DEG_RAD2 = PI / 360.0f;
@@ -703,6 +704,34 @@ struct AABB {
 		return q;
 	}
 	
+	std::vector<vec3_t> getCorners() {
+		std::vector<vec3_t> corners;
+		corners.push_back({upper.x, upper.y, upper.z});
+		corners.push_back({lower.x, upper.y, upper.z});
+		corners.push_back({lower.x, upper.y, lower.z});
+		corners.push_back({upper.x, upper.y, upper.z});
+		corners.push_back({upper.x, lower.y, lower.z});
+		corners.push_back({upper.x, lower.y, upper.z});
+		corners.push_back({lower.x, lower.y, lower.z});
+		corners.push_back({lower.x, lower.y, lower.z});
+		return corners;
+	}
+	std::vector<vec3_t> getSamples() {
+		std::vector<vec3_t> corners;
+		vec3_t size = upper.sub(lower);
+		vec3_t amount = {2*size.x +1, 2*size.y +1, 2*size.y +1};
+		vec3_t step = {1 / amount.x, 1 / amount.y, 1 / amount.z};
+		for (int x = 0; x < (int)round(amount.x); x++) {
+			for (int y = 0; y < (int)round(amount.y); y++) {
+				for (int z = 0; z < (int)round(amount.z); z++) {
+					vec3_t diff = step.mul(vec3_ti{x, y, z}.toVec3t());
+					corners.push_back(lower.add(diff));
+				}
+			}
+		}
+		return corners;
+	}
+
 	// http://www.codercorner.com/RayAABB.cpp
 	
 	typedef unsigned int udword;

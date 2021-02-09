@@ -1,20 +1,20 @@
 #include "HMath.h"
 #include "../SDK/CBlockLegacy.h"
 #include "../SDK/CEntity.h"
+#include "../Memory/GameData.h"
 
 struct Explosion {
 	int power;
 	vec3_t pos;
-	//C_BlockSource* region;
-	Explosion(/*C_BlockSource* reg, */float x, float y, float z, int power) {
+	Explosion(float x, float y, float z, int power) {
 		pos = vec3_t(x, y, z);
 		this->power = power;
 	}
-	Explosion(/*C_BlockSource* reg, */vec3_t pos, int power) {
+	Explosion(vec3_t pos, int power) {
 		this->pos = pos;
 		this->power = power;
 	}
-	Explosion(/*C_BlockSource* reg, */int x, int y, int z, int power, bool crystal = true) {
+	Explosion(int x, int y, int z, int power, bool crystal = true) {
 		if (crystal) {
 			this->pos = vec3_ti(x, y, z).toVec3t().add(.5f);
 		} else {
@@ -22,7 +22,7 @@ struct Explosion {
 		}
 		this->power = power;
 	}
-	Explosion(/*C_BlockSource* reg, */vec3_ti block, int power, bool crystal = true) {
+	Explosion(vec3_ti block, int power, bool crystal = true) {
 		if (crystal) {
 			this->pos = block.toVec3t().add(.5f);
 		} else {
@@ -30,8 +30,7 @@ struct Explosion {
 		}
 		this->power = power;
 	}
-	Explosion(/*C_BlockSource* reg, */C_Entity source) {
-		//region = reg;
+	Explosion(C_Entity source) {
 		pos = source.aabb.centerPoint();
 		switch (source.getEntityTypeId()) {
 			case 65:
@@ -49,10 +48,10 @@ struct Explosion {
 				break;
 		}
 	}
-	float getExplosionDamage(C_Entity* ent, bool getReduced = false) const {
+	inline float getExplosionDamage(C_Entity* ent, bool getReduced = false) const {
 		float dist = ent->aabb.DistToAABB(pos);
 		int DamageRad = 2 * power;
-		float impact = (1 - (dist / DamageRad)) * getExposure(pos, ent);
+		float impact = (1 - (dist / DamageRad)) * getExposure(ent);
 		float damage = ((impact*impact+impact) * 7 * power + 1);
 
 		// https://minecraft.gamepedia.com/Armor/Bedrock_Edition
@@ -78,14 +77,28 @@ struct Explosion {
 		}
 		return damage;
 	}
+	inline float getExposure(C_Entity* to) const {
+		getExposure(pos, to);
+	}
 	static float getExposure(vec3_t pos, C_Entity* to) {
 		C_BlockSource* reg = to->region;
-		// TODO: Calculate actual value https://minecraft.gamepedia.com/Explosion
-		return .75f; // temp retval until i figure out how the fuck to calculate that bs somewhat efficiently
+		auto samples = to->aabb.getSamples();
+		size_t a = 0; // all
+		size_t t = 0; // hits
+		for (; a < samples.size(); a++) {
+			if (isUnobstructed(pos, samples.at(a), reg)) t++;
+		}
+		return t / (float)a;
 	}
-	static float getDamageMultiplied(const float& damage, int dif = 3) {
+	// TODO: Calculate actual value https://minecraft.gamepedia.com/Explosion#Interaction_with_entities
+	static bool isUnobstructed(vec3_t pos, vec3_t to, C_BlockSource* region) {
+		AABB bloks;
+		return true;
+	}
+	static float getDamageMultiplied(const float& damage, int dif = 3/*-1*//*asume we are on hard until i figure out how to find that out*/) {
 		int diff = dif;
-		//diff = mc.world.getDifficulty().getId();
-		return damage * ((diff == 0) ? 0.0f : ((diff == 2) ? 1.0f : ((diff == 1) ? 0.5f : 1.5f)));
+		//if (diff == -1)
+		//	diff = g_Data.getClientInstance()->getDifficulty();
+		return damage * (diff / .5f);
 	}
 };
