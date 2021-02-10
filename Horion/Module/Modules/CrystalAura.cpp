@@ -80,7 +80,7 @@ void CrystalAura::CPlace(C_GameMode* gm, C_Entity* ent) {
 							ValidPos = true;
 							bestPos = blockPos;
 							damage = currentD;
-						} else if (currentD < damage)/*(blockPos.toVec3t().dist(*pos) < bestPos.toVec3t().dist(*pos))*/ {
+						} else if (currentD < damage) {/*(blockPos.toVec3t().dist(*pos) < bestPos.toVec3t().dist(*pos))*/
 							bestPos = blockPos;
 							damage = currentD;
 						}

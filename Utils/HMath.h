@@ -554,6 +554,44 @@ struct glmatrixf {
 	}
 };
 
+struct Ray {
+private:
+#define NaNvec3 vec3_t{NAN, NAN, NAN};
+#define Infvec3 vec3_t{INFINITY, INFINITY, INFINITY};
+
+public:
+	vec3_t origin;
+	vec3_t dir;
+	// Set to NAN for infinte Lenght
+	float lenght;
+	// dir w/ its actual lenght
+	inline vec3_t DirrLenght() {
+		if (lenght == NAN)
+			return dir.mul(INFINITY);
+		else
+			return dir.mul(lenght);
+		//return NaNvec3;
+	}
+	// the place at which the ray stops
+	inline vec3_t out() {
+		//if (lenght == NAN)
+		//	return NaNvec3;
+		//else
+		return origin.add(DirrLenght());
+	}
+	Ray(vec3_t origin, vec3_t dir) {
+		this->lenght = dir.magnitude();
+		this->dir = dir.normalize();
+		this->origin = origin;
+	}
+	Ray(vec3_t origin, vec3_t dir, float lenght = NAN) {
+		this->origin = origin;
+		this->dir = dir.normalize();
+		this->lenght = lenght;
+	}
+	// TODO: Colision-detection
+};
+
 struct AABB {
 	vec3_t lower;
 	vec3_t upper;
@@ -731,15 +769,24 @@ struct AABB {
 		}
 		return corners;
 	}
+	AABB sort() {
+		vec3_t min = {std::min(lower.x, upper.x), std::min(lower.y, upper.y), std::min(lower.z, upper.z)};
+		vec3_t max = {std::max(lower.x, upper.x), std::max(lower.y, upper.y), std::max(lower.z, upper.z)};
+		return AABB(min, max);
+	}
+	void Sort() {
+		lower = {std::min(lower.x, upper.x), std::min(lower.y, upper.y), std::min(lower.z, upper.z)};
+		upper = {std::max(lower.x, upper.x), std::max(lower.y, upper.y), std::max(lower.z, upper.z)};
+	}
 
 	// http://www.codercorner.com/RayAABB.cpp
-	
-	typedef unsigned int udword;
-	
+	//
+	//typedef unsigned int udword;
+	//
 	//! Integer representation of a floating-point value.
-	#define IR(x) ((udword&)x)
-	
-	#define RAYAABB_EPSILON 0.00001f
+	//#define IR(x) ((udword&)x)
+	//
+	//#define RAYAABB_EPSILON 0.00001f
 	//#define Point vec3_t
 	
 //////////////////////////////////////////////////////////////////////////////////////*/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -764,7 +811,7 @@ struct AABB {
  *	\return		true if ray intersects AABB
  */
 //////////////////////////////////////////////////////////////////////////////////////*////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	bool RayAABB(/*const AABB& aabb, */ const vec3_t &origin, const vec3_t &dir, vec3_t* &coord) {
+	/*bool RayAABB(const vec3_t &origin, const vec3_t &dir, vec3_t* &coord) {
 		
 		bool Inside = true;
 		vec3_t MinB = this->lower;
@@ -812,8 +859,57 @@ struct AABB {
 			}
 		}
 		return true;  // ray hits box
-	}
-#define USE_MINMAX
+	}*/
+	/*bool RayAABB(const vec3_t &origin, const vec3_t &dir) {
+		bool Inside = true;
+		vec3_t MinB = this->lower;
+		vec3_t MaxB = this->upper;
+		vec3_t MaxT;
+		vec3_t tempCoord;
+		MaxT.x = MaxT.y = MaxT.z = -1.0f;
+
+		// Find candidate planes.
+		for (udword i = 0; i < 3; i++) {
+			if (origin.getElement(i) < MinB.getElement(i)) {
+				*tempCoord.getElementPtr(i) = MinB.getElement(i);
+				Inside = false;
+				float curDir = dir.getElement(i);
+				// Calculate T distances to candidate planes
+				if (IR(curDir)) *MaxT.getElementPtr(i) = (MinB.getElement(i) - origin.getElement(i)) / dir.getElement(i);
+			} else if (origin.getElement(i) > MaxB.getElement(i)) {
+				*tempCoord.getElementPtr(i) = MaxB.getElement(i);
+				Inside = false;
+				float curDir = dir.getElement(i);
+				// Calculate T distances to candidate planes
+				if (IR(curDir)) *MaxT.getElementPtr(i) = (MaxB.getElement(i) - origin.getElement(i)) / dir.getElement(i);
+			}
+		}
+		// Ray origin inside bounding box
+		if (Inside) {
+			tempCoord = origin;
+			return true;
+		}
+		// Get largest of the maxT's for final choice of intersection
+		udword WhichPlane = 0;
+		if (MaxT.getElement(1) > MaxT.getElement(WhichPlane)) WhichPlane = 1;
+		if (MaxT.getElement(2) > MaxT.getElement(WhichPlane)) WhichPlane = 2;
+		// Check final candidate actually inside box
+		float curDir = MaxT.getElement(WhichPlane);
+		if (IR(curDir) & 0x80000000) return false;
+
+		for (udword i = 0; i < 3; i++) {
+			if (i != WhichPlane) {
+				*tempCoord.getElementPtr(i) = origin.getElement(i) + MaxT.getElement(WhichPlane) * dir.getElement(i);
+#ifdef RAYAABB_EPSILON
+				if (tempCoord.getElement(i) < MinB.getElement(i) - RAYAABB_EPSILON || tempCoord.getElement(i) > MaxB.getElement(i) + RAYAABB_EPSILON) return false;
+#else
+				if (tempCoord.getElement(i) < MinB.getElement(i) || tempCoord.getElement(i) > MaxB.getElement(i)) return false;
+#endif
+			}
+		}
+		return true;  // ray hits box
+	}*/
+
 	/*
 Updated October, 5, 2001 :
 	- Below is an alternative version, up to ~25% faster than the one above on my Celeron.
@@ -827,6 +923,7 @@ Updated October, 9, 2001:
 	slower (at least on my machine!).
 */
 
+#define USE_MINMAX
 	
 	#ifndef USE_MINMAX
 	// Unroll loop, do the div early to let it pair with CPU code
@@ -895,8 +992,8 @@ Updated October, 9, 2001:
 	#endif // RayAABB_Epsilon
 	
 	#endif
-/*
-	bool RayAABB4(const AABB &aabb, const vec3_t &origin, const vec3_t &dir, vec3_t &coord) {
+
+	/*bool RayAABB4(const AABB &aabb, const vec3_t &origin, const vec3_t &dir, vec3_t &coord) {
 		bool Inside = true;
 	#ifndef USE_MINMAX
 		vec3_t MinB;
@@ -988,10 +1085,9 @@ Updated October, 9, 2001:
 				if (IR(MaxT[1]) > IR(MaxT[WhichPlane])) WhichPlane = 1;
 				if (IR(MaxT[2]) > IR(MaxT[WhichPlane])) WhichPlane = 2;
 			}
-		}*/
+		}
 	
 		// Old code below:
-		/*
 		// Get largest of the maxT's for final choice of intersection
 		udword WhichPlane = 0;
 		if(MaxT[1] > MaxT[WhichPlane])	WhichPlane = 1;
@@ -999,57 +1095,23 @@ Updated October, 9, 2001:
 	
 		// Check final candidate actually inside box
 		if(IR(MaxT[WhichPlane])&0x80000000) return false;
-	*//*
 	
 		COMPUTE_INTERSECT(0)
 		COMPUTE_INTERSECT(1)
 		COMPUTE_INTERSECT(2)
 	
 		return true;  // ray hits box
-	}
+	}*/
 	
 	// Versions usint the SAT. Original code for OBBs from MAGIC.
 	// Rewritten for AABBs and reorganized for early exits.
-	
-	// For a segment
-	bool Meshmerizer::SegmentAABB(const Segment& segment, const AABB& aabb) {
-		Point BoxExtents, Diff, Dir;
-		float fAWdU[3];
-	
-		Dir.x = 0.5f * (segment.mP1.x - segment.mP0.x);
-		BoxExtents.x = aabb.GetExtents(0);
-		Diff.x = (0.5f * (segment.mP1.x + segment.mP0.x)) - aabb.GetCenter(0);
-		fAWdU[0] = fabsf(Dir.x);
-		if (fabsf(Diff.x) > BoxExtents.x + fAWdU[0]) return false;
-	
-		Dir.y = 0.5f * (segment.mP1.y - segment.mP0.y);
-		BoxExtents.y = aabb.GetExtents(1);
-		Diff.y = (0.5f * (segment.mP1.y + segment.mP0.y)) - aabb.GetCenter(1);
-		fAWdU[1] = fabsf(Dir.y);
-		if (fabsf(Diff.y) > BoxExtents.y + fAWdU[1]) return false;
-	
-		Dir.z = 0.5f * (segment.mP1.z - segment.mP0.z);
-		BoxExtents.z = aabb.GetExtents(2);
-		Diff.z = (0.5f * (segment.mP1.z + segment.mP0.z)) - aabb.GetCenter(2);
-		fAWdU[2] = fabsf(Dir.z);
-		if (fabsf(Diff.z) > BoxExtents.z + fAWdU[2]) return false;
-	
-		float f;
-		f = Dir.y * Diff.z - Dir.z * Diff.y;
-		if (fabsf(f) > BoxExtents.y * fAWdU[2] + BoxExtents.z * fAWdU[1]) return false;
-		f = Dir.z * Diff.x - Dir.x * Diff.z;
-		if (fabsf(f) > BoxExtents.x * fAWdU[2] + BoxExtents.z * fAWdU[0]) return false;
-		f = Dir.x * Diff.y - Dir.y * Diff.x;
-		if (fabsf(f) > BoxExtents.x * fAWdU[1] + BoxExtents.y * fAWdU[0]) return false;
-	
-		return true;
-	}
-	
+	/*
+#define Point vec3_t
 	// For a ray
-	bool Meshmerizer::RayAABB(const Ray& ray, const AABB& aabb) {
+	bool RayAABB(const Ray& ray, const AABB& aabb) {
 		Point BoxExtents, Diff;
 	
-		Diff.x = ray.mOrig.x - aabb.GetCenter(0);
+		Diff.x = ray.mOrig.x - aabb.centerPoint(0);
 		BoxExtents.x = aabb.GetExtents(0);
 		if (fabsf(Diff.x) > BoxExtents.x && Diff.x * ray.mDir.x >= 0.0f) return false;
 	

@@ -16,7 +16,7 @@ struct Explosion {
 	}
 	Explosion(int x, int y, int z, int power, bool crystal = true) {
 		if (crystal) {
-			this->pos = vec3_ti(x, y, z).toVec3t().add(.5f);
+			this->pos = vec3_ti(x, y, z).toVec3t().add(.5f, 1.f, .5f);
 		} else {
 			this->pos = vec3_ti(x, y, z).toVec3t();
 		}
@@ -24,7 +24,7 @@ struct Explosion {
 	}
 	Explosion(vec3_ti block, int power, bool crystal = true) {
 		if (crystal) {
-			this->pos = block.toVec3t().add(.5f);
+			this->pos = block.toVec3t().add(.5f, 1.f, .5f);
 		} else {
 			this->pos = block.toVec3t();
 		}
@@ -84,16 +84,42 @@ struct Explosion {
 		C_BlockSource* reg = to->region;
 		auto samples = to->aabb.getSamples();
 		size_t a = 0; // all
-		size_t t = 0; // hits
+		size_t h = 0; // hits
+		auto blocks = getBlocks(pos, samples.at(a), reg);
 		for (; a < samples.size(); a++) {
-			if (isUnobstructed(pos, samples.at(a), reg)) t++;
+			if (!isObstructed(pos, samples.at(a), blocks)) h++;
 		}
-		return t / (float)a;
+		return h / (float)a;
 	}
 	// TODO: Calculate actual value https://minecraft.gamepedia.com/Explosion#Interaction_with_entities
-	static bool isUnobstructed(vec3_t pos, vec3_t to, C_BlockSource* region) {
-		AABB bloks;
-		return true;
+	static bool isObstructed(vec3_t pos, vec3_t to, const std::vector<AABB>& block) {
+		bool ret = false;
+
+		return ret;
+	}
+	static std::vector<AABB> getBlocks(vec3_t pos, vec3_t to, C_BlockSource* region) {
+		std::vector<AABB> blocks;
+		AABB bloks = AABB(pos.floor(), to.floor()).sort();
+		for (size_t x = bloks.lower.x; x < bloks.upper.x; x++) {
+			for (size_t y = bloks.lower.y; y < bloks.upper.y; y++) {
+				for (size_t z = bloks.lower.z; z < bloks.upper.z; z++) {
+					vec3_ti curPos = {x, y, z};
+					C_Block* block = region->getBlock(curPos);
+					if (block != nullptr) {
+						C_BlockLegacy* legacy = block->toLegacy();
+						if (legacy != nullptr) {
+							if (legacy->material->isSolid || legacy->material->isLiquid) {
+								AABB h = legacy->aabb;
+								if (h.upper.x == h.lower.x || h.upper.y == h.lower.y || h.upper.z == h.lower.z)
+									h = AABB(curPos.toVec3t(), curPos.add(1).toVec3t());
+								blocks.push_back(h);
+							}
+						}
+					}
+				}
+			}
+		}
+		return blocks;
 	}
 	static float getDamageMultiplied(const float& damage, int dif = 3/*-1*//*asume we are on hard until i figure out how to find that out*/) {
 		int diff = dif;
