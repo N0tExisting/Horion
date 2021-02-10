@@ -78,7 +78,7 @@ struct Explosion {
 		return damage;
 	}
 	inline float getExposure(C_Entity* to) const {
-		getExposure(pos, to);
+		return getExposure(pos, to);
 	}
 	static float getExposure(vec3_t pos, C_Entity* to) {
 		C_BlockSource* reg = to->region;
