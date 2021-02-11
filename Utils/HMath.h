@@ -779,6 +779,79 @@ struct AABB {
 		upper = {std::max(lower.x, upper.x), std::max(lower.y, upper.y), std::max(lower.z, upper.z)};
 	}
 
+#define Vector3D vec3_t
+	//Helper function for Line/AABB test.  Tests collision on a single dimension
+	//Param:    Start of line, Direction/length of line,
+	//          Min value of AABB on plane, Max value of AABB on plane
+	//          Enter and Exit "timestamps" of intersection (OUT)
+	//Return:   True if there is overlap between Line and AABB, False otherwise
+	//Note:     Enter and Exit are used for calculations and are only updated in case of intersection
+	bool Line_AABB_1d(float start, float dir, float min, float max, float* enter, float* exit) {
+		//If the line segment is more of a point, just check if it's within the segment
+		if(fabs(dir) < 1.0E-8)
+			return (start >= min && start <= max);
+
+		//Find if the lines overlap
+		float ooDir = 1.0f / dir;
+		float t0 = (min - start) * ooDir;
+		float t1 = (max - start) * ooDir;
+
+		//Make sure t0 is the "first" of the intersections
+		if(t0 > t1)
+			std::swap(t0, t1);
+
+		//Check if intervals are disjoint
+		if(t0 > *exit || t1 < *enter)
+			return false;
+
+		//Reduce interval based on intersection
+		if(t0 > *enter)
+			*enter = t0;
+		if(t1 < *exit)
+			*exit = t1;
+
+		return true;
+	}
+
+	//Check collision between a line segment and an AABB
+	//Param:    Start point of line segement, End point of line segment,
+	//          One corner of AABB, opposite corner of AABB,
+	//          Location where line hits the AABB (OUT)
+	//Return:   True if a collision occurs, False otherwise
+	//Note:     If no collision occurs, OUT param is not reassigned and is not considered useable
+	inline bool Line_AABB(const Vector3D& start, const Vector3D& end, Vector3D* hitPoint = nullptr) {
+		bool ret = true;
+		float enter = 0.0f;
+		float exit = 1.0f;
+		Vector3D dir = end.sub(start);
+		AABB tmp = this->sort();
+		const Vector3D &min = tmp.lower;
+		const Vector3D &max = tmp.upper;
+		//Check each dimension of Line/AABB for intersection
+		if(!Line_AABB_1d(start.x, dir.x, min.x, max.x, &enter, &exit))
+			ret = false;
+		if(!Line_AABB_1d(start.y, dir.y, min.y, max.y, &enter, &exit))
+			ret = false;
+		if(!Line_AABB_1d(start.z, dir.z, min.z, max.z, &enter, &exit))
+			ret = false;
+	
+		//If there is intersection on all dimensions, report that point
+		if (hitPoint != nullptr)
+			*hitPoint = dir.mul(enter).add(start);
+		return ret;
+	}
+	bool slabs(vec3_t rayOrigin, vec3_t Raydir) {
+		AABB sanitze = this->sort();
+		vec3_t t0 = sanitze.lower.sub(rayOrigin).div(Raydir);
+		vec3_t t1 = sanitze.upper.sub(rayOrigin).div(Raydir);
+		vec3_t tmin = AABB(t0, t1).sort().lower, tmax = AABB(t0, t1).sort().upper;
+		return std::max(std::max(tmin.x, tmin.y),tmin.z) <= std::min(std::min(tmax.x,tmax.y),tmax.z);
+	}//						tmin.max_component()						tmax.min_component()
+	
+#ifdef Vector3D
+#undef Vector3D
+#endif // Vector3D
+
 	// http://www.codercorner.com/RayAABB.cpp
 	//
 	//typedef unsigned int udword;
@@ -931,13 +1004,13 @@ Updated October, 9, 2001:
 		if (origin[i] < MinB[i]) {                                    \
 			/* Calculate T distances to candidate planes */           \
 			if (IR(dir[i])) MaxT[i] = (MinB[i] - origin[i]) / dir[i]; \
-	                                                                  \
+																	  \
 			Inside = FALSE;                                           \
 			coord[i] = MinB[i];                                       \
 		} else if (origin[i] > MaxB[i]) {                             \
 			/* Calculate T distances to candidate planes */           \
 			if (IR(dir[i])) MaxT[i] = (MaxB[i] - origin[i]) / dir[i]; \
-	                                                                  \
+																	  \
 			Inside = FALSE;                                           \
 			coord[i] = MaxB[i];                                       \
 		}
@@ -946,13 +1019,13 @@ Updated October, 9, 2001:
 		if (origin[i] < aabb.GetMin(i)) {                                    \
 			/* Calculate T distances to candidate planes */                  \
 			if (IR(dir[i])) MaxT[i] = (aabb.GetMin(i) - origin[i]) / dir[i]; \
-	                                                                         \
+																			 \
 			Inside = false;                                                  \
 			coord[i] = aabb.GetMin(i);                                       \
 		} else if (origin[i] > aabb.GetMax(i)) {                             \
 			/* Calculate T distances to candidate planes */                  \
 			if (IR(dir[i])) MaxT[i] = (aabb.GetMax(i) - origin[i]) / dir[i]; \
-	                                                                         \
+																			 \
 			Inside = false;                                                  \
 			coord[i] = aabb.GetMax(i);                                       \
 		}

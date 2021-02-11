@@ -82,10 +82,10 @@ struct Explosion {
 	}
 	static float getExposure(vec3_t pos, C_Entity* to) {
 		C_BlockSource* reg = to->region;
-		auto samples = to->aabb.getSamples();
+		auto samples = to->aabb.sort().getSamples();
 		size_t a = 0; // all
 		size_t h = 0; // hits
-		auto blocks = getBlocks(pos, samples.at(a), reg);
+		auto blocks = getBlocks(pos, samples.back(), reg);
 		for (; a < samples.size(); a++) {
 			if (!isObstructed(pos, samples.at(a), blocks)) h++;
 		}
@@ -94,7 +94,13 @@ struct Explosion {
 	// TODO: Calculate actual value https://minecraft.gamepedia.com/Explosion#Interaction_with_entities
 	static bool isObstructed(vec3_t pos, vec3_t to, const std::vector<AABB>& block) {
 		bool ret = false;
-
+		//Ray ray = Ray(pos, to);
+		auto m = block.size();
+		for (size_t i = 0; i < m; i++) {
+			AABB current = block.at(i);
+			if (!current.slabs(pos, to) && !current.Line_AABB(pos, to))
+				return true;
+		}
 		return ret;
 	}
 	static std::vector<AABB> getBlocks(vec3_t pos, vec3_t to, C_BlockSource* region) {
