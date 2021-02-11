@@ -757,7 +757,7 @@ struct AABB {
 	std::vector<vec3_t> getSamples() {
 		std::vector<vec3_t> corners;
 		vec3_t size = upper.sub(lower);
-		vec3_t amount = {2*size.x +1, 2*size.y +1, 2*size.y +1};
+		vec3_t amount = {2*size.x +1 , 2*size.y +1 , 2*size.y +1};
 		vec3_t step = {1 / amount.x, 1 / amount.y, 1 / amount.z};
 		for (int x = 0; x < (int)round(amount.x); x++) {
 			for (int y = 0; y < (int)round(amount.y); y++) {
@@ -801,13 +801,13 @@ struct AABB {
 			std::swap(t0, t1);
 
 		//Check if intervals are disjoint
-		if(t0 > *exit || t1 < *enter)
+		if(t0 >= *exit || t1 <= *enter)
 			return false;
 
 		//Reduce interval based on intersection
-		if(t0 > *enter)
+		if(t0 >= *enter)
 			*enter = t0;
-		if(t1 < *exit)
+		if(t1 <= *exit)
 			*exit = t1;
 
 		return true;
@@ -845,7 +845,7 @@ struct AABB {
 		vec3_t t0 = sanitze.lower.sub(rayOrigin).div(Raydir);
 		vec3_t t1 = sanitze.upper.sub(rayOrigin).div(Raydir);
 		vec3_t tmin = AABB(t0, t1).sort().lower, tmax = AABB(t0, t1).sort().upper;
-		return std::max(std::max(tmin.x, tmin.y),tmin.z) <= std::min(std::min(tmax.x,tmax.y),tmax.z);
+		return std::max(std::max(tmin.x, tmin.y),tmin.z) < std::min(std::min(tmax.x,tmax.y),tmax.z);
 	}//						tmin.max_component()						tmax.min_component()
 	
 #ifdef Vector3D

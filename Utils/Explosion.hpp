@@ -85,7 +85,7 @@ struct Explosion {
 		auto samples = to->aabb.sort().getSamples();
 		size_t a = 0; // all
 		size_t h = 0; // hits
-		auto blocks = getBlocks(pos, samples.back(), reg);
+		auto blocks = getBlocks(pos, samples, reg);
 		for (; a < samples.size(); a++) {
 			if (!isObstructed(pos, samples.at(a), blocks)) h++;
 		}
@@ -98,14 +98,25 @@ struct Explosion {
 		auto m = block.size();
 		for (size_t i = 0; i < m; i++) {
 			AABB current = block.at(i);
-			if (!current.slabs(pos, to) && !current.Line_AABB(pos, to))
+			if (current.slabs(pos, to) || current.Line_AABB(pos, to))
 				return true;
 		}
 		return ret;
 	}
-	static std::vector<AABB> getBlocks(vec3_t pos, vec3_t to, C_BlockSource* region) {
+	// make sure you only have to call this once
+	static std::vector<AABB> getBlocks(vec3_t pos, std::vector<vec3_t> to, C_BlockSource* region) {
 		std::vector<AABB> blocks;
-		AABB bloks = AABB(pos.floor(), to.floor()).sort();
+		to.push_back(pos);
+		vec3_t max = {-INFINITY, -INFINITY, -INFINITY}, min = {INFINITY, INFINITY, INFINITY};
+		for (auto it = to.begin(); it != to.end(); it++) {
+			max.x = std::max(max.x, it._Ptr->x);
+			max.y = std::max(max.y, it._Ptr->y);
+			max.z = std::max(max.z, it._Ptr->z);
+			min.x = std::min(min.x, it._Ptr->x);
+			min.y = std::min(min.y, it._Ptr->y);
+			min.z = std::min(min.z, it._Ptr->z);
+		}
+		AABB bloks = AABB(min.floor(), max.floor());
 		for (int x = bloks.lower.x; x < bloks.upper.x; x++) {
 			for (int y = bloks.lower.y; y < bloks.upper.y; y++) {
 				for (int z = bloks.lower.z; z < bloks.upper.z; z++) {

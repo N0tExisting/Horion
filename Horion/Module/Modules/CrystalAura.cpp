@@ -73,14 +73,14 @@ void CrystalAura::CPlace(C_GameMode* gm, C_Entity* ent) {
 				if (block != nullptr && upperBlock != nullptr) {
 					int blockId = block->toLegacy()->blockId;
 					int upperBlockId = upperBlock->toLegacy()->blockId;
-					Explosion curent = Explosion(/*gm->player->region, */blockPos, 6);
+					Explosion curent = Explosion(blockPos, 6);
 					float currentD = curent.getExplosionDamage(ent, true);
 					if ((blockId == 49 || blockId == 7) && upperBlockId == 0 && CanPlaceC(&blockPos)){//Check for awailable block
 						if (!ValidPos) {
 							ValidPos = true;
 							bestPos = blockPos;
 							damage = currentD;
-						} else if (currentD < damage) {/*(blockPos.toVec3t().dist(*pos) < bestPos.toVec3t().dist(*pos))*/
+						} else if (currentD > damage) {/*(blockPos.toVec3t().dist(*pos) < bestPos.toVec3t().dist(*pos))*/
 							bestPos = blockPos;
 							damage = currentD;
 						}
