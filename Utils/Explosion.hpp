@@ -106,9 +106,9 @@ struct Explosion {
 	static std::vector<AABB> getBlocks(vec3_t pos, vec3_t to, C_BlockSource* region) {
 		std::vector<AABB> blocks;
 		AABB bloks = AABB(pos.floor(), to.floor()).sort();
-		for (size_t x = bloks.lower.x; x < bloks.upper.x; x++) {
-			for (size_t y = bloks.lower.y; y < bloks.upper.y; y++) {
-				for (size_t z = bloks.lower.z; z < bloks.upper.z; z++) {
+		for (int x = bloks.lower.x; x < bloks.upper.x; x++) {
+			for (int y = bloks.lower.y; y < bloks.upper.y; y++) {
+				for (int z = bloks.lower.z; z < bloks.upper.z; z++) {
 					vec3_ti curPos = {x, y, z};
 					C_Block* block = region->getBlock(curPos);
 					if (block != nullptr) {

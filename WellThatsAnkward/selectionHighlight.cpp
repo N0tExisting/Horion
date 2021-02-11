@@ -115,15 +115,15 @@ void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 							.AddEntry(GradientEntry(MC_Color(.75f, .75f, .0f), .5f))// yellow color at the middle
 							->AddEntry(GradientEntry(MC_Color(.0f, .875f, .0f), .75f));//better transition to green & blue
 			AABB aabb = ent->aabb;
-			vec3_t* hitPos = new vec3_t();
-			aabb.RayAABB(g_Data.getLocalPlayer()->eyePos0, ptr->rayHitVec, hitPos);
-			float Dist = aabb.DistToAABB(g_Data.getLocalPlayer()->eyePos0);//hitPos->dist(g_Data.getLocalPlayer()->eyePos0);
+			vec3_t hitPos;
+			aabb.Line_AABB(g_Data.getLocalPlayer()->eyePos0, ptr->rayHitVec, &hitPos);
+			float Dist = aabb.DistToAABB(g_Data.getLocalPlayer()->eyePos0);
+			float betterDist = hitPos.dist(g_Data.getLocalPlayer()->eyePos0);
 			MC_Color col = dist.GetColor(Dist / moduleMgr->getModule<Reach>()->GetCurrentReach());
 			AABB rendered = AABB(ent->getPos()->lerp(ent->getPosOld(), DrawUtils::getLerpTime()),
 				ent->width, ent->height, ent->getPos()->y - aabb.lower.y);
 			rendered.upper.y += .1f;
 			DrawUtils::drawAABB(rendered, col, fOpacity, 1, -1);
-			delete hitPos;
 
 			Utils::ApplyRainbow(Color, 0.5f);
 			DrawUtils::setColor(Color[0], Color[1], Color[2], fOpacity);
@@ -132,8 +132,7 @@ void selectionHighlight::onPreRender(C_MinecraftUIRenderContext* renderCtx) {
 
 			char n[0x23];
 			char _n[0x23];
-			sprintf_s(n, 0x23, "%.3f / %.3f", Dist,
-				moduleMgr->getModule<Reach>()->GetCurrentReach());
+			sprintf_s(n, 0x23, "%.3f(%.3f) / %.3f", betterDist, Dist, moduleMgr->getModule<Reach>()->GetCurrentReach());
 			std::string name = ent->getNameTag()->getText();
 			if (name.length() > 1) {
 				sprintf_s(_n, 0x23, "%s (%s)", ent->getNameTag()->getText(), n);
