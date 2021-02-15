@@ -59,9 +59,9 @@ void AutoGapple::PrepareEat(C_GameMode* gm) {
 }
 
 void AutoGapple::Eat(C_GameMode* gm) {
-	if (timeEating < eatingTime + lagComp)
-		eating = false;
 	C_ItemStack* stack = inv->getItemStack(slot);
 	(*stack->item)->C_Item::use(*stack, *gm->player);
 	timeEating++;
+	if (timeEating < eatingTime + lagComp)
+		eating = false; // TODO: Packet?
 }
