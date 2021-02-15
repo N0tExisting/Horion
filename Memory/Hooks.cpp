@@ -444,16 +444,20 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 			QueryPerformanceCounter(&start);
 		}
 		if (!g_Data.isInjectorConnectionActive()) {
-			__int64 retval = oText(a1, renderCtx);
-
+#ifndef _DEBUG_
+			_int64 retval = oText(a1, renderCtx);
+#endif
 			LARGE_INTEGER end, elapsed;
 			QueryPerformanceCounter(&end);
 			elapsed.QuadPart = end.QuadPart - start.QuadPart;
 			float elapsedFlot = (float)elapsed.QuadPart / frequency.QuadPart;
+			g_Data.FPS = 1 / elapsedFlot;
 			if (elapsedFlot > 1.5f) {
 				vec2_t windowSize = dat->windowSize;
 
-				DrawUtils::fillRectangle(vec4_t(0, 0, windowSize.x, windowSize.y), MC_Color(0.2f, 0.2f, 0.2f), 0.8f);
+#ifndef _DEBUG
+					DrawUtils::fillRectangle(vec4_t(0, 0, windowSize.x, windowSize.y), MC_Color(0.2f, 0.2f, 0.2f), 0.8f);
+#endif
 
 				std::string text = "Download the new injector at http://horionbeta.club/";
 				if (!wasConnectedBefore)
@@ -465,8 +469,9 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 
 				DrawUtils::flush();
 			}
-
+#ifndef _DEBUG
 			return retval;
+#endif
 		} else
 			wasConnectedBefore = true;
 	}
@@ -1306,7 +1311,7 @@ __int8* Hooks::BlockLegacy_getLightEmission(C_BlockLegacy* a1, __int8* a2) {
 	return oFunc(a1, a2);
 }
 
-__int64 Hooks::LevelRenderer_renderLevel(__int64 _this, __int64 a2, __int64 a3) {
+__int64 Hooks::LevelRenderer_renderLevel(__int64 _this, __int64 ctx, __int64 a3) {
 	static auto oFunc = g_Hooks.LevelRenderer_renderLevelHook->GetFastcall<__int64, __int64, __int64, __int64>();
 
 	using reloadShit_t = void(__fastcall*)(__int64);
@@ -1332,9 +1337,9 @@ __int64 Hooks::LevelRenderer_renderLevel(__int64 _this, __int64 a2, __int64 a3) 
 			reloadChunk(i[3]);
 	}
 
-	auto ret = oFunc(_this, a2, a3);
+	auto ret = oFunc(_this, ctx, a3);
 
-	DrawUtils::setGameRenderContext(a2);
+	DrawUtils::setGameRenderContext(ctx);
 	moduleMgr->onLevelRender();
 	DrawUtils::setGameRenderContext(0);
 

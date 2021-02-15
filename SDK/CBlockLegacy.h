@@ -61,7 +61,11 @@ private:
 public:
 	C_BlockLegacy** blockLegacy; // 0x10
 
-	inline C_BlockLegacy* toLegacy() { return *blockLegacy; }
+	inline C_BlockLegacy* toLegacy() {
+		if (blockLegacy != nullptr)
+			return *blockLegacy;
+		return nullptr;
+	}
 
 	virtual ~C_Block();
 	virtual int getRenderLayer();

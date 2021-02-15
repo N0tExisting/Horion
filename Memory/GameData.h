@@ -126,6 +126,7 @@ public:
 	static void log(const char* fmt, ...);
 	void checkGameVersion();
 	float fov = 0.f;
+	float FPS = 0.f;
 	int fps = 0;
 	int frameCount = 0;
 	int cpsLeft = 0;

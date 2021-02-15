@@ -118,11 +118,11 @@ void CrystalAura::DestroyC (C_Entity* ent, int range) {
 	}
 }
 
-bool shouldChange = false;
+//bool shouldChange = false;
 void CrystalAura::onTick(C_GameMode* gm) {
-	if (shouldChange) {
-		shouldChange = false;
-	}
+	//if (shouldChange) {
+	//	shouldChange = false;
+	//}
 	this->delay++;
 	if (supplies == nullptr)
 		supplies = g_Data.getLocalPlayer()->getSupplies();
