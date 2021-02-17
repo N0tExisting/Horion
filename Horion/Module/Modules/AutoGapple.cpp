@@ -34,18 +34,15 @@ void AutoGapple::preTick(C_GameMode* gm) {
 }
 
 void AutoGapple::onTick(C_GameMode* gm) {
+	click->rightClickDown = wasClick;
 	if (shouldDisable) {
 		shouldDisable = false;
 		this->setEnabled(false);
 		return;
 	}
-	click->rightClickDown = wasClick;
 }
 
 void AutoGapple::onDisable() {
-	if (prevSlot > -1 && prevSlot < 10)
-		supplies->selectedHotbarSlot = prevSlot;
-	click->rightClickDown = wasClick;
 }
 //Prepare a gapple
 void AutoGapple::PrepareEat() {
@@ -55,14 +52,14 @@ void AutoGapple::PrepareEat() {
 	for (int n = 0; n < 9; n++) {
 		C_ItemStack* stack = inv->getItemStack(n);
 		if (stack->item != nullptr) {
-			if ((*stack->item)->itemId == 322) {
+			if ((*stack->item)->itemId == 322/* && (!found || !PrefEnchant)*/) {
 				slot = n;
 				eatingTime = (*stack->item)->duration;
 				eating = true;
 				if (!PrefEnchant)
 					return;
 				found = true;
-			} else if ((*stack->item)->itemId == 466) {
+			} else if ((*stack->item)->itemId == 466/* && (!found || PrefEnchant)*/) {
 				slot = n;
 				eatingTime = (*stack->item)->duration;
 				eating = true;
@@ -79,6 +76,8 @@ void AutoGapple::Eat() {
 		eating = false;
 		shouldDisable = true;
 		stack = nullptr;
+		if (prevSlot > -1 && prevSlot < 10)
+			supplies->selectedHotbarSlot = prevSlot;
 		return;
 	}
 	supplies->selectedHotbarSlot = slot;
