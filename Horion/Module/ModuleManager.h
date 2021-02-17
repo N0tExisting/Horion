@@ -1,5 +1,5 @@
 #pragma once
-
+#define GAPPLE
 #include <typeinfo>
 #include <vector>
 #include <optional>

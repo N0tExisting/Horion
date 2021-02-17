@@ -332,6 +332,9 @@ void Hooks::Enable() {
 
 void Hooks::GameMode_tick(C_GameMode* _this) {
 	static auto oTick = g_Hooks.GameMode_tickHook->GetFastcall<void, C_GameMode*>();
+
+	moduleMgr->getModule<AutoGapple>()->preTick(_this);
+
 	oTick(_this);
 
 	GameData::updateGameData(_this);

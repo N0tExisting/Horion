@@ -137,10 +137,18 @@ private:
 	virtual bool isTintable(void)const;
 	virtual __int64 buildIdAux(short, const CompoundTag*);
 	virtual __int64 buildDescriptor(short, const CompoundTag*);
+
+public:
 	virtual __int64 use(C_ItemStack&, C_Entity&) const;
+
+private:
 	virtual __int64 dispense(C_BlockSource&, __int64&, int, vec3_t const&, unsigned char) const;
+
+public:
 	virtual __int64 useTimeDepleted(C_ItemStack&, __int64*, C_Entity*) const;
 	virtual __int64 releaseUsing(C_ItemStack&, C_Entity*, int) const;
+
+private:
 	virtual __int64 getDestroySpeed(C_ItemStack const&, C_Block const&) const;
 	virtual __int64 hurtEnemy(__int64&, __int64*, __int64*) const;
 	virtual __int64 hurtEnemy(C_ItemStack&, __int64*, __int64*) const;

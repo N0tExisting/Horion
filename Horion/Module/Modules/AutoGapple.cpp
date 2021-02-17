@@ -17,25 +17,39 @@ void AutoGapple::onEnable() {
 	timeEating = 0;
 }
 
-void AutoGapple::onTick(C_GameMode* gm) {
+void AutoGapple::preTick(C_GameMode* gm) {
 	currHealth = 20;  //replace 20 w/ value from Memory(0x??...??C4)
+	if (click == nullptr)
+		click = *g_Data.getHIDController();
 	if (supplies == nullptr)
 		supplies = g_Data.getLocalPlayer()->getSupplies();
 	if (inv == nullptr)
 		inv = supplies->inventory;
-	if (health >= currHealth && !eating) {
-		AutoGapple::PrepareEat(gm);
-	}else if (eating) {
-		supplies->selectedHotbarSlot = slot;
-		AutoGapple::Eat(gm);
+
+	wasClick = click->rightClickDown;
+	if (health >= currHealth && !eating)
+		AutoGapple::PrepareEat();
+	 else if (eating)
+		AutoGapple::Eat();
+}
+
+void AutoGapple::onTick(C_GameMode* gm) {
+	if (shouldDisable) {
+		shouldDisable = false;
+		this->setEnabled(false);
+		return;
 	}
+	click->rightClickDown = wasClick;
 }
 
 void AutoGapple::onDisable() {
-	supplies->selectedHotbarSlot = prevSlot;
+	if (prevSlot > -1 && prevSlot < 10)
+		supplies->selectedHotbarSlot = prevSlot;
+	click->rightClickDown = wasClick;
 }
 //Prepare a gapple
-void AutoGapple::PrepareEat(C_GameMode* gm) {
+void AutoGapple::PrepareEat() {
+	bool found = false;
 	//loop Hotbar
 	prevSlot = supplies->selectedHotbarSlot;
 	for (int n = 0; n < 9; n++) {
@@ -44,24 +58,32 @@ void AutoGapple::PrepareEat(C_GameMode* gm) {
 			if ((*stack->item)->itemId == 322) {
 				slot = n;
 				eatingTime = (*stack->item)->duration;
-					eating = true;
+				eating = true;
 				if (!PrefEnchant)
 					return;
+				found = true;
 			} else if ((*stack->item)->itemId == 466) {
 				slot = n;
 				eatingTime = (*stack->item)->duration;
-					eating = true;
+				eating = true;
 				if (PrefEnchant)
 					return;
+				found = true;
 			}
 		}
 	}
 }
 
-void AutoGapple::Eat(C_GameMode* gm) {
-	C_ItemStack* stack = inv->getItemStack(slot);
-	(*stack->item)->C_Item::use(*stack, *gm->player);
+void AutoGapple::Eat() {
+	if (timeEating < eatingTime + lagComp) {
+		eating = false;
+		shouldDisable = true;
+		stack = nullptr;
+		return;
+	}
+	supplies->selectedHotbarSlot = slot;
+	click->rightClickDown = true;
+	if (stack == nullptr)
+		stack = inv->getItemStack(slot);
 	timeEating++;
-	if (timeEating < eatingTime + lagComp)
-		eating = false; // TODO: Packet?
 }

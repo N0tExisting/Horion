@@ -52,7 +52,7 @@ bool CanPlaceC(vec3_ti* pos) {
 	g_Data.forEachEntity([](C_Entity* ent, bool b) {
 		if (!space)
 			return;
-		if (ent->aabb.intersects(*new AABB(_pos, 1.f, 1.f)))
+		if (ent->aabb.intersects(*new AABB(_pos, _pos.add(1))))
 			space = false;
 	});
 	return space;
