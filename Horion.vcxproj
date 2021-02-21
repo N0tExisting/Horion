@@ -415,6 +415,7 @@
     <ClCompile Include="SDK\Tag.cpp" />
     <ClCompile Include="SDK\Tessellator.cpp" />
     <ClCompile Include="SDK\TextHolder.cpp" />
+    <ClCompile Include="Horion\Module\Modules\Trajectories.cpp" />
     <ClCompile Include="Utils\Logger.cpp" />
     <ClCompile Include="Utils\SkinUtil.cpp" />
     <ClCompile Include="Utils\Target.cpp" />
@@ -638,6 +639,7 @@
     <ClInclude Include="SDK\Tag.h" />
     <ClInclude Include="SDK\Tessellator.h" />
     <ClInclude Include="SDK\TextHolder.h" />
+    <ClInclude Include="Horion\Module\Modules\Trajectories.h" />
     <ClInclude Include="Utils\ChakraHelper.h" />
     <ClInclude Include="Utils\DllHelper.h" />
     <ClInclude Include="Utils\HMath.h" />

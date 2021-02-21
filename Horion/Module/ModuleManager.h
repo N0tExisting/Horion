@@ -89,6 +89,7 @@
 #include "Modules/Timer.h"
 #include "Modules/Tower.h"
 #include "Modules/Tracer.h"
+#include "Modules/Trajectories.h"
 #include "Modules/TriggerBot.h"
 #include "Modules/Twerk.h"
 #include "Modules/Velocity.h"
