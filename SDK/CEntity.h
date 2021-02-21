@@ -687,7 +687,7 @@ public:
 
 #pragma pack(pop)
 
-class C_ServerPlayer;
+class C_ServerPlayer/* : public C_Player*/;
 
 class C_Player : public C_Entity {
 public:

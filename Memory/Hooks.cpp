@@ -1300,15 +1300,15 @@ int Hooks::BlockLegacy_getRenderLayer(C_BlockLegacy* a1) {
 	return oFunc(a1);
 }
 
-__int8* Hooks::BlockLegacy_getLightEmission(C_BlockLegacy* a1, __int8* a2) {
+__int8* Hooks::BlockLegacy_getLightEmission(C_BlockLegacy* _this, __int8* _EmissionPtr) {
 	static auto oFunc = g_Hooks.BlockLegacy_getLightEmissionHook->GetFastcall<__int8*, C_BlockLegacy*, __int8*>();
 
 	static auto xrayMod = moduleMgr->getModule<Xray>();
 	if (xrayMod->isEnabled()) {
-		*a2 = 15;
-		return a2;
+		*_EmissionPtr = 15;
+		return _EmissionPtr;
 	}
-	return oFunc(a1, a2);
+	return oFunc(_this, _EmissionPtr);
 }
 
 __int64 Hooks::LevelRenderer_renderLevel(__int64 _this, __int64 ctx, __int64 a3) {

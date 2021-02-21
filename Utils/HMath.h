@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <exception>
+#include <vector>
 
 static constexpr float DEG_RAD2 = PI / 360.0f;
 static constexpr float DEG_RAD = 180.0f / PI;
@@ -623,6 +624,29 @@ struct AABB {
 		if (contains(p))
 			return 0.f;
 		return p.dist(ClosestPointAABB(p));
+	}
+
+	std::vector<vec3_t> getCorners() {
+		std::vector<vec3_t> corners;
+		corners.push_back({upper.x, upper.y, upper.z});
+		corners.push_back({lower.x, upper.y, upper.z});
+		corners.push_back({lower.x, upper.y, lower.z});
+		corners.push_back({upper.x, upper.y, upper.z});
+		corners.push_back({upper.x, lower.y, lower.z});
+		corners.push_back({upper.x, lower.y, upper.z});
+		corners.push_back({lower.x, lower.y, lower.z});
+		corners.push_back({lower.x, lower.y, lower.z});
+		return corners;
+	}
+
+	AABB sort() {
+		vec3_t min = {std::min(lower.x, upper.x), std::min(lower.y, upper.y), std::min(lower.z, upper.z)};
+		vec3_t max = {std::max(lower.x, upper.x), std::max(lower.y, upper.y), std::max(lower.z, upper.z)};
+		return AABB(min, max);
+	}
+	void Sort() {
+		lower = {std::min(lower.x, upper.x), std::min(lower.y, upper.y), std::min(lower.z, upper.z)};
+		upper = {std::max(lower.x, upper.x), std::max(lower.y, upper.y), std::max(lower.z, upper.z)};
 	}
 
 	vec3_t ClosestPointAABB(vec3_t p) {

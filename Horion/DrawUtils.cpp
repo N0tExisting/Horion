@@ -610,10 +610,10 @@ void DrawUtils::setGameRenderContext(__int64 ctx) {
 			ticksPerSecond = 1;
 		ElapsedMicroseconds.QuadPart /= Frequency.QuadPart / ticksPerSecond;
 		lerpT = (ElapsedMicroseconds.QuadPart / 1000000.f);
-		if (lerpT > 1)
-			lerpT = 1;
-		else if (lerpT < 0)
-			lerpT = 0;
+		while (lerpT > 1)
+			lerpT--;
+		while (lerpT < 0)
+			lerpT++;
 	}
 }
 float DrawUtils::getLerpTime() {
