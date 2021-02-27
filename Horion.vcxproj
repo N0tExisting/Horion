@@ -237,6 +237,7 @@
   </ItemGroup>
   <ItemGroup>
     <!--<ClCompile Include="Horion\Module\Modules\AutoBucket.cpp" />-->
+    <ClCompile Include="Horion\Module\Modules\AutoRespawn.cpp" />
     <ClCompile Include="Horion\Command\CommandMgr.cpp" />
     <ClCompile Include="Horion\Command\Commands\BindCommand.cpp" />
     <ClCompile Include="Horion\Command\Commands\BruhCommand.cpp" />
@@ -426,6 +427,7 @@
   </ItemGroup>
   <ItemGroup>
     <!--<ClInclude Include="Horion\Module\Modules\AutoBucket.h" />-->
+    <ClInclude Include="Horion\Module\Modules\AutoRespawn.h" />
     <ClInclude Include="Horion\Command\CommandMgr.h" />
     <ClInclude Include="Horion\Command\Commands\BindCommand.h" />
     <ClInclude Include="Horion\Command\Commands\BruhCommand.h" />

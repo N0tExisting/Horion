@@ -444,7 +444,7 @@ __int64 Hooks::RenderText(__int64 a1, C_MinecraftUIRenderContext* renderCtx) {
 			QueryPerformanceCounter(&start);
 		}
 		if (!g_Data.isInjectorConnectionActive()) {
-#ifndef _DEBUG_
+#ifndef _DEBUG
 			_int64 retval = oText(a1, renderCtx);
 #endif
 			LARGE_INTEGER end, elapsed;
@@ -1227,6 +1227,7 @@ float Hooks::LevelRendererPlayer_getFov(__int64 _this, float a2, bool a3) {
 void Hooks::MultiLevelPlayer_tick(C_EntityList* _this) {
 	static auto oTick = g_Hooks.MultiLevelPlayer_tickHook->GetFastcall<void, C_EntityList*>();
 	oTick(_this);
+	moduleMgr->getModule<AutoRespawn>()->onTick(nullptr);
 	GameData::EntityList_tick(_this);
 }
 
@@ -1357,7 +1358,7 @@ void Hooks::ClickFunc(__int64 a1, char mouseButton, char isDown, __int16 mouseX,
 			// isDown = 120 (SCROLL UP)
 			ClickGui::onWheelScroll(isDown > 0);
 		}
-		if (mouseButton != 0)  // Mouse click event
+		if (mouseButton != 0) // Mouse click event
 			return;
 	}
 	return oFunc(a1, mouseButton, isDown, mouseX, mouseY, relativeMovementX, relativeMovementY, a8);
@@ -2087,7 +2088,6 @@ bool Hooks::Mob__isImmobile(C_Entity* ent) {
 void Hooks::InventoryTransactionManager__addAction(C_InventoryTransactionManager* _this, C_InventoryAction& action) {
 	auto func = g_Hooks.InventoryTransactionManager__addActionHook->GetFastcall<void, C_InventoryTransactionManager*, C_InventoryAction&>();
 
-#ifdef TEST_DEBUG
 	char* srcName = "none";
 	if (action.sourceItem.item && *action.sourceItem.item)
 		srcName = (*action.sourceItem.item)->name.getText();
@@ -2095,6 +2095,8 @@ void Hooks::InventoryTransactionManager__addAction(C_InventoryTransactionManager
 	if (action.targetItem.item && *action.targetItem.item)
 		targetName = (*action.targetItem.item)->name.getText();
 	logF("%i %i %i %s %s", action.type, action.slot, action.sourceType, srcName, targetName, action.sourceType);
+
+#ifdef TEST_DEBUG
 
 	/*if(/*action.slot == 14 && action.sourceType == 124 && strcmp(targetName, "none") == 0 && *strcmp(srcName, "stone_shovel") == 0){
 		std::string tag = "{ench:[{id:9s,lvl:1s}]}";

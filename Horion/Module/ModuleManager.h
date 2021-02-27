@@ -20,6 +20,7 @@
 #include "Modules/AutoArmor.h"
 #include "Modules/AutoClicker.h"
 #include "Modules/AutoGapple.h"
+#include "Modules/AutoRespawn.h"
 #include "Modules/AutoSneak.h"
 #include "Modules/AutoSprint.h"
 #include "Modules/AutoTotem.h"

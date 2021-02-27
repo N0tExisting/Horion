@@ -719,11 +719,11 @@ private:
 	virtual __int64 checkMovementStats(vec3_t const &);
 	virtual __int64 unknown20(void) const;
 	virtual __int64 unknown21(void) const;
+
+public:
 	virtual __int64 respawn(void);
 	virtual __int64 resetRot(void);
 	virtual __int64 resetPos(bool);
-
-public:
 	virtual bool isInTrialMode(void);
 	virtual bool hasResource(int);
 
